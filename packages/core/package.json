@@ -1,0 +1,48 @@
+{
+  "name": "@genui/core",
+  "version": "1.0.0",
+  "description": "Contract-driven UI for coding agents. Ship component contracts, let the agent materialize them once, compose screens from them, and gate every step with a deterministic check.",
+  "keywords": [
+    "ui",
+    "design-system",
+    "coding-agent",
+    "claude-code",
+    "cursor",
+    "codex",
+    "copilot",
+    "contracts",
+    "generative-ui",
+    "react"
+  ],
+  "license": "MIT",
+  "author": "Himz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Himz-Hung/Gen-UI"
+  },
+  "homepage": "https://github.com/Himz-Hung/Gen-UI#readme",
+  "bugs": "https://github.com/Himz-Hung/Gen-UI/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "bin": {
+    "fw": "./bin/fw.js"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

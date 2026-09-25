@@ -1,0 +1,22 @@
+{
+  "screen": "CardDetail",
+  "data": { "card": "Card", "cartCount": "number", "qty": "number" },
+  "actions": ["goBack", "openCart", "addToCart", "changeQty"],
+  "root": "page",
+  "elements": {
+    "page":   { "type": "Container", "props": { "maxWidth": "lg" }, "children": ["bar", "body"] },
+    "bar":    { "type": "TopBar", "props": { "title": "Card", "showBack": true, "actions": [{ "icon": "cart", "label": "Cart", "action": "openCart" }] }, "on": { "back": "goBack", "actionPress": "openCart" } },
+    "body":   { "type": "Inline", "props": { "gap": "6", "align": "start", "wrap": true }, "children": ["img", "details"] },
+    "img":    { "type": "Image", "props": { "src": "", "alt": "", "ratio": "5:7", "radius": "lg" } },
+    "details":{ "type": "Stack", "props": { "gap": "3" }, "children": ["name", "meta", "price", "stock", "qty", "add"] },
+    "name":   { "type": "Heading", "props": { "value": "", "level": "1", "size": "xl" } },
+    "meta":   { "type": "Inline", "props": { "gap": "2" }, "children": ["set", "rarity", "condition"] },
+    "set":    { "type": "Text", "props": { "value": "", "color": "muted" } },
+    "rarity": { "type": "Badge", "props": { "label": "", "tone": "primary" } },
+    "condition": { "type": "Badge", "props": { "label": "", "tone": "neutral" } },
+    "price":  { "type": "Stat", "props": { "label": "Price", "value": "" } },
+    "stock":  { "type": "Text", "props": { "value": "", "size": "sm", "color": "muted" } },
+    "qty":    { "type": "Select", "props": { "label": "Quantity", "value": "1", "options": [{ "value": "1", "label": "1" }] }, "on": { "change": "changeQty" } },
+    "add":    { "type": "Button", "props": { "label": "Add to cart", "size": "lg", "icon": "plus" }, "on": { "press": "addToCart" } }
+  }
+}

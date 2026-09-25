@@ -1,0 +1,16 @@
+{
+  "screen": "Home",
+  "data": { "cards": "Card[]", "total": "Money" },
+  "actions": ["openCard"],
+  "root": "page",
+  "elements": {
+    "page":   { "type": "Container", "props": { "maxWidth": "huge" }, "children": ["hero", "outer", "list", "ghost"] },
+    "hero":   { "type": "HeroBanner", "props": { "title": "Hi" } },
+    "outer":  { "type": "Button", "props": { "label": "Outer" }, "children": ["inner"] },
+    "inner":  { "type": "Button", "props": { "variant": "primary" }, "on": { "press": "buyNow", "hover": "openCard" } },
+    "list":   { "type": "List", "children": ["txt"] },
+    "txt":    { "type": "Text", "props": { "value": { "path": "/cards" }, "size": 12, "colour": "red" } },
+    "ghost":  { "type": "Text", "props": { "value": "x" }, "children": ["page"] },
+    "orphan": { "type": "Divider" }
+  }
+}

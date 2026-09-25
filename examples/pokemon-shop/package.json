@@ -1,0 +1,24 @@
+{
+  "name": "pokemon-shop",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@genui/core": "1.0.0",
+    "@genui/rules": "1.0.0",
+    "zustand": "^4.5.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.21"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "node ../../packages/core/bin/fw.js check"
+  }
+}

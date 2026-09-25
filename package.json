@@ -1,0 +1,20 @@
+{
+  "name": "genui-fw",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "fw": "node packages/core/bin/fw.js",
+    "typecheck": "tsc -p packages/core/tsconfig.json --noEmit && tsc -p packages/rules/tsconfig.json --noEmit",
+    "test": "npm run typecheck && cd examples/pokemon-shop && node ../../packages/core/bin/fw.js check && npx tsc -p tsconfig.json && npx vite build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "version": "1.0.0"
+}

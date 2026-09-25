@@ -1,0 +1,17 @@
+{
+  "screen": "Cart",
+  "data": { "cart": "Cart" },
+  "actions": ["openCard", "changeQty", "removeItem", "checkout", "continueShopping"],
+  "root": "page",
+  "elements": {
+    "page":    { "type": "Container", "props": { "maxWidth": "md" }, "children": ["bar", "body"] },
+    "bar":     { "type": "TopBar", "props": { "title": "Your cart", "showBack": true }, "on": { "back": "continueShopping" } },
+    "body":    { "type": "Stack", "props": { "gap": "5" }, "children": ["items", "empty", "summary"] },
+    "items":   { "type": "List", "children": ["row"] },
+    "row":     { "type": "ListItem", "props": { "title": "", "subtitle": "", "trailing": "", "pressable": true }, "on": { "press": "openCard" } },
+    "empty":   { "type": "EmptyState", "props": { "title": "Your cart is empty", "actionLabel": "Continue shopping" }, "on": { "action": "continueShopping" } },
+    "summary": { "type": "Inline", "props": { "justify": "between" }, "children": ["subtotal", "checkout"] },
+    "subtotal":{ "type": "Stat", "props": { "label": "Subtotal", "value": "" } },
+    "checkout":{ "type": "Button", "props": { "label": "Checkout", "size": "lg" }, "on": { "press": "checkout" } }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@genui/rules",
+  "version": "1.0.0",
+  "description": "Shipped UI component contracts for @genui/core (29 platform-neutral contracts: layout, typography, actions, inputs, data display, feedback, navigation, overlay).",
+  "keywords": [
+    "ui",
+    "contracts",
+    "design-system",
+    "genui"
+  ],
+  "license": "MIT",
+  "author": "Himz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Himz-Hung/Gen-UI"
+  },
+  "homepage": "https://github.com/Himz-Hung/Gen-UI#readme",
+  "bugs": "https://github.com/Himz-Hung/Gen-UI/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@genui/core": "^1.0.0"
+  }
+}

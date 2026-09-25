@@ -1,0 +1,1259 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-24T09:41:35.312Z",
+  "components": {
+    "Alert": {
+      "name": "Alert",
+      "category": "feedback",
+      "purpose": "Inline message about the current screen: info, success, warning or error. Not a toast.",
+      "props": {
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "info"
+        },
+        "title": {
+          "kind": "string"
+        },
+        "description": {
+          "kind": "string",
+          "optional": true
+        },
+        "dismissible": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "dismiss": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Alert.tsx"
+      }
+    },
+    "Badge": {
+      "name": "Badge",
+      "category": "data",
+      "purpose": "Small status label (e.g. \"Holo\", \"Out of stock\"). Not interactive.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "neutral",
+            "primary",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "neutral"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Badge.tsx"
+      }
+    },
+    "Button": {
+      "name": "Button",
+      "category": "action",
+      "purpose": "Triggers an action. Not for navigation to another screen — use Link.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "optional": true,
+          "default": "primary"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "icon": {
+          "kind": "string",
+          "optional": true,
+          "description": "icon name shown before the label"
+        },
+        "fullWidth": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": [],
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Button.tsx"
+      }
+    },
+    "Card": {
+      "name": "Card",
+      "category": "data",
+      "purpose": "Bordered surface grouping related content. Optionally pressable as a whole.",
+      "props": {
+        "padding": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "optional": true,
+          "default": "4"
+        },
+        "pressable": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "whole card acts as one target and emits press"
+        },
+        "selected": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": true,
+      "composition": {
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Card.tsx"
+      }
+    },
+    "Checkbox": {
+      "name": "Checkbox",
+      "category": "input",
+      "purpose": "Boolean choice with a label. For a single on/off setting that applies immediately, use Switch.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "checked": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "boolean"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "Container": {
+      "name": "Container",
+      "category": "layout",
+      "purpose": "Constrains content width and centers it on wide screens; adds horizontal page padding on narrow screens. One per screen, at the top of the tree.",
+      "props": {
+        "maxWidth": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "optional": true,
+          "default": "lg",
+          "description": "sm 640, md 768, lg 1024, xl 1280"
+        },
+        "padding": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "4"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Container.tsx"
+      }
+    },
+    "Divider": {
+      "name": "Divider",
+      "category": "layout",
+      "purpose": "Thin separating line between groups of content.",
+      "props": {
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "optional": true,
+          "default": "horizontal"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Divider.tsx"
+      }
+    },
+    "EmptyState": {
+      "name": "EmptyState",
+      "category": "feedback",
+      "purpose": "Shown in place of a list or result that has nothing to show. Explains why and offers one next step.",
+      "props": {
+        "title": {
+          "kind": "string"
+        },
+        "description": {
+          "kind": "string",
+          "optional": true
+        },
+        "icon": {
+          "kind": "string",
+          "optional": true
+        },
+        "actionLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "when present, a primary Button with this label is shown"
+        }
+      },
+      "events": {
+        "action": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/EmptyState.tsx"
+      }
+    },
+    "Grid": {
+      "name": "Grid",
+      "category": "layout",
+      "purpose": "Responsive grid of equal-width cells. Use for product/card listings. Not for tabular data — use Table.",
+      "props": {
+        "minItemWidth": {
+          "kind": "number",
+          "optional": true,
+          "default": 220,
+          "description": "cells are at least this wide (px); column count follows from available width"
+        },
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "4"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Grid.tsx"
+      }
+    },
+    "Heading": {
+      "name": "Heading",
+      "category": "typography",
+      "purpose": "Section or page title. Level is semantic (document outline), size is visual.",
+      "props": {
+        "value": {
+          "kind": "string"
+        },
+        "level": {
+          "kind": "enum",
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "optional": true,
+          "default": "2",
+          "description": "semantic level; exactly one level 1 per screen"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "optional": true,
+          "description": "defaults follow level: 1→xl, 2→lg, 3→md, 4→sm"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Heading.tsx"
+      }
+    },
+    "IconButton": {
+      "name": "IconButton",
+      "category": "action",
+      "purpose": "Compact button showing only an icon. Requires an accessible label.",
+      "props": {
+        "icon": {
+          "kind": "string"
+        },
+        "label": {
+          "kind": "string",
+          "description": "accessible name, not shown visually"
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "ghost",
+            "secondary"
+          ],
+          "optional": true,
+          "default": "ghost"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/IconButton.tsx"
+      }
+    },
+    "Image": {
+      "name": "Image",
+      "category": "media",
+      "purpose": "Displays an image with a fixed aspect ratio and a placeholder while loading.",
+      "props": {
+        "src": {
+          "kind": "string"
+        },
+        "alt": {
+          "kind": "string",
+          "description": "empty string for decorative images"
+        },
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "1:1",
+            "4:3",
+            "3:4",
+            "16:9",
+            "5:7"
+          ],
+          "optional": true,
+          "default": "5:7",
+          "description": "5:7 is a trading card"
+        },
+        "fit": {
+          "kind": "enum",
+          "values": [
+            "cover",
+            "contain"
+          ],
+          "optional": true,
+          "default": "contain"
+        },
+        "radius": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Image.tsx"
+      }
+    },
+    "Inline": {
+      "name": "Inline",
+      "category": "layout",
+      "purpose": "Horizontal arrangement of children with a consistent gap. Wraps onto new lines when out of room unless wrap is false.",
+      "props": {
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "2",
+          "description": "index into tokens.spacing"
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end",
+            "baseline"
+          ],
+          "optional": true,
+          "default": "center"
+        },
+        "justify": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end",
+            "between"
+          ],
+          "optional": true,
+          "default": "start"
+        },
+        "wrap": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Inline.tsx"
+      }
+    },
+    "Input": {
+      "name": "Input",
+      "category": "input",
+      "purpose": "Single-line text entry with label, optional hint and error.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "value": {
+          "kind": "string"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true
+        },
+        "type": {
+          "kind": "enum",
+          "values": [
+            "text",
+            "email",
+            "password",
+            "number",
+            "tel"
+          ],
+          "optional": true,
+          "default": "text"
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "description": "when present the field is in error state and this text is shown"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "required": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "new value on every keystroke"
+        },
+        "submit": {
+          "kind": "void",
+          "description": "Enter / keyboard done"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Input.tsx"
+      }
+    },
+    "Link": {
+      "name": "Link",
+      "category": "action",
+      "purpose": "Navigates to another screen. Not for actions that change data — use Button.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "inline",
+            "standalone"
+          ],
+          "optional": true,
+          "default": "inline",
+          "description": "inline sits in running text; standalone is a block-level nav item"
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void",
+          "description": "the flow decides where it goes; the component never knows a route"
+        }
+      },
+      "children": false,
+      "composition": {
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Link.tsx"
+      }
+    },
+    "List": {
+      "name": "List",
+      "category": "data",
+      "purpose": "Vertical list of ListItem rows separated by dividers. For free-form children use Stack.",
+      "props": {
+        "dense": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {
+        "canContain": [
+          "ListItem"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/List.tsx"
+      }
+    },
+    "ListItem": {
+      "name": "ListItem",
+      "category": "data",
+      "purpose": "One row in a List: title, optional subtitle and trailing text, optionally pressable.",
+      "props": {
+        "title": {
+          "kind": "string"
+        },
+        "subtitle": {
+          "kind": "string",
+          "optional": true
+        },
+        "trailing": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted, e.g. a price"
+        },
+        "pressable": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/ListItem.tsx"
+      }
+    },
+    "Modal": {
+      "name": "Modal",
+      "category": "overlay",
+      "purpose": "Blocking dialog over the current screen. For confirmations use ConfirmDialog (planned); for non-blocking messages use Alert.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "title": {
+          "kind": "string"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        }
+      },
+      "events": {
+        "close": {
+          "kind": "void",
+          "description": "emitted by the close control, Escape, and backdrop press"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "Pagination": {
+      "name": "Pagination",
+      "category": "navigation",
+      "purpose": "Move between pages of a long list.",
+      "props": {
+        "page": {
+          "kind": "number",
+          "description": "1-based current page"
+        },
+        "pageCount": {
+          "kind": "number"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "number",
+          "description": "requested page, 1-based"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Pagination.tsx"
+      }
+    },
+    "SearchBox": {
+      "name": "SearchBox",
+      "category": "input",
+      "purpose": "Text search with a search icon and a clear control. Emits search on submit, not on every keystroke.",
+      "props": {
+        "value": {
+          "kind": "string"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "default": "Search"
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        },
+        "search": {
+          "kind": "string",
+          "description": "committed query"
+        },
+        "clear": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/SearchBox.tsx"
+      }
+    },
+    "Select": {
+      "name": "Select",
+      "category": "input",
+      "purpose": "Pick one option from a short list (≤ 15). For longer lists use SearchBox with results.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "value": {
+          "kind": "string"
+        },
+        "options": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string"
+              }
+            }
+          }
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "error": {
+          "kind": "string",
+          "optional": true
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "selected option value"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Select.tsx"
+      }
+    },
+    "Skeleton": {
+      "name": "Skeleton",
+      "category": "feedback",
+      "purpose": "Loading placeholder shaped like the content it stands in for.",
+      "props": {
+        "shape": {
+          "kind": "enum",
+          "values": [
+            "text",
+            "rect",
+            "circle",
+            "card"
+          ],
+          "optional": true,
+          "default": "rect"
+        },
+        "lines": {
+          "kind": "number",
+          "optional": true,
+          "default": 1,
+          "description": "for shape=text"
+        },
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "1:1",
+            "4:3",
+            "16:9",
+            "5:7"
+          ],
+          "optional": true,
+          "description": "for shape=rect/card"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "Spacer": {
+      "name": "Spacer",
+      "category": "layout",
+      "purpose": "Empty space. Inside Inline with justify=start it pushes following siblings to the far end when grow is true.",
+      "props": {
+        "size": {
+          "kind": "enum",
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "3"
+        },
+        "grow": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Spacer.tsx"
+      }
+    },
+    "Stack": {
+      "name": "Stack",
+      "category": "layout",
+      "purpose": "Vertical arrangement of children with a consistent gap. Use for page sections and form fields. Not for horizontal rows — use Inline.",
+      "props": {
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "3",
+          "description": "index into tokens.spacing"
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end",
+            "stretch"
+          ],
+          "optional": true,
+          "default": "stretch"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Stack.tsx"
+      }
+    },
+    "Stat": {
+      "name": "Stat",
+      "category": "data",
+      "purpose": "One labelled figure, e.g. \"Total · $124.00\". Use in a Grid or Inline for KPI rows.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "value": {
+          "kind": "string",
+          "description": "pre-formatted; the component never formats numbers or currency"
+        },
+        "trend": {
+          "kind": "enum",
+          "values": [
+            "up",
+            "down",
+            "flat"
+          ],
+          "optional": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Stat.tsx"
+      }
+    },
+    "Tabs": {
+      "name": "Tabs",
+      "category": "navigation",
+      "purpose": "Switch between views within the same screen. For moving between screens use the flow and TopBar/BottomNav.",
+      "props": {
+        "tabs": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string"
+              }
+            }
+          }
+        },
+        "value": {
+          "kind": "string"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "Tag": {
+      "name": "Tag",
+      "category": "data",
+      "purpose": "Removable chip, e.g. an active filter. For non-interactive labels use Badge.",
+      "props": {
+        "label": {
+          "kind": "string"
+        },
+        "removable": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        }
+      },
+      "events": {
+        "remove": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "Text": {
+      "name": "Text",
+      "category": "typography",
+      "purpose": "Body text. Not for headings — use Heading.",
+      "props": {
+        "value": {
+          "kind": "string"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "weight": {
+          "kind": "enum",
+          "values": [
+            "regular",
+            "medium",
+            "bold"
+          ],
+          "optional": true,
+          "default": "regular"
+        },
+        "color": {
+          "kind": "enum",
+          "values": [
+            "text",
+            "muted",
+            "primary",
+            "danger"
+          ],
+          "optional": true,
+          "default": "text",
+          "description": "token name"
+        },
+        "truncate": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "single line with ellipsis"
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end"
+          ],
+          "optional": true,
+          "default": "start"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/Text.tsx"
+      }
+    },
+    "TopBar": {
+      "name": "TopBar",
+      "category": "navigation",
+      "purpose": "Screen header: title, optional back control, optional actions. One per screen, first child of the Container or root.",
+      "props": {
+        "title": {
+          "kind": "string"
+        },
+        "showBack": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "actions": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "icon": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string"
+              },
+              "action": {
+                "kind": "string"
+              }
+            }
+          },
+          "optional": true,
+          "default": [],
+          "description": "each renders as an IconButton; action is the action name emitted through the actionPress event"
+        }
+      },
+      "events": {
+        "back": {
+          "kind": "void"
+        },
+        "actionPress": {
+          "kind": "string",
+          "description": "action name from the actions prop"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "react": "ui/TopBar.tsx"
+      }
+    },
+    "PriceTag": {
+      "name": "PriceTag",
+      "category": "composite",
+      "purpose": "TODO: what it is for, and what not to use it for.",
+      "props": {
+        "amount": {
+          "kind": "number"
+        },
+        "currency": {
+          "kind": "enum",
+          "values": [
+            "USD",
+            "EUR"
+          ]
+        },
+        "strike": {
+          "kind": "boolean",
+          "optional": true
+        }
+      },
+      "events": {
+        "click": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "added",
+      "impl": {
+        "react": "src/legacy/PriceTag.tsx"
+      }
+    }
+  }
+}

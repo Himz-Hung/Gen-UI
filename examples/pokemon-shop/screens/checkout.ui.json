@@ -1,0 +1,19 @@
+{
+  "screen": "Checkout",
+  "data": { "cart": "Cart", "email": "string", "address": "string", "emailError": "string", "submitting": "boolean" },
+  "actions": ["goBack", "changeEmail", "changeAddress", "placeOrder"],
+  "root": "page",
+  "elements": {
+    "page":    { "type": "Container", "props": { "maxWidth": "md" }, "children": ["bar", "body"] },
+    "bar":     { "type": "TopBar", "props": { "title": "Checkout", "showBack": true }, "on": { "back": "goBack" } },
+    "body":    { "type": "Stack", "props": { "gap": "5" }, "children": ["form", "divider", "summary", "place"] },
+    "form":    { "type": "Stack", "props": { "gap": "3" }, "children": ["email", "address"] },
+    "email":   { "type": "Input", "props": { "label": "Email", "type": "email", "value": { "path": "/email" }, "error": { "path": "/emailError" }, "required": true }, "on": { "change": "changeEmail" } },
+    "address": { "type": "Input", "props": { "label": "Shipping address", "value": { "path": "/address" }, "required": true }, "on": { "change": "changeAddress" } },
+    "divider": { "type": "Divider" },
+    "summary": { "type": "Inline", "props": { "justify": "between" }, "children": ["count", "subtotal"] },
+    "count":   { "type": "Text", "props": { "value": "", "color": "muted" } },
+    "subtotal":{ "type": "Stat", "props": { "label": "Subtotal", "value": "" } },
+    "place":   { "type": "Button", "props": { "label": "Place order", "size": "lg", "fullWidth": true, "loading": { "path": "/submitting" } }, "on": { "press": "placeOrder" } }
+  }
+}

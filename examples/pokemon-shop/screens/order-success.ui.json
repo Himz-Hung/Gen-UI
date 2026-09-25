@@ -1,0 +1,13 @@
+{
+  "screen": "OrderSuccess",
+  "data": { "order": "Order" },
+  "actions": ["continueShopping"],
+  "root": "page",
+  "elements": {
+    "page":  { "type": "Container", "props": { "maxWidth": "sm" }, "children": ["body"] },
+    "body":  { "type": "Stack", "props": { "gap": "5", "align": "center" }, "children": ["alert", "note", "back"] },
+    "alert": { "type": "Alert", "props": { "tone": "success", "title": "Order placed", "description": "" } },
+    "note":  { "type": "Text", "props": { "value": "", "color": "muted", "align": "center" } },
+    "back":  { "type": "Button", "props": { "label": "Continue shopping", "variant": "secondary" }, "on": { "press": "continueShopping" } }
+  }
+}

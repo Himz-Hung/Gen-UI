@@ -1,0 +1,28 @@
+{
+  "screen": "Home",
+  "data": { "cards": "Card[]", "sets": "CardSet[]", "cartCount": "number", "page": "number", "pageCount": "number", "query": "string" },
+  "actions": ["openCard", "openCart", "search", "filterSet", "changePage", "addToCart"],
+  "root": "page",
+  "elements": {
+    "page":     { "type": "Container", "props": { "maxWidth": "xl" }, "children": ["bar", "body"] },
+    "bar":      { "type": "TopBar", "props": { "title": "PokéCards Shop", "actions": [{ "icon": "cart", "label": "Cart", "action": "openCart" }] }, "on": { "actionPress": "openCart" } },
+    "body":     { "type": "Stack", "props": { "gap": "5" }, "children": ["filters", "grid", "empty", "pager"] },
+    "filters":  { "type": "Inline", "props": { "gap": "3", "wrap": true }, "children": ["search", "setFilter"] },
+    "search":   { "type": "SearchBox", "props": { "value": { "path": "/query" }, "placeholder": "Search cards" }, "on": { "search": "search", "clear": "search" } },
+    "setFilter":{ "type": "Select", "props": { "label": "Set", "value": "", "options": [{ "value": "", "label": "All sets" }], "placeholder": "All sets" }, "on": { "change": "filterSet" } },
+    "grid":     { "type": "Grid", "props": { "minItemWidth": 240, "gap": "4" }, "children": ["cardTile"] },
+    "cardTile": { "type": "Card", "props": { "padding": "3", "pressable": true }, "on": { "press": "openCard" }, "children": ["cardStack"] },
+    "cardStack":{ "type": "Stack", "props": { "gap": "2" }, "children": ["img", "name", "meta", "priceRow"] },
+    "img":      { "type": "Image", "props": { "src": "", "alt": "", "ratio": "5:7", "fit": "contain" } },
+    "name":     { "type": "Heading", "props": { "value": "", "level": "3", "size": "sm" } },
+    "meta":     { "type": "Inline", "props": { "gap": "2" }, "children": ["setName", "rarity", "condition"] },
+    "setName":  { "type": "Text", "props": { "value": "", "size": "sm", "color": "muted", "truncate": true } },
+    "rarity":   { "type": "Badge", "props": { "label": "", "tone": "primary" } },
+    "condition":{ "type": "Badge", "props": { "label": "", "tone": "neutral" } },
+    "priceRow": { "type": "Inline", "props": { "justify": "between" }, "children": ["price", "add"] },
+    "price":    { "type": "Text", "props": { "value": "", "weight": "bold" } },
+    "add":      { "type": "Button", "props": { "label": "Add to cart", "size": "sm", "icon": "plus" }, "on": { "press": "addToCart" } },
+    "empty":    { "type": "EmptyState", "props": { "title": "No cards match", "description": "Try another name or clear the set filter.", "actionLabel": "Clear search" }, "on": { "action": "search" } },
+    "pager":    { "type": "Pagination", "props": { "page": { "path": "/page" }, "pageCount": { "path": "/pageCount" } }, "on": { "change": "changePage" } }
+  }
+}
