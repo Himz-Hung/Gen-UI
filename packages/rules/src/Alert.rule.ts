@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Alert', category: 'feedback',
   purpose: 'Inline message about the current screen: info, success, warning or error. Not a toast.',

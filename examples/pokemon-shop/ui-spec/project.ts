@@ -1,4 +1,4 @@
-import { defineProject } from '@genui/core';
+import { defineProject } from '@himz-genui/core';
 
 export default defineProject({
   name: 'PokéCards Shop',

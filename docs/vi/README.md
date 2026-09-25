@@ -18,7 +18,7 @@ Bạn chỉ chạm ba chỗ: **mô tả app** trong `ui-spec/`, **một câu l�
 Node ≥ 20, project React TypeScript hoặc folder trống.
 
 ```sh
-npm i -D @genui/core @genui/rules
+npm i -D @himz-genui/core @himz-genui/rules
 npx fw init --agent claude --platform react --name "My Shop"
 #            --agent cursor | codex | copilot      --create vite (scaffold Vite trước, chưa thử)
 ```

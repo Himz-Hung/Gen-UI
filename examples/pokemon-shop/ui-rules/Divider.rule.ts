@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Divider', category: 'layout',
   purpose: 'Thin separating line between groups of content.',

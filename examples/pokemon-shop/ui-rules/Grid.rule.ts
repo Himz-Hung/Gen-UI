@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Grid', category: 'layout',
   purpose: 'Responsive grid of equal-width cells. Use for product/card listings. Not for tabular data — use Table.',

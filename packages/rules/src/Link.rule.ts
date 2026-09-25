@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Link', category: 'action',
   purpose: 'Navigates to another screen. Not for actions that change data — use Button.',

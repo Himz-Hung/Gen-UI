@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'SearchBox', category: 'input',
   purpose: 'Text search with a search icon and a clear control. Emits search on submit, not on every keystroke.',

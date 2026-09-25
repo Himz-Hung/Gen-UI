@@ -1,4 +1,4 @@
-// Node-only library surface (what the CLI is built from). Import as '@genui/core/node'.
+// Node-only library surface (what the CLI is built from). Import as '@himz-genui/core/node'.
 export * from './index.ts';
 export { checkSpec } from './check.ts';
 export { checkFlows } from './flowcheck.ts';

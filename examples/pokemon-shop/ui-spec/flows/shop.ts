@@ -1,4 +1,4 @@
-import { defineFlow } from '@genui/core';
+import { defineFlow } from '@himz-genui/core';
 
 export default defineFlow({
   name: 'Shop',

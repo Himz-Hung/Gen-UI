@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Text', category: 'typography',
   purpose: 'Body text. Not for headings — use Heading.',

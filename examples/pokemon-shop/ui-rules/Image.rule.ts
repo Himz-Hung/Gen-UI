@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Image', category: 'media',
   purpose: 'Displays an image with a fixed aspect ratio and a placeholder while loading.',

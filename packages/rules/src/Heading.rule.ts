@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Heading', category: 'typography',
   purpose: 'Section or page title. Level is semantic (document outline), size is visual.',

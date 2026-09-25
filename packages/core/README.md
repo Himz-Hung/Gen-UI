@@ -17,8 +17,8 @@ Two packages:
 
 | package | what |
 |---|---|
-| `@genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
-| `@genui/rules` | 29 platform-neutral component contracts |
+| `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
+| `@himz-genui/rules` | 29 platform-neutral component contracts |
 
 > Status: **1.0.0**, React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
 
@@ -83,7 +83,7 @@ Compared to alternatives:
 Requires Node ≥ 20 and a React + TypeScript project (or an empty folder — see `--create`).
 
 ```sh
-npm i -D @genui/core @genui/rules
+npm i -D @himz-genui/core @himz-genui/rules
 npx fw init --agent claude --platform react --name "My App"
 ```
 
@@ -197,7 +197,7 @@ my-app/
 ### `project.ts`
 
 ```ts
-import { defineProject } from '@genui/core';
+import { defineProject } from '@himz-genui/core';
 
 export default defineProject({
   name: 'PokéCards Shop',
@@ -293,7 +293,7 @@ prose is for behaviour.
 
 ```ts
 // ui-rules/Button.rule.ts (shipped)
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 
 export default defineComponent({
   name: 'Button', category: 'action',
@@ -337,7 +337,7 @@ export default defineComponent({
 | `platform.<name>` | advisory hints for one platform — never a shared rule |
 | `version` | bump to force re-verification of existing implementations |
 
-**Shipped contracts** (`@genui/rules`, 29):
+**Shipped contracts** (`@himz-genui/rules`, 29):
 
 | category | components |
 |---|---|

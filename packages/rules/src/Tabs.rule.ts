@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Tabs', category: 'navigation',
   purpose: 'Switch between views within the same screen. For moving between screens use the flow and TopBar/BottomNav.',

@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'ListItem', category: 'data',
   purpose: 'One row in a List: title, optional subtitle and trailing text, optionally pressable.',

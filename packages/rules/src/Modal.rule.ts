@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Modal', category: 'overlay',
   purpose: 'Blocking dialog over the current screen. For confirmations use ConfirmDialog (planned); for non-blocking messages use Alert.',

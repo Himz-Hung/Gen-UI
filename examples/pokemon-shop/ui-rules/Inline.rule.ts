@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Inline', category: 'layout',
   purpose: 'Horizontal arrangement of children with a consistent gap. Wraps onto new lines when out of room unless wrap is false.',

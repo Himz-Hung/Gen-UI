@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'EmptyState', category: 'feedback',
   purpose: 'Shown in place of a list or result that has nothing to show. Explains why and offers one next step.',

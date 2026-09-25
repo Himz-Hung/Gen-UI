@@ -7,16 +7,16 @@ import { DIRS } from './loader.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-/** Locate the shipped contracts folder: resolve @genui/rules from the consumer project first, then from this repo. */
+/** Locate the shipped contracts folder: resolve @himz-genui/rules from the consumer project first, then from this repo. */
 function shippedRulesDir(root: string): string {
   const candidates: string[] = [];
   try {
     const req = createRequire(join(root, 'package.json'));
-    candidates.push(join(dirname(req.resolve('@genui/rules/package.json')), 'src'));
+    candidates.push(join(dirname(req.resolve('@himz-genui/rules/package.json')), 'src'));
   } catch { /* not installed in consumer */ }
   candidates.push(join(here, '..', '..', 'rules', 'src'));
   const found = candidates.find((p) => existsSync(p));
-  if (!found) throw new Error('Cannot find @genui/rules — install it next to @genui/core');
+  if (!found) throw new Error('Cannot find @himz-genui/rules — install it next to @himz-genui/core');
   return found;
 }
 
@@ -53,7 +53,7 @@ export function init(root: string, o: InitOptions): string[] {
   mkdirSync(join(root, DIRS.screens), { recursive: true });
   mkdirSync(join(specDir, 'components'), { recursive: true });
 
-  w(`${DIRS.spec}/project.ts`, `import { defineProject } from '@genui/core';
+  w(`${DIRS.spec}/project.ts`, `import { defineProject } from '@himz-genui/core';
 
 export default defineProject({
   name: '${o.name ?? 'My App'}',
@@ -68,14 +68,14 @@ export default defineProject({
   guards: [],
 });
 `);
-  w(`${DIRS.spec}/domain.ts`, `import { defineDomain, t } from '@genui/core';
+  w(`${DIRS.spec}/domain.ts`, `import { defineDomain, t } from '@himz-genui/core';
 
 // Business types the screens receive. Referenced by name in screen data, e.g. "Card[]".
 export default defineDomain({
   Example: t.object({ id: t.string(), name: t.string() }),
 });
 `);
-  w(`${DIRS.spec}/flows/main.ts`, `import { defineFlow } from '@genui/core';
+  w(`${DIRS.spec}/flows/main.ts`, `import { defineFlow } from '@himz-genui/core';
 
 export default defineFlow({
   name: 'Main',
@@ -85,7 +85,7 @@ export default defineFlow({
   },
 });
 `);
-  w(`${DIRS.spec}/screens/home.ts`, `import { defineScreen } from '@genui/core';
+  w(`${DIRS.spec}/screens/home.ts`, `import { defineScreen } from '@himz-genui/core';
 
 export default defineScreen({
   name: 'Home',

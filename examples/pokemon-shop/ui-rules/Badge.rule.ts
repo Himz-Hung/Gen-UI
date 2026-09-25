@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Badge', category: 'data',
   purpose: 'Small status label (e.g. "Holo", "Out of stock"). Not interactive.',

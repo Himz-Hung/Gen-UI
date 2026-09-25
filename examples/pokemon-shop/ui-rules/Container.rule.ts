@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Container', category: 'layout',
   purpose: 'Constrains content width and centers it on wide screens; adds horizontal page padding on narrow screens. One per screen, at the top of the tree.',

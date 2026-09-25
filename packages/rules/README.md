@@ -1,10 +1,10 @@
-# @genui/rules
+# @himz-genui/rules
 
-Shipped component contracts for [`@genui/core`](https://www.npmjs.com/package/@genui/core). Install both,
+Shipped component contracts for [`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core). Install both,
 then `npx fw init` copies these files into your project's `ui-rules/`.
 
 ```sh
-npm i -D @genui/core @genui/rules
+npm i -D @himz-genui/core @himz-genui/rules
 ```
 
 29 platform-neutral contracts:

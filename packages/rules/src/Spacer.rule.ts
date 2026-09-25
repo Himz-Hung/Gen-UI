@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Spacer', category: 'layout',
   purpose: 'Empty space. Inside Inline with justify=start it pushes following siblings to the far end when grow is true.',

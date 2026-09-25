@@ -1,4 +1,4 @@
-import { defineDomain, t } from '@genui/core';
+import { defineDomain, t } from '@himz-genui/core';
 
 export default defineDomain({
   Rarity: t.enum(['common', 'uncommon', 'rare', 'holo', 'ultra']),

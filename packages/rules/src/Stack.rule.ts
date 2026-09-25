@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Stack', category: 'layout',
   purpose: 'Vertical arrangement of children with a consistent gap. Use for page sections and form fields. Not for horizontal rows — use Inline.',

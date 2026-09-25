@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Checkbox', category: 'input',
   purpose: 'Boolean choice with a label. For a single on/off setting that applies immediately, use Switch.',

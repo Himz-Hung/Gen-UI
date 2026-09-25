@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Skeleton', category: 'feedback',
   purpose: 'Loading placeholder shaped like the content it stands in for.',

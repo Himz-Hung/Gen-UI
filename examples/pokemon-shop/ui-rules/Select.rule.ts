@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Select', category: 'input',
   purpose: 'Pick one option from a short list (≤ 15). For longer lists use SearchBox with results.',

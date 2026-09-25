@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'TopBar', category: 'navigation',
   purpose: 'Screen header: title, optional back control, optional actions. One per screen, first child of the Container or root.',

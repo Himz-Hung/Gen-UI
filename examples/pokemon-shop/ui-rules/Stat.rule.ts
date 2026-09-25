@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Stat', category: 'data',
   purpose: 'One labelled figure, e.g. "Total · $124.00". Use in a Grid or Inline for KPI rows.',

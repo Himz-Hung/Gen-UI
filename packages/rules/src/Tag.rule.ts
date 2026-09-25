@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Tag', category: 'data',
   purpose: 'Removable chip, e.g. an active filter. For non-interactive labels use Badge.',

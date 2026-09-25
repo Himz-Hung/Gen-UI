@@ -1,4 +1,4 @@
-import { defineScreen } from '@genui/core';
+import { defineScreen } from '@himz-genui/core';
 
 export default defineScreen({
   name: 'Checkout',

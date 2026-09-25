@@ -1,4 +1,4 @@
-import { defineComponent, t } from '@genui/core';
+import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'IconButton', category: 'action',
   purpose: 'Compact button showing only an icon. Requires an accessible label.',
