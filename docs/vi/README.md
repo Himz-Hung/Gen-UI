@@ -15,7 +15,7 @@ Bạn chỉ chạm ba chỗ: **mô tả app** trong `ui-spec/`, **một câu l�
 
 ## 1. Cài
 
-Node ≥ 20, project React TypeScript hoặc folder trống.
+Node ≥ 20, project React TypeScript hoặc folder trống. Package đã có trên npm.
 
 ```sh
 npm i -D @himz-genui/core @himz-genui/rules
@@ -201,7 +201,7 @@ Mọi lệnh tự làm mới `ui.catalog.json` và file chỉ dẫn trước khi
 
 ## 10. Giới hạn 1.0
 
-Chỉ React. `fw verify` kiểm bề mặt. Chưa có `defineShell`, `defineSources`, MCP. `--create` chưa thử.
+Chỉ React. `fw verify` kiểm bề mặt. Chưa có `defineShell`, `defineSources`, MCP. `--create` chưa thử. Đã publish npm 25/09/2026.
 Hứa nhất quán **trong một project**, không hứa hai project ra code giống nhau.
 
 ## 11. Ví dụ

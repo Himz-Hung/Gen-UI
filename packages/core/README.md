@@ -20,7 +20,7 @@ Two packages:
 | `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
 | `@himz-genui/rules` | 29 platform-neutral component contracts |
 
-> Status: **1.0.0**, React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
+> Status: **1.0.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
 
 ---
 
