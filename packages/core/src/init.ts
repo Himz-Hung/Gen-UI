@@ -68,6 +68,18 @@ export default defineProject({
   guards: [],
 });
 `);
+  w(`${DIRS.spec}/app.ts`, `import { defineApp } from '@himz-genui/core';
+
+// The outline: every screen and every component this app uses, by name. Write it first.
+// Screen details go in ui-spec/screens/<name>.ts; flows, specs and screen code may only use names listed here.
+export default defineApp({
+  name: '${o.name ?? 'My App'}',
+  screens: {
+    Home: 'TODO: one line on what this screen is for',
+  },
+  components: ['Container', 'Stack', 'TopBar', 'Heading', 'Text', 'Button'],
+});
+`);
   w(`${DIRS.spec}/domain.ts`, `import { defineDomain, t } from '@himz-genui/core';
 
 // Business types the screens receive. Referenced by name in screen data, e.g. "Card[]".
@@ -75,24 +87,30 @@ export default defineDomain({
   Example: t.object({ id: t.string(), name: t.string() }),
 });
 `);
-  w(`${DIRS.spec}/flows/main.ts`, `import { defineFlow } from '@himz-genui/core';
-
-export default defineFlow({
-  name: 'Main',
-  entry: 'Home',
-  screens: {
-    Home: { on: {} },
-  },
-});
-`);
   w(`${DIRS.spec}/screens/home.ts`, `import { defineScreen } from '@himz-genui/core';
 
+// One file per screen. The file name is the screen name (card-detail.ts → CardDetail),
+// the purpose is in ui-spec/app.ts. Not sure what to write? Ask your agent to draft it.
 export default defineScreen({
-  name: 'Home',
-  purpose: 'TODO',
+  // What does the user see here?
+  shows: ['TODO: e.g. "Top bar with the app name", "List of items: name, price"'],
+
+  // What can the user do here that does NOT change screen? action name → what it does
+  local: {},
+
+  // Special cases: situation → what the screen does. e.g. empty: 'Say there is nothing yet'
+  when: {},
+
+  // Which data does the screen receive? name → type from domain.ts, e.g. { items: 'Example[]' }
   data: {},
-  actions: [],
-  needs: ['TODO: describe what this screen must show and let the user do'],
+
+  // Where can the user go from here, and how? target screen → what the user does
+  // e.g. { Detail: 'tap an item', Home: { how: 'press Done', replace: true } }
+  goTo: {},
+
+  // back: omit = back to the previous screen · false = no back · 'Home' = fallback when there is none
+  // params: what this screen receives when opened, e.g. { itemId: 'string' }
+  // guard: a guard name from project.ts that must pass to open this screen
 });
 `);
   w(`${DIRS.ui}/README.md`, `# ui/

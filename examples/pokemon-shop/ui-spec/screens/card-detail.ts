@@ -1,14 +1,24 @@
 import { defineScreen } from '@himz-genui/core';
 
 export default defineScreen({
-  name: 'CardDetail',
-  purpose: 'Show one card large with all details and let the user add it to the cart.',
-  data: { card: 'Card', cartCount: 'number', qty: 'number' },
-  actions: ['goBack', 'openCart', 'addToCart', 'changeQty'],
-  needs: [
-    'Top bar with back and cart action',
-    'Large card image on the left, details on the right; stacked on narrow screens',
+  shows: [
+    'Top bar with back and a cart action',
+    'Large card image, details beside it',
     'Name, set and year, rarity, condition, price, stock',
-    'Quantity select limited by stock and an add-to-cart button',
+    'Quantity select and an add-to-cart button',
   ],
+  local: {
+    changeQty: 'pick how many copies, limited by stock',
+    addToCart: 'add the chosen quantity to the cart',
+  },
+  when: {
+    'narrow screen': 'stack the image above the details',
+  },
+  data: { card: 'Card', cartCount: 'number', qty: 'number' },
+  params: { cardId: 'string' },
+  goTo: {
+    Cart: 'press the cart action in the top bar',
+  },
+  // Opened from a shared link there is no previous screen: back goes Home.
+  back: 'Home',
 });

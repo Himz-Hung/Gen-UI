@@ -9,17 +9,19 @@ description: Build UI for this project from contracts. Use whenever creating or 
 This project builds UI from contracts (`ui-rules/`, `ui-spec/components/`). Target platform(s): react.
 Design tokens live in `ui-spec/project.ts`. Never hard-code colors, spacing, radius or fonts.
 
-## The six rules
+## The rules
 
-1. **Need a component that is not yet in `ui/`?** Run `fw docs <Name>`, read the contract, write the implementation into `ui/<Name>.<ext>`, then run `fw verify <Name>` until it passes. Never write a component anywhere else. Never rewrite one that already exists in `ui/`.
-2. **Building a screen?** Write `screens/<name>.ui.json` first (see `ui-spec/screens/<name>.ts` for what it needs). No code yet.
-3. **Specs only use names from `ui.catalog.json`.** Run `fw check screens/<name>.ui.json` until it passes. Props are literals or `{ "path": "/dataName" }`; events map to action names declared in the screen — never code.
-4. **Compose the screen in `src/screens/<Name>Screen.tsx` from `ui/` only.** No raw markup/widgets outside `ui/`. Run `fw check src/screens/<Name>Screen.tsx`. App shell (router, store, main) lives in `src/` outside `screens/` and is hand-written.
-5. **Tokens** come from `ui-spec/project.ts`.
-6. **Navigation** follows `ui-spec/flows/`. Do not invent routes. `fw check ui-spec/flows` checks them.
+1. **`ui-spec/app.ts` is the outline.** Only the screens and components listed there exist for this app. Need a new screen or component? Add its name to the outline first (a new component also needs a contract), then `fw check ui-spec/app.ts`. When `fw check` says *Did you mean …?* and it is a typo, fix the name; do not add the misspelled one.
+2. **Screen in the outline with no `ui-spec/screens/<name>.ts` yet?** Draft it from its purpose in `ui-spec/app.ts`, `ui-spec/domain.ts` and the screens around it: `shows` (what the user sees), `local` (actions that stay on the screen), `when` (empty / loading / error / disabled cases), `data`, `goTo` (target screen → how the user gets there), `back`, `params`. If `data` or `params` need a type that `ui-spec/domain.ts` does not declare yet, draft that type too (`t.object`, `t.array`, `t.ref`; values shown as text are pre-formatted strings such as `priceLabel: t.string()`). Run `fw check ui-spec/screens`, then **show the drafts (screen and any new types) to the user and wait for approval** before writing its spec.
+3. **Need a component that is not yet in `ui/`?** Run `fw docs <Name>`, read the contract, write the implementation into `ui/<Name>.<ext>`, then run `fw verify <Name>` until it passes. Never write a component anywhere else. Never rewrite one that already exists in `ui/`.
+4. **Building a screen?** Write `screens/<name>.ui.json` first, from `ui-spec/screens/<name>.ts`. No code yet.
+5. **Specs only use names from `ui.catalog.json`.** Run `fw check screens/<name>.ui.json` until it passes. Props are literals or `{ "path": "/dataName" }`; events map to the screen's actions — never code. Actions are: `go<Target>` for each `goTo` (or its `action`), each `local` key, and `goBack` unless `back: false` or first screen. Do not repeat `data` / `actions` in the spec when the description has them.
+6. **Compose the screen in `src/screens/<Name>Screen.tsx` from `ui/` only.** No raw markup/widgets outside `ui/`. Run `fw check src/screens/<Name>Screen.tsx`. App shell (router, store, main) lives in `src/` outside `screens/` and is hand-written.
+7. **Tokens** come from `ui-spec/project.ts`.
+8. **Navigation** follows `goTo` / `back` / `params` in `ui-spec/screens/*.ts` (or `ui-spec/flows/` in older projects). Do not invent routes. `fw check ui-spec/screens` checks them.
 
-Before finishing, run `fw check` with no arguments: it checks everything.
-If a needed component has no contract, write one in `ui-spec/components/<Name>.rule.ts` (compose from existing primitives), then follow rule 1. Every `fw` command refreshes the catalog.
+Before finishing, run `fw check` with no arguments: it checks everything and prints what is still to do for each outline entry.
+If a needed component has no contract, write one in `ui-spec/components/<Name>.rule.ts` (compose from existing primitives), then follow the rule for a component not yet in `ui/`. Every `fw` command refreshes the catalog.
 
 ## Catalog (names only — read details with `fw docs <Name>`)
 
@@ -36,5 +38,5 @@ If a needed component has no contract, write one in `ui-spec/components/<Name>.r
 
 ## Commands
 
-`fw docs <Name>` · `fw verify <Name>` · `fw check <spec.ui.json>` · `fw check <Screen.tsx>` · `fw check` (everything)
+`fw docs <Name>` · `fw verify <Name>` · `fw check ui-spec/app.ts` · `fw check <spec.ui.json>` · `fw check <Screen.tsx>` · `fw check` (everything)
 <!-- fw:end -->

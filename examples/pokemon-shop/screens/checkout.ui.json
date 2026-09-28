@@ -1,7 +1,6 @@
 {
   "screen": "Checkout",
   "data": { "cart": "Cart", "email": "string", "address": "string", "emailError": "string", "submitting": "boolean" },
-  "actions": ["goBack", "changeEmail", "changeAddress", "placeOrder"],
   "root": "page",
   "elements": {
     "page":    { "type": "Container", "props": { "maxWidth": "md" }, "children": ["bar", "body"] },

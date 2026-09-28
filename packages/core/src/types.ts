@@ -88,6 +88,16 @@ export function parseTypeString(s: string): TypeNode {
   return { kind: 'ref', ref: trimmed };
 }
 
+/** Every domain type name a type refers to, at any depth: Cart[] → Cart, { items: CartItem[] } → CartItem. */
+export function refsIn(node: TypeNode): string[] {
+  switch (node.kind) {
+    case 'ref': return [node.ref!];
+    case 'array': return refsIn(node.of!);
+    case 'object': return Object.values(node.fields ?? {}).flatMap(refsIn);
+    default: return [];
+  }
+}
+
 /** Structural equality of two types, ignoring optional/default/description. */
 export function sameType(a: TypeNode, b: TypeNode): boolean {
   if (a.kind !== b.kind) return false;

@@ -1,7 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { Catalog, ComponentContract, DomainTypes, FlowConfig, ProjectConfig, ScreenDescription, ScreenSpec, CatalogEntry } from './define.ts';
+import type { AppOutline, Catalog, ComponentContract, DomainTypes, FlowConfig, ProjectConfig, ScreenDescription, ScreenSpec, CatalogEntry } from './define.ts';
+import { toScreenInfo, type ScreenInfo } from './screens.ts';
 
 export const DIRS = {
   rules: 'ui-rules',
@@ -36,23 +37,30 @@ function listFiles(dir: string, suffix: string): string[] {
 export interface Project {
   root: string;
   config: ProjectConfig;
+  /** ui-spec/app.ts, when the project has one. Absent = outline checks are skipped (1.0 projects). */
+  app?: AppOutline;
   domain: DomainTypes;
   flows: FlowConfig[];
-  descriptions: ScreenDescription[];
+  /** ui-spec/screens/*.ts, both formats, normalized */
+  screens: ScreenInfo[];
   contracts: Map<string, { contract: ComponentContract; source: CatalogEntry['source']; file: string }>;
 }
 
 export async function loadProject(root = findRoot()): Promise<Project> {
   const specDir = join(root, DIRS.spec);
   const config = await importDefault<ProjectConfig>(join(specDir, 'project.ts'));
+  const appFile = join(specDir, 'app.ts');
+  const app = existsSync(appFile) ? await importDefault<AppOutline>(appFile) : undefined;
   const domainFile = join(specDir, 'domain.ts');
   const domain = existsSync(domainFile) ? await importDefault<DomainTypes>(domainFile) : {};
 
   const flows: FlowConfig[] = [];
   for (const f of listFiles(join(specDir, 'flows'), '.ts')) flows.push(await importDefault<FlowConfig>(f));
 
-  const descriptions: ScreenDescription[] = [];
-  for (const f of listFiles(join(specDir, 'screens'), '.ts')) descriptions.push(await importDefault<ScreenDescription>(f));
+  const entry = app ? Object.keys(app.screens)[0] : undefined;
+  const screens: ScreenInfo[] = [];
+  for (const f of listFiles(join(specDir, 'screens'), '.ts'))
+    screens.push(toScreenInfo(await importDefault<ScreenDescription>(f), relative(root, f), entry));
 
   const contracts: Project['contracts'] = new Map();
   const load = async (dir: string, source: CatalogEntry['source']) => {
@@ -70,7 +78,7 @@ export async function loadProject(root = findRoot()): Promise<Project> {
   await load(join(specDir, 'components'), 'project');
   await load(join(specDir, 'added'), 'added');
 
-  return { root, config, domain, flows, descriptions, contracts };
+  return { root, config, app, domain, flows, screens, contracts };
 }
 
 export function readCatalog(root: string): Catalog | null {

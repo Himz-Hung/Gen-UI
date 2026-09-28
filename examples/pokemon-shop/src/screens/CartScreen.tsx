@@ -10,19 +10,19 @@ import { Stat } from '../../ui/Stat';
 import { Button } from '../../ui/Button';
 import { useStore, type Cart } from '../store';
 
-export function CartScreen({ cart, onOpenCard, onCheckout, onContinueShopping }: { cart: Cart; onOpenCard: (id: string) => void; onCheckout: () => void; onContinueShopping: () => void }) {
+export function CartScreen({ cart, onGoCardDetail, onGoCheckout, onGoHome }: { cart: Cart; onGoCardDetail: (id: string) => void; onGoCheckout: () => void; onGoHome: () => void }) {
   const setQty = useStore((s) => s.setQty);
   const remove = useStore((s) => s.remove);
   return (
     <Container maxWidth="md">
-      <TopBar title="Your cart" showBack onBack={onContinueShopping} />
+      <TopBar title="Your cart" showBack onBack={onGoHome} />
       <Stack gap="5">
         {cart.items.length === 0 ? (
-          <EmptyState title="Your cart is empty" description="Cards you add will show up here." actionLabel="Continue shopping" onAction={onContinueShopping} />
+          <EmptyState title="Your cart is empty" description="Cards you add will show up here." actionLabel="Continue shopping" onAction={onGoHome} />
         ) : (
           <List>
             {cart.items.map((i) => (
-              <ListItem key={i.card.id} title={`${i.card.name} × ${i.qty}`} subtitle={`${i.card.set.name} · ${i.card.condition} · ${i.card.priceLabel} each`} trailing={i.lineTotalLabel} pressable onPress={() => onOpenCard(i.card.id)} />
+              <ListItem key={i.card.id} title={`${i.card.name} × ${i.qty}`} subtitle={`${i.card.set.name} · ${i.card.condition} · ${i.card.priceLabel} each`} trailing={i.lineTotalLabel} pressable onPress={() => onGoCardDetail(i.card.id)} />
             ))}
           </List>
         )}
@@ -39,7 +39,7 @@ export function CartScreen({ cart, onOpenCard, onCheckout, onContinueShopping }:
         )}
         <Inline justify="between" align="end">
           <Stat label="Subtotal" value={cart.subtotalLabel} hint={`${cart.count} item${cart.count === 1 ? '' : 's'}`} />
-          <Button label="Checkout" size="lg" disabled={cart.items.length === 0} onPress={onCheckout} />
+          <Button label="Checkout" size="lg" disabled={cart.items.length === 0} onPress={onGoCheckout} />
         </Inline>
       </Stack>
     </Container>

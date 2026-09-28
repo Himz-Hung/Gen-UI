@@ -1,4 +1,4 @@
-// Minimal router implementing ui-spec/flows/shop.ts. Screen names and params come from the flow;
+// Minimal router implementing the goTo / back / params of ui-spec/screens/*.ts. Screen names and params come from there;
 // URL shape is an implementation detail.
 import { useEffect, useState } from 'react';
 

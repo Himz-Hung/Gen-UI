@@ -1,16 +1,34 @@
 import { defineScreen } from '@himz-genui/core';
 
 export default defineScreen({
-  name: 'Home',
-  purpose: 'Browse and search the card catalog, open a card, jump to the cart.',
-  data: { cards: 'Card[]', sets: 'CardSet[]', cartCount: 'number', page: 'number', pageCount: 'number', query: 'string' },
-  actions: ['openCard', 'openCart', 'search', 'filterSet', 'changePage', 'addToCart'],
-  needs: [
+  // What does the user see here?
+  shows: [
     'Top bar with the shop name and a cart action showing how many items are in the cart',
     'Search box and a set filter side by side',
     'Responsive grid of cards: image, name, set, rarity badge, condition, price, add-to-cart button',
-    'Out-of-stock cards show a badge and a disabled button',
-    'Empty state when nothing matches the search',
     'Pagination below the grid',
   ],
+
+  // What can the user do here that does NOT change screen?
+  local: {
+    search: 'search cards by name',
+    filterSet: 'show only one card set',
+    changePage: 'go to another page of results',
+    addToCart: 'add one copy of a card to the cart',
+  },
+
+  // Special cases
+  when: {
+    'card out of stock': 'show an out-of-stock badge and disable its add-to-cart button',
+    'nothing matches': 'show an empty state that clears the search',
+  },
+
+  // Which data does the screen receive? Types come from domain.ts
+  data: { cards: 'Card[]', sets: 'CardSet[]', cartCount: 'number', page: 'number', pageCount: 'number', query: 'string' },
+
+  // Where can the user go from here, and how?
+  goTo: {
+    CardDetail: 'tap a card',
+    Cart: 'press the cart action in the top bar',
+  },
 });

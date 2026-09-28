@@ -20,7 +20,7 @@ import { useStore } from '../store';
 const PAGE_SIZE = 8;
 const RARITY_TONE = { common: 'neutral', uncommon: 'neutral', rare: 'primary', holo: 'primary', ultra: 'warning' } as const;
 
-export function HomeScreen({ cartCount, onOpenCard, onOpenCart }: { cartCount: number; onOpenCard: (id: string) => void; onOpenCart: () => void }) {
+export function HomeScreen({ cartCount, onGoCardDetail, onGoCart }: { cartCount: number; onGoCardDetail: (id: string) => void; onGoCart: () => void }) {
   const add = useStore((s) => s.add);
   const [draft, setDraft] = useState('');
   const [query, setQuery] = useState('');
@@ -34,7 +34,7 @@ export function HomeScreen({ cartCount, onOpenCard, onOpenCart }: { cartCount: n
 
   return (
     <Container maxWidth="xl">
-      <TopBar title="PokéCards Shop" actions={[{ icon: 'cart', label: `Cart (${cartCount})`, action: 'openCart' }]} onActionPress={() => onOpenCart()} />
+      <TopBar title="PokéCards Shop" actions={[{ icon: 'cart', label: `Cart (${cartCount})`, action: 'goCart' }]} onActionPress={() => onGoCart()} />
       <Stack gap="5">
         <Inline gap="3" align="end" wrap>
           <SearchBox value={draft} placeholder="Search cards" onChange={setDraft} onSearch={search} onClear={() => search('')} />
@@ -43,7 +43,7 @@ export function HomeScreen({ cartCount, onOpenCard, onOpenCart }: { cartCount: n
         {cards.length > 0 ? (
           <Grid minItemWidth={240} gap="4">
             {cards.map((c) => (
-              <Card key={c.id} padding="3" pressable onPress={() => onOpenCard(c.id)}>
+              <Card key={c.id} padding="3" pressable onPress={() => onGoCardDetail(c.id)}>
                 <Stack gap="2">
                   <Image src={c.imageUrl} alt="" ratio="5:7" />
                   <Heading value={c.name} level="3" size="sm" />

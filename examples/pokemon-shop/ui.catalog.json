@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-25T03:00:10.718Z",
+  "generatedAt": "2026-09-28T08:59:46.272Z",
   "components": {
     "Alert": {
       "name": "Alert",
@@ -670,9 +670,7 @@
       },
       "version": 1,
       "source": "rules",
-      "impl": {
-        "react": "ui/Link.tsx"
-      }
+      "impl": {}
     },
     "List": {
       "name": "List",
@@ -962,9 +960,7 @@
       "composition": {},
       "version": 1,
       "source": "rules",
-      "impl": {
-        "react": "ui/Spacer.tsx"
-      }
+      "impl": {}
     },
     "Stack": {
       "name": "Stack",

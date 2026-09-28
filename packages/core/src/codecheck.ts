@@ -3,14 +3,16 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve, dirname } from 'node:path';
 import { Report } from './diagnostics.ts';
 import { DIRS } from './loader.ts';
+import { notInOutline } from './appcheck.ts';
+import type { AppOutline } from './define.ts';
 
 /**
  * Screens may only compose components from ui/. Any capitalized JSX tag in a
  * screen file must be imported from a path that resolves under ui/.
  * Lowercase (raw) markup is an error outside ui/.
  */
-/** `dirs` may be folders or single .tsx/.jsx files, relative to root. */
-export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = []): Report[] {
+/** `dirs` may be folders or single .tsx/.jsx files, relative to root. With `outline`, tags must also be listed in ui-spec/app.ts. */
+export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }): Report[] {
   const reports: Report[] = [];
   const uiDir = resolve(root, DIRS.ui);
   const allowed = allowedImpl.map((p) => resolve(root, p).replace(/\.(tsx|ts|jsx|js)$/, ''));
@@ -42,6 +44,8 @@ export function checkCode(root: string, dirs = ['src/screens', 'screens'], allow
         else if (!fromUi.has(tag.split('.')[0])) {
           const from = fromElsewhere.get(tag.split('.')[0]);
           r.error(where, from ? `imported from "${from}", which is not ui/ or a registered impl` : 'not imported from ui/ (locally defined component?) — move it to ui/ and verify it');
+        } else if (outline && !outline.app.components.includes(tag.split('.')[0])) {
+          r.error(where, notInOutline(tag.split('.')[0], outline.app, outline.hasContract));
         }
       }
       n.forEachChild(visit);

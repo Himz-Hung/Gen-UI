@@ -28,10 +28,10 @@ Sinh ra:
 | Đường dẫn | Là gì | Ai sửa |
 |---|---|---|
 | `ui-rules/*.rule.ts` | 29 hợp đồng ship sẵn | không — override trong `ui-spec/components/` |
+| `ui-spec/app.ts` | outline: mọi màn và component, theo tên | **bạn**, viết đầu tiên |
 | `ui-spec/project.ts` | tên, nền tảng, agent, token, guard | **bạn** |
 | `ui-spec/domain.ts` | kiểu dữ liệu nghiệp vụ | **bạn** |
-| `ui-spec/flows/*.ts` | màn nào đi đâu khi action gì | **bạn** |
-| `ui-spec/screens/*.ts` | mô tả từng màn | **bạn** |
+| `ui-spec/screens/*.ts` | mỗi màn một file: thấy gì, làm được gì, đi tới đâu | **bạn** (hoặc agent viết nháp để bạn duyệt) |
 | `ui-spec/components/` | hợp đồng thêm | bạn / agent |
 | `ui-spec/added/` | hợp đồng từ `fw add` | sinh, sửa được |
 | `ui/` | code component | **agent**, qua `fw verify` |
@@ -41,6 +41,25 @@ Sinh ra:
 | `ui.catalog.json`, file chỉ dẫn agent | sinh tự động mỗi lần chạy `fw` | không |
 
 ## 2. Mô tả app trong `ui-spec/`
+
+**`app.ts`**: outline, viết **đầu tiên**. Liệt kê toàn bộ màn (mỗi màn một dòng mục đích) và toàn bộ
+component app sẽ dùng. Mọi file khác (mô tả màn, spec, code màn) chỉ được dùng tên có ở đây.
+
+```ts
+export default defineApp({
+  name: 'PokéCards Shop',
+  screens: {
+    Home: 'Duyệt và tìm thẻ, mở một thẻ, nhảy sang giỏ',
+    Cart: 'Xem giỏ, đổi số lượng, sang checkout',
+  },
+  components: ['Container', 'Stack', 'TopBar', 'List', 'ListItem', 'Button', 'EmptyState', 'Stat'],
+});
+```
+
+Mục có trong outline mà chưa làm chi tiết **không phải lỗi**. `fw check` in ra dòng tiến độ, ví dụ
+`spec 1/3   todo: CardDetail, Cart`. Gõ sai tên ở đâu thì `fw check` gợi ý tên đúng (`itemlisst` →
+*Did you mean "ListItem"?*, `stat` → *Wrong case: it is "Stat"*). Không có `app.ts` thì bỏ qua check
+outline, project 1.0 vẫn chạy như cũ. Chốt: `npx fw check ui-spec/app.ts`.
 
 **`project.ts`** — token và cấu hình. Component đọc token qua `ui/tokens.ts`, đổi ở đây là đổi hết.
 
@@ -53,7 +72,7 @@ export default defineProject({
     radius:  { sm: 4, md: 8, lg: 16, full: 9999 },
     font:    { body: 'Inter', heading: 'Inter' },
   },
-  guards: ['requireCartNotEmpty'],                // flow chỉ gọi tên; thân viết tay
+  guards: ['requireCartNotEmpty'],                // màn chỉ gọi tên qua guard; thân viết tay
 });
 ```
 
@@ -69,37 +88,71 @@ export default defineDomain({
 Hệ kiểu `t`: `string number boolean`, `enum([...])`, `ref('Tên')`, `array(x)`, `object({...})`,
 `.opt()` bỏ trống được, `.def(v)` mặc định, `.desc('...')` mô tả cho agent.
 
-**`flows/shop.ts`** — điều hướng. Action không có trong `on` là action nội bộ, không cần khai.
+**`screens/cart.ts`**: mô tả một màn. Mỗi màn một file, **tên file là tên màn** (`card-detail.ts` là
+`CardDetail`), mục đích màn đã có ở `app.ts`. Mỗi field trả lời một câu hỏi:
 
 ```ts
-export default defineFlow({
-  name: 'Shop', entry: 'Home',
-  screens: {
-    Home:     { on: { openCard: { go: 'CardDetail', params: { cardId: 'string' } }, openCart: { go: 'Cart' } } },
-    CardDetail: { params: { cardId: 'string' }, back: 'Home', on: { goBack: { back: true } } },
-    Cart:     { back: 'Home', on: { checkout: { go: 'Checkout' } } },
-    Checkout: { guard: 'requireCartNotEmpty', on: { placeOrder: { go: 'OrderSuccess', mode: 'replace', params: { orderId: 'string' } } } },
+export default defineScreen({
+  // Người dùng thấy gì trên màn này?
+  shows: ['Mỗi món: ảnh nhỏ, tên, số lượng, thành tiền, nút xoá', 'Tạm tính và nút checkout'],
+
+  // Làm được gì mà KHÔNG chuyển màn? tên action → làm gì
+  local: { changeQty: 'đổi số lượng một món', removeItem: 'xoá một món' },
+
+  // Trường hợp đặc biệt: tình huống → màn làm gì
+  when: { 'giỏ trống': 'hiện empty state có nút "Continue shopping"; checkout bị khoá' },
+
+  // Màn nhận dữ liệu gì? Kiểu lấy từ domain.ts
+  data: { cart: 'Cart' },
+
+  // Từ đây đi được tới đâu, bằng cách nào? màn đích → người dùng làm gì
+  goTo: {
+    CardDetail: 'bấm vào một món',
+    Checkout: 'bấm Checkout',
+    Home: { how: 'bấm Continue shopping', replace: true },
   },
 });
 ```
 
-**`screens/home.ts`** — mô tả màn. `data` và `actions` là những tên duy nhất agent được bind.
+| Field | Nghĩa | Bắt buộc |
+|---|---|---|
+| `shows` | người dùng thấy gì (tiếng người) | có |
+| `local` | action không chuyển màn: tên → mô tả | không |
+| `when` | trường hợp đặc biệt: tình huống → nên hiển thị gì | không |
+| `data` | dữ liệu màn nhận: tên → kiểu (`"Card[]"`) | không |
+| `goTo` | màn đích → cách đi: một chuỗi, hoặc `{ how, action?, replace?, modal? }` | không |
+| `back` | không ghi = về màn trước · `false` = không có back · `'Home'` = về Home nếu không có màn trước | không |
+| `params` | tham số màn nhận khi được mở; **chỉ khai ở màn nhận**, màn gọi không khai lại | không |
+| `guard` | guard trong `project.ts` phải thỏa mới được vào màn | không |
 
-```ts
-export default defineScreen({
-  name: 'Home',
-  purpose: 'Duyệt và tìm thẻ, mở một thẻ, nhảy sang giỏ.',
-  data: { cards: 'Card[]', cartCount: 'number', page: 'number', pageCount: 'number' },
-  actions: ['openCard', 'openCart', 'search', 'changePage', 'addToCart'],
-  needs: ['Top bar có tên shop và nút giỏ', 'Grid thẻ: ảnh, tên, badge độ hiếm, giá, nút thêm', 'Pagination dưới grid'],
-});
-```
+**Điều hướng nằm luôn trong từng màn**, không còn file flow riêng:
 
-Chốt: `npx fw check ui-spec/flows`.
+- Mỗi màn đích trong `goTo` sinh ra một action `go<Tên màn>` (`goCheckout`). Muốn đặt tên khác (khi action
+  làm nhiều việc hơn là chuyển màn) thì dùng `action`: `OrderSuccess: { how: 'bấm Place order', action: 'placeOrder', replace: true }`.
+- Mọi màn tự có `goBack`, trừ màn đầu tiên trong outline và màn có `back: false`.
+- Action của màn = action từ `goTo` + key của `local` + `goBack`. Spec chỉ được bind các action này và không
+  phải khai lại.
+- Màn đầu tiên trong `app.ts` là màn mở đầu. Màn không có `goTo` nào dẫn tới thì bị báo là không tới được.
+- `fw check` in ra sơ đồ điều hướng suy từ các `goTo`/`back` để bạn nhìn tổng thể.
+
+**Không biết viết gì?** Chỉ cần viết outline, rồi nhờ agent (*"Viết nháp mô tả màn Cart cho tôi duyệt"*).
+Agent viết nháp `ui-spec/screens/<tên>.ts`, **kèm luôn kiểu dữ liệu còn thiếu trong `domain.ts`**, chạy `fw check`,
+rồi đưa bạn duyệt cả hai trước khi làm spec. Việc chờ duyệt là chỉ dẫn trong rule của agent; `fw check` không ép
+được bước này. Kiểu được dùng mà chưa khai hiện ở dòng tiến độ `domain   todo: Cart, CartItem`.
+
+`shows`, `local`, `when` là để agent đọc. `fw check` kiểm cấu trúc và mọi cái tên (màn đích, action,
+kiểu, guard), gõ sai có gợi ý *Did you mean*. Chốt: `npx fw check ui-spec/screens`.
+
+**Project 1.0** (mô tả màn có `name` / `purpose` / `actions` / `needs` và file `ui-spec/flows/*.ts`) vẫn
+chạy như cũ. Chỉ không được dùng lẫn cho cùng một màn.
 
 ## 3. Gọi agent
 
 > Làm màn Home theo ui-spec/screens/home.ts
+
+hoặc, khi mới có outline:
+
+> Viết nháp mô tả màn Cart cho tôi duyệt
 
 Agent đọc file chỉ dẫn sinh ra và tự đi hết Pha A, Pha B, lặp sửa tới khi mọi cửa kiểm pass. Bạn
 chỉ theo dõi.
@@ -156,19 +209,22 @@ Lỗi khi có `<div>`, import component ngoài, hay khai component ngay trong fi
 npx fw check
 ```
 
-Chạy lần lượt: mọi component trong `ui/`, mọi spec, flow, mọi màn trong `src/screens/`. Dòng cuối
-`N failed, M passed`. Exit `0` sạch, `1` có lỗi, `2` dùng sai. Dùng thẳng trong CI.
+Chạy lần lượt: outline, mọi component trong `ui/`, mọi spec, mô tả màn và điều hướng, mọi màn trong
+`src/screens/`. Sau đó in tiến độ từng mục trong outline (đã mô tả, có spec, có code, component đã có trong
+`ui/`) và sơ đồ điều hướng,
+dòng cuối `N failed, M passed`. Exit `0` sạch, `1` có lỗi, `2` dùng sai. Dùng thẳng trong CI.
 
 ## 7. Tình huống thường gặp
 
 | Tình huống | Làm gì |
 |---|---|
 | Team đã có component | `npx fw add src/legacy/PriceTag.tsx` — sinh hợp đồng trỏ về file gốc, không copy |
+| Thêm màn / component mới | thêm tên vào `ui-spec/app.ts` trước, rồi mới làm chi tiết |
 | Cần component chưa có hợp đồng | viết `ui-spec/components/<Name>.rule.ts`, rồi Pha A |
 | Muốn đổi hợp đồng ship sẵn | tạo file cùng `name` trong `ui-spec/components/`, không sửa `ui-rules/` |
 | Đổi màu / font | sửa `project.ts`; mọi lệnh `fw` tự sync |
 | Nâng version hợp đồng | tăng `version`; `impl` cũ bị xoá, phải `fw verify` lại |
-| Chỉ kiểm một phần | `fw check screens/` · `fw check src/screens/` · `fw check ui-spec/flows` |
+| Chỉ kiểm một phần | `fw check ui-spec/app.ts` · `fw check screens/` · `fw check src/screens/` · `fw check ui-spec/screens` |
 
 ## 8. Bảng lệnh
 
@@ -177,7 +233,7 @@ Chạy lần lượt: mọi component trong `ui/`, mọi spec, flow, mọi màn 
 | `fw init --agent … --platform … [--name] [--create]` | bạn | khởi tạo |
 | `fw add <file.tsx> [--name]` | bạn | đăng ký component sẵn có |
 | `fw check` | bạn / CI | kiểm hết |
-| `fw check <path…>` | agent | kiểm spec, file màn, folder, hoặc flows theo đường dẫn |
+| `fw check <path…>` | agent | kiểm spec, file màn, folder, `ui-spec/screens` hoặc `ui-spec/app.ts` theo đường dẫn |
 | `fw docs <Name>` | agent | in hợp đồng |
 | `fw verify [<Name>…]` | agent | kiểm component; không tên = tất cả |
 
@@ -188,15 +244,22 @@ Mọi lệnh tự làm mới `ui.catalog.json` và file chỉ dẫn trước khi
 | Thông báo | Sửa |
 |---|---|
 | `No ui-spec/ folder found` | cd vào project hoặc `fw init` |
-| `unknown component "X" — not in catalog` | viết hợp đồng vào `ui-spec/components/`, hoặc dùng cái có sẵn |
+| `unknown component "X", not in the catalog. Did you mean "Y"?` | sửa tên theo gợi ý; nếu thật sự là component mới thì viết hợp đồng vào `ui-spec/components/` |
+| `X is in the catalog but not in ui-spec/app.ts components` | thêm X vào `components` của outline |
+| `screen "X" is not in ui-spec/app.ts screens` | sửa tên theo gợi ý, hoặc thêm màn vào outline |
+| `"X" has no contract` (trong `app.ts`) | outline gõ sai tên, hoặc component mới chưa có hợp đồng |
+| `…which lists "Buton" (no such contract). Fix the typo` | sửa lỗi gõ trong `app.ts`, đừng sửa các file đang dùng tên đúng |
 | `X is not materialized for react yet` | Pha A cho X |
-| `path "/x" does not resolve in screen data` | thêm vào `data` của spec và của `ui-spec/screens/<màn>.ts` |
-| `action "x" is not declared` | thêm vào `actions` |
+| `path "/x" does not resolve in screen data` | thêm vào `data` của `ui-spec/screens/<màn>.ts` |
+| `action "x" is not declared for this screen` | thêm vào `goTo` hoặc `local` của `ui-spec/screens/<màn>.ts`, hoặc sửa tên theo gợi ý |
+| `…has goTo.Chekout, which is not a screen. Fix the typo there` | sửa tên màn đích trong mô tả màn, đừng sửa spec |
+| `X has no back (back: false…), so "goBack" does not exist here` | bỏ `goBack` khỏi spec, hoặc cho màn có back |
+| `unknown field. Did you mean "shows"?` | sửa tên field trong mô tả màn |
 | `Button may not be inside Button` | sửa cấu trúc |
 | `raw markup outside ui/` | thay bằng component trong `ui/` |
 | `imported from "…", which is not ui/ or a registered impl` | `fw add` nó, hoặc viết hợp đồng và vật chất hoá |
 | `guard "x" is not declared` | thêm vào `guards` trong `project.ts` |
-| `nothing to check in: …` | đường dẫn không phải `.ui.json`, `.tsx`, folder hay `ui-spec/flows` |
+| `nothing to check in: …` | đường dẫn không phải `.ui.json`, `.tsx`, folder, `ui-spec/screens`, `ui-spec/flows` hay `ui-spec/app.ts` |
 | tsc `TS5097 allowImportingTsExtensions` | thêm `"allowImportingTsExtensions": true` vào tsconfig |
 
 ## 10. Giới hạn 1.0
@@ -206,12 +269,12 @@ Hứa nhất quán **trong một project**, không hứa hai project ra code gi�
 
 ## 11. Ví dụ
 
-`examples/pokemon-shop`: 5 mô tả màn, 1 flow, 5 spec, 25 component, 5 màn, shell Vite có router và
+`examples/pokemon-shop`: outline, 5 mô tả màn kèm điều hướng, 5 spec, 22 component, 5 màn, shell Vite có router và
 store, `.fixtures/` cố tình sai.
 
 ```sh
 cd examples/pokemon-shop
-npm run check                                  # 36 passed
+npm run check                                  # 40 passed
 npx vite                                       # mở http://localhost:5173
 node ../../packages/core/bin/fw.js check .fixtures   # 2 failed, cố tình
 ```

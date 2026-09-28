@@ -12,23 +12,23 @@ export function App() {
   const lines = useStore((s) => s.lines);
   const cart = selectCart(lines);
 
-  // Flow: ui-spec/flows/shop.ts. Guards are hand-written here.
+  // Navigation: goTo / back in ui-spec/screens/*.ts. Guards are hand-written here.
   const requireCartNotEmpty = () => cart.items.length > 0;
 
   switch (route.screen) {
     case 'Home':
-      return <HomeScreen cartCount={cart.count} onOpenCard={(id) => go({ screen: 'CardDetail', cardId: id })} onOpenCart={() => go({ screen: 'Cart' })} />;
+      return <HomeScreen cartCount={cart.count} onGoCardDetail={(id) => go({ screen: 'CardDetail', cardId: id })} onGoCart={() => go({ screen: 'Cart' })} />;
     case 'CardDetail': {
       const card = CARDS.find((c) => c.id === route.cardId);
       if (!card) { go({ screen: 'Home' }, 'replace'); return null; }
-      return <CardDetailScreen card={card} cartCount={cart.count} onGoBack={back} onOpenCart={() => go({ screen: 'Cart' })} />;
+      return <CardDetailScreen card={card} cartCount={cart.count} onGoBack={back} onGoCart={() => go({ screen: 'Cart' })} />;
     }
     case 'Cart':
-      return <CartScreen cart={cart} onOpenCard={(id) => go({ screen: 'CardDetail', cardId: id })} onCheckout={() => { if (requireCartNotEmpty()) go({ screen: 'Checkout' }); }} onContinueShopping={() => go({ screen: 'Home' }, 'replace')} />;
+      return <CartScreen cart={cart} onGoCardDetail={(id) => go({ screen: 'CardDetail', cardId: id })} onGoCheckout={() => { if (requireCartNotEmpty()) go({ screen: 'Checkout' }); }} onGoHome={() => go({ screen: 'Home' }, 'replace')} />;
     case 'Checkout':
       if (!requireCartNotEmpty()) { go({ screen: 'Cart' }, 'replace'); return null; }
       return <CheckoutScreen cart={cart} onGoBack={back} onPlaced={(orderId) => go({ screen: 'OrderSuccess', orderId }, 'replace')} />;
     case 'OrderSuccess':
-      return <OrderSuccessScreen onContinueShopping={() => go({ screen: 'Home' }, 'replace')} />;
+      return <OrderSuccessScreen onGoHome={() => go({ screen: 'Home' }, 'replace')} />;
   }
 }

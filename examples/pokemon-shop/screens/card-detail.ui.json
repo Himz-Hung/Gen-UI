@@ -1,11 +1,10 @@
 {
   "screen": "CardDetail",
   "data": { "card": "Card", "cartCount": "number", "qty": "number" },
-  "actions": ["goBack", "openCart", "addToCart", "changeQty"],
   "root": "page",
   "elements": {
     "page":   { "type": "Container", "props": { "maxWidth": "lg" }, "children": ["bar", "body"] },
-    "bar":    { "type": "TopBar", "props": { "title": "Card", "showBack": true, "actions": [{ "icon": "cart", "label": "Cart", "action": "openCart" }] }, "on": { "back": "goBack", "actionPress": "openCart" } },
+    "bar":    { "type": "TopBar", "props": { "title": "Card", "showBack": true, "actions": [{ "icon": "cart", "label": "Cart", "action": "goCart" }] }, "on": { "back": "goBack", "actionPress": "goCart" } },
     "body":   { "type": "Inline", "props": { "gap": "6", "align": "start", "wrap": true }, "children": ["img", "details"] },
     "img":    { "type": "Image", "props": { "src": "", "alt": "", "ratio": "5:7", "radius": "lg" } },
     "details":{ "type": "Stack", "props": { "gap": "3" }, "children": ["name", "meta", "price", "stock", "qty", "add"] },
