@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-28T08:59:46.272Z",
+  "generatedAt": "2026-09-28T09:15:59.668Z",
   "components": {
     "Alert": {
       "name": "Alert",
@@ -19,11 +19,13 @@
           "default": "info"
         },
         "title": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "description": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         },
         "dismissible": {
           "kind": "boolean",
@@ -52,7 +54,8 @@
       "purpose": "Small status label (e.g. \"Holo\", \"Out of stock\"). Not interactive.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "tone": {
           "kind": "enum",
@@ -84,7 +87,8 @@
       "purpose": "Triggers an action. Not for navigation to another screen — use Link.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "variant": {
           "kind": "enum",
@@ -200,7 +204,8 @@
       "purpose": "Boolean choice with a label. For a single on/off setting that applies immediately, use Switch.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "checked": {
           "kind": "boolean"
@@ -295,11 +300,13 @@
       "purpose": "Shown in place of a list or result that has nothing to show. Explains why and offers one next step.",
       "props": {
         "title": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "description": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         },
         "icon": {
           "kind": "string",
@@ -308,7 +315,8 @@
         "actionLabel": {
           "kind": "string",
           "optional": true,
-          "description": "when present, a primary Button with this label is shown"
+          "description": "when present, a primary Button with this label is shown",
+          "text": true
         }
       },
       "events": {
@@ -368,7 +376,8 @@
       "purpose": "Section or page title. Level is semantic (document outline), size is visual.",
       "props": {
         "value": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "level": {
           "kind": "enum",
@@ -413,7 +422,8 @@
         },
         "label": {
           "kind": "string",
-          "description": "accessible name, not shown visually"
+          "description": "accessible name, not shown visually",
+          "text": true
         },
         "variant": {
           "kind": "enum",
@@ -468,7 +478,8 @@
         },
         "alt": {
           "kind": "string",
-          "description": "empty string for decorative images"
+          "description": "empty string for decorative images",
+          "text": true
         },
         "ratio": {
           "kind": "enum",
@@ -577,14 +588,16 @@
       "purpose": "Single-line text entry with label, optional hint and error.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "value": {
           "kind": "string"
         },
         "placeholder": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         },
         "type": {
           "kind": "enum",
@@ -600,12 +613,14 @@
         },
         "hint": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         },
         "error": {
           "kind": "string",
           "optional": true,
-          "description": "when present the field is in error state and this text is shown"
+          "description": "when present the field is in error state and this text is shown",
+          "text": true
         },
         "disabled": {
           "kind": "boolean",
@@ -642,7 +657,8 @@
       "purpose": "Navigates to another screen. Not for actions that change data — use Button.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "variant": {
           "kind": "enum",
@@ -702,16 +718,19 @@
       "purpose": "One row in a List: title, optional subtitle and trailing text, optionally pressable.",
       "props": {
         "title": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "subtitle": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         },
         "trailing": {
           "kind": "string",
           "optional": true,
-          "description": "pre-formatted, e.g. a price"
+          "description": "pre-formatted, e.g. a price",
+          "text": true
         },
         "pressable": {
           "kind": "boolean",
@@ -743,7 +762,8 @@
           "kind": "boolean"
         },
         "title": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "size": {
           "kind": "enum",
@@ -806,7 +826,8 @@
         "placeholder": {
           "kind": "string",
           "optional": true,
-          "default": "Search"
+          "default": "Search",
+          "text": true
         },
         "loading": {
           "kind": "boolean",
@@ -840,7 +861,8 @@
       "purpose": "Pick one option from a short list (≤ 15). For longer lists use SearchBox with results.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "value": {
           "kind": "string"
@@ -854,14 +876,16 @@
                 "kind": "string"
               },
               "label": {
-                "kind": "string"
+                "kind": "string",
+                "text": true
               }
             }
           }
         },
         "placeholder": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         },
         "disabled": {
           "kind": "boolean",
@@ -870,7 +894,8 @@
         },
         "error": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         }
       },
       "events": {
@@ -1010,11 +1035,13 @@
       "purpose": "One labelled figure, e.g. \"Total · $124.00\". Use in a Grid or Inline for KPI rows.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "value": {
           "kind": "string",
-          "description": "pre-formatted; the component never formats numbers or currency"
+          "description": "pre-formatted; the component never formats numbers or currency",
+          "text": true
         },
         "trend": {
           "kind": "enum",
@@ -1027,7 +1054,8 @@
         },
         "hint": {
           "kind": "string",
-          "optional": true
+          "optional": true,
+          "text": true
         }
       },
       "events": {},
@@ -1053,7 +1081,8 @@
                 "kind": "string"
               },
               "label": {
-                "kind": "string"
+                "kind": "string",
+                "text": true
               }
             }
           }
@@ -1079,7 +1108,8 @@
       "purpose": "Removable chip, e.g. an active filter. For non-interactive labels use Badge.",
       "props": {
         "label": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "removable": {
           "kind": "boolean",
@@ -1104,7 +1134,8 @@
       "purpose": "Body text. Not for headings — use Heading.",
       "props": {
         "value": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "size": {
           "kind": "enum",
@@ -1171,7 +1202,8 @@
       "purpose": "Screen header: title, optional back control, optional actions. One per screen, first child of the Container or root.",
       "props": {
         "title": {
-          "kind": "string"
+          "kind": "string",
+          "text": true
         },
         "showBack": {
           "kind": "boolean",
@@ -1187,7 +1219,8 @@
                 "kind": "string"
               },
               "label": {
-                "kind": "string"
+                "kind": "string",
+                "text": true
               },
               "action": {
                 "kind": "string"

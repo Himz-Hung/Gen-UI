@@ -5,6 +5,7 @@ import { Report } from './diagnostics.ts';
 import { DIRS, type Project } from './loader.ts';
 import { didYouMean, suggest } from './suggest.ts';
 import { parseTypeString, refsIn } from './types.ts';
+import { stringsProgress } from './i18ncheck.ts';
 
 export const APP_FILE = `${DIRS.spec}/app.ts`;
 
@@ -84,6 +85,7 @@ export function progress(project: Project, catalog: Catalog, specs: ScreenSpec[]
     stage('spec', specced, screens, `${DIRS.screens}/<name>.ui.json`),
     stage('code', coded, screens, `src/${DIRS.screens}/<Name>Screen.tsx`),
     stage('in ui/', built, app.components, 'fw docs <Name>, write ui/<Name>, fw verify <Name>'),
+    ...stringsProgress(project),
     ...navigationMap(project),
   ];
 }

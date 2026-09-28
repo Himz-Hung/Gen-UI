@@ -1,21 +1,20 @@
 {
   "screen": "CardDetail",
-  "data": { "card": "Card", "cartCount": "number", "qty": "number" },
   "root": "page",
   "elements": {
     "page":   { "type": "Container", "props": { "maxWidth": "lg" }, "children": ["bar", "body"] },
-    "bar":    { "type": "TopBar", "props": { "title": "Card", "showBack": true, "actions": [{ "icon": "cart", "label": "Cart", "action": "goCart" }] }, "on": { "back": "goBack", "actionPress": "goCart" } },
+    "bar":    { "type": "TopBar", "props": { "title": { "path": "/card/name" }, "showBack": true, "actions": [{ "icon": "cart", "label": { "i18n": "nav.cart", "params": { "count": { "path": "/cartCount" } } }, "action": "goCart" }] }, "on": { "back": "goBack", "actionPress": "goCart" } },
     "body":   { "type": "Inline", "props": { "gap": "6", "align": "start", "wrap": true }, "children": ["img", "details"] },
-    "img":    { "type": "Image", "props": { "src": "", "alt": "", "ratio": "5:7", "radius": "lg" } },
+    "img":    { "type": "Image", "props": { "src": { "path": "/card/imageUrl" }, "alt": { "i18n": "detail.imageAlt", "params": { "name": { "path": "/card/name" } } }, "ratio": "5:7", "radius": "lg" } },
     "details":{ "type": "Stack", "props": { "gap": "3" }, "children": ["name", "meta", "price", "stock", "qty", "add"] },
-    "name":   { "type": "Heading", "props": { "value": "", "level": "1", "size": "xl" } },
+    "name":   { "type": "Heading", "props": { "value": { "path": "/card/name" }, "level": "1", "size": "xl" } },
     "meta":   { "type": "Inline", "props": { "gap": "2" }, "children": ["set", "rarity", "condition"] },
-    "set":    { "type": "Text", "props": { "value": "", "color": "muted" } },
-    "rarity": { "type": "Badge", "props": { "label": "", "tone": "primary" } },
-    "condition": { "type": "Badge", "props": { "label": "", "tone": "neutral" } },
-    "price":  { "type": "Stat", "props": { "label": "Price", "value": "" } },
-    "stock":  { "type": "Text", "props": { "value": "", "size": "sm", "color": "muted" } },
-    "qty":    { "type": "Select", "props": { "label": "Quantity", "value": "1", "options": [{ "value": "1", "label": "1" }] }, "on": { "change": "changeQty" } },
-    "add":    { "type": "Button", "props": { "label": "Add to cart", "size": "lg", "icon": "plus" }, "on": { "press": "addToCart" } }
+    "set":    { "type": "Text", "props": { "value": { "path": "/card/set/name" }, "color": "muted" } },
+    "rarity": { "type": "Badge", "props": { "label": { "path": "/card/rarity" }, "tone": "primary" } },
+    "condition": { "type": "Badge", "props": { "label": { "path": "/card/condition" }, "tone": "neutral" } },
+    "price":  { "type": "Stat", "props": { "label": { "i18n": "detail.price" }, "value": { "path": "/card/priceLabel" } } },
+    "stock":  { "type": "Text", "props": { "value": { "i18n": "detail.inStock", "params": { "count": { "path": "/card/stock" } } }, "size": "sm", "color": "muted" } },
+    "qty":    { "type": "Select", "props": { "label": { "i18n": "detail.quantity" }, "value": { "path": "/qty" }, "options": [{ "value": "1", "label": "1" }] }, "on": { "change": "changeQty" } },
+    "add":    { "type": "Button", "props": { "label": { "i18n": "common.addToCart" }, "size": "lg", "icon": "plus" }, "on": { "press": "addToCart" } }
   }
 }

@@ -3,7 +3,7 @@ export default defineComponent({
   name: 'Link', category: 'action',
   purpose: 'Navigates to another screen. Not for actions that change data — use Button.',
   props: {
-    label: t.string(),
+    label: t.text(),
     variant: t.enum(['inline', 'standalone']).def('inline').desc('inline sits in running text; standalone is a block-level nav item'),
   },
   events: { press: t.void().desc('the flow decides where it goes; the component never knows a route') },

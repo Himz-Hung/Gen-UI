@@ -5,6 +5,10 @@ import { Report } from './diagnostics.ts';
 import { DIRS } from './loader.ts';
 import { notInOutline } from './appcheck.ts';
 import type { AppOutline } from './define.ts';
+import type { TypeNode } from './types.ts';
+
+/** Multi-language projects: which props of a component are text, and how code translates. */
+export interface CodeI18n { props: (component: string) => Record<string, TypeNode> | undefined; languages: string[]; library?: string }
 
 /**
  * Screens may only compose components from ui/. Any capitalized JSX tag in a
@@ -12,7 +16,7 @@ import type { AppOutline } from './define.ts';
  * Lowercase (raw) markup is an error outside ui/.
  */
 /** `dirs` may be folders or single .tsx/.jsx files, relative to root. With `outline`, tags must also be listed in ui-spec/app.ts. */
-export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }): Report[] {
+export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }, i18n?: CodeI18n): Report[] {
   const reports: Report[] = [];
   const uiDir = resolve(root, DIRS.ui);
   const allowed = allowedImpl.map((p) => resolve(root, p).replace(/\.(tsx|ts|jsx|js)$/, ''));
@@ -47,6 +51,11 @@ export function checkCode(root: string, dirs = ['src/screens', 'screens'], allow
         } else if (outline && !outline.app.components.includes(tag.split('.')[0])) {
           r.error(where, notInOutline(tag.split('.')[0], outline.app, outline.hasContract));
         }
+        if (i18n) hardCodedText(n, tag, i18n, sf, r);
+      }
+      if (i18n && ts.isJsxText(n) && LETTERS.test(n.text)) {
+        const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
+        r.error(`line ${line + 1}`, `text "${n.text.trim()}" written directly in JSX: pass it to a text prop through ${how(i18n)}`);
       }
       n.forEachChild(visit);
     };
@@ -54,6 +63,47 @@ export function checkCode(root: string, dirs = ['src/screens', 'screens'], allow
     reports.push(r);
   }
   return reports;
+}
+
+const LETTERS = /\p{L}/u;
+const how = (i: CodeI18n) => `the project's i18n function${i.library ? ` (${i.library})` : ''} with a key from ui-spec/strings/`;
+
+/**
+ * String and template literals given to text props (at any depth: TopBar actions[].label, Select options[].label).
+ * Only literals whose fixed part has letters count: `${a} × ${b}` is layout, `Cart (${n})` is text.
+ * Values computed elsewhere (setState('…'), a variable) are not visible here.
+ */
+function hardCodedText(n: ts.JsxOpeningElement | ts.JsxSelfClosingElement, tag: string, i18n: CodeI18n, sf: ts.SourceFile, r: Report) {
+  const props = i18n.props(tag.split('.')[0]);
+  if (!props) return;
+  const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
+  const report = (lit: string, at: string) => r.error(`line ${line + 1} <${tag}> ${at}`, `hard-coded text "${lit}" in a project with languages ${i18n.languages.join(', ')}: use ${how(i18n)}`);
+  const check = (e: ts.Expression, ty: TypeNode, at: string) => {
+    if (ts.isParenthesizedExpression(e)) return check(e.expression, ty, at);
+    if (ts.isConditionalExpression(e)) { check(e.whenTrue, ty, at); check(e.whenFalse, ty, at); return; }
+    if (ts.isBinaryExpression(e) && [ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken].includes(e.operatorToken.kind)) { check(e.right, ty, at); return; }
+    if (ty.kind === 'array' && ts.isArrayLiteralExpression(e)) { e.elements.forEach((x, i) => { if (!ts.isSpreadElement(x)) check(x, ty.of!, `${at}[${i}]`); }); return; }
+    if (ty.kind === 'object' && ts.isObjectLiteralExpression(e)) {
+      for (const p of e.properties) if (ts.isPropertyAssignment(p) && !ts.isComputedPropertyName(p.name)) {
+        const f = ty.fields?.[p.name.getText(sf)];
+        if (f) check(p.initializer, f, `${at}.${p.name.getText(sf)}`);
+      }
+      return;
+    }
+    if (!ty.text) return;
+    if ((ts.isStringLiteral(e) || ts.isNoSubstitutionTemplateLiteral(e)) && LETTERS.test(e.text)) report(e.text, at);
+    else if (ts.isTemplateExpression(e)) {
+      const fixed = e.head.text + e.templateSpans.map((s) => s.literal.text).join('');
+      if (LETTERS.test(fixed)) report(e.getText(sf).slice(1, -1), at);
+    }
+  };
+  for (const a of n.attributes.properties) {
+    if (!ts.isJsxAttribute(a) || !a.initializer) continue;
+    const name = a.name.getText(sf), ty = props[name];
+    if (!ty) continue;
+    if (ts.isStringLiteral(a.initializer)) { if (ty.text && LETTERS.test(a.initializer.text)) report(a.initializer.text, name); }
+    else if (ts.isJsxExpression(a.initializer) && a.initializer.expression) check(a.initializer.expression, ty, name);
+  }
 }
 
 function walk(dir: string, re: RegExp): string[] {

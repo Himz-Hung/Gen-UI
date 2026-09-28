@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, resolve, relative } from 'node:path';
+import { basename, join, resolve, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { AppOutline, Catalog, ComponentContract, DomainTypes, FlowConfig, ProjectConfig, ScreenDescription, ScreenSpec, CatalogEntry } from './define.ts';
+import type { Strings, AppOutline, Catalog, ComponentContract, DomainTypes, FlowConfig, ProjectConfig, ScreenDescription, ScreenSpec, CatalogEntry } from './define.ts';
 import { toScreenInfo, type ScreenInfo } from './screens.ts';
 
 export const DIRS = {
@@ -43,6 +43,8 @@ export interface Project {
   flows: FlowConfig[];
   /** ui-spec/screens/*.ts, both formats, normalized */
   screens: ScreenInfo[];
+  /** ui-spec/strings/<lang>.ts, flattened: "cart.title" → "Your cart". `invalid` lists keys whose value is not a string. */
+  strings: Map<string, { file: string; flat: Record<string, string>; invalid: string[] }>;
   contracts: Map<string, { contract: ComponentContract; source: CatalogEntry['source']; file: string }>;
 }
 
@@ -62,6 +64,21 @@ export async function loadProject(root = findRoot()): Promise<Project> {
   for (const f of listFiles(join(specDir, 'screens'), '.ts'))
     screens.push(toScreenInfo(await importDefault<ScreenDescription>(f), relative(root, f), entry));
 
+  const strings: Project['strings'] = new Map();
+  for (const f of listFiles(join(specDir, 'strings'), '.ts')) {
+    const flat: Record<string, string> = {}, invalid: string[] = [];
+    const visit = (o: Strings, prefix: string) => {
+      for (const [k, v] of Object.entries(o ?? {})) {
+        const key = prefix ? `${prefix}.${k}` : k;
+        if (typeof v === 'string') flat[key] = v;
+        else if (typeof v === 'object' && v !== null && !Array.isArray(v)) visit(v, key);
+        else invalid.push(key);
+      }
+    };
+    visit(await importDefault<Strings>(f), '');
+    strings.set(basename(f, '.ts'), { file: relative(root, f), flat, invalid });
+  }
+
   const contracts: Project['contracts'] = new Map();
   const load = async (dir: string, source: CatalogEntry['source']) => {
     for (const f of listFiles(dir, '.rule.ts')) {
@@ -78,7 +95,7 @@ export async function loadProject(root = findRoot()): Promise<Project> {
   await load(join(specDir, 'components'), 'project');
   await load(join(specDir, 'added'), 'added');
 
-  return { root, config, app, domain, flows, screens, contracts };
+  return { root, config, app, domain, flows, screens, strings, contracts };
 }
 
 export function readCatalog(root: string): Catalog | null {

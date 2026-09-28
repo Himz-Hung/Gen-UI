@@ -32,6 +32,7 @@ Two packages:
 - [How it works](#how-it-works)
 - [Project layout](#project-layout)
 - [Describing your app (`ui-spec/`)](#describing-your-app-ui-spec)
+- [Languages](#languages)
 - [Contracts](#contracts)
 - [Screen specs](#screen-specs)
 - [Commands](#commands)
@@ -300,6 +301,7 @@ Screens reference these by name: `"Card[]"`, `"Cart"`.
 | | |
 |---|---|
 | `t.string()` `t.number()` `t.boolean()` | primitives |
+| `t.text()` | a string the user reads (label, title…): translated in multi-language projects |
 | `t.enum(['a', 'b'])` | one of |
 | `t.ref('Card')` | a domain type |
 | `t.array(x)` `t.object({ … })` | containers |
@@ -365,6 +367,50 @@ export default defineScreen({
 with `goTo` must not also appear in a flow.
 
 ---
+
+## Languages
+
+Single-language apps need nothing. For several languages:
+
+```ts
+// ui-spec/project.ts
+languages: ['en', 'vi'],        // the first is the default
+i18nLibrary: 'i18next',         // convention: how code translates (a library, or your own file)
+
+// ui-spec/strings/en.ts (one file per language, same keys)
+export default defineStrings({
+  cart: { title: 'Your cart', line: '{set} · {condition} · {price} each' },
+});
+```
+
+- Contracts mark the props a user reads with `t.text()` (`label`, `title`, `description`, `placeholder`,
+  `alt`, `Text.value`…). `fw docs` shows them as *(text)*.
+- In specs a text prop takes `{ "i18n": "cart.title" }`; `{placeholders}` are filled from `params`.
+- In screen code the agent calls the project's i18n function with the same key.
+- The agent adds new keys to the default language, drafts the others, and shows you the new strings.
+
+`fw check` (and `fw check ui-spec/strings`):
+
+| check | level |
+|---|---|
+| a language in `languages` has no strings file | error |
+| a key of the default language missing in another language, or an extra key | error |
+| `{placeholders}` differ between languages | error |
+| a spec key that does not exist (with *Did you mean*), a missing or unknown param | error |
+| `{ "i18n": … }` on a prop that is not text, or in a project without `languages` | error |
+| hard-coded text on a text prop, in a spec or in screen code (string or template literal with letters, at any depth; `` `${a} × ${b}` `` passes) | error |
+| text written directly between JSX tags in a screen | error |
+| a key no spec or source file uses | warning |
+
+Progress gains one line per extra language: `strings vi  34/35   todo: cart.oneLess`.
+
+Not caught: text that reaches a prop through a variable or `setState('…')`, and the unused-key warning is a hint only (any quoted word in `src/` that equals a key counts as a use); and contract defaults such as
+`SearchBox.placeholder = 'Search'` (pass the prop). Currency, dates and numbers are formatted by the app
+(domain values are pre-formatted strings such as `priceLabel`); data from an API is not translated.
+
+**Upgrading a 1.0 project:** `ui-rules/` is a copy made by `fw init`, so it does not get `t.text()` by
+itself. Copy the new contracts from `node_modules/@himz-genui/rules/src/` into `ui-rules/` (they change no
+props, so implementations stay verified).
 
 ## Contracts
 
@@ -441,7 +487,8 @@ props interface named `<Name>Props`, event `x` → prop `onX`, children via `chi
 
 ## Screen specs
 
-The agent writes one JSON file per screen before any code. Flat map, parent–child by id:
+The agent writes one JSON file per screen before any code, and `fw check` verifies it. **People do not
+write or read this file**: to see what the agent built, run `fw docs Home` (below). Flat map, parent–child by id:
 
 ```json
 {
@@ -449,12 +496,12 @@ The agent writes one JSON file per screen before any code. Flat map, parent–ch
   "root": "page",
   "elements": {
     "page":  { "type": "Container", "props": { "maxWidth": "xl" }, "children": ["bar", "grid", "pager"] },
-    "bar":   { "type": "TopBar", "props": { "title": "PokéCards Shop", "actions": [{ "icon": "cart", "label": "Cart", "action": "goCart" }] }, "on": { "actionPress": "goCart" } },
+    "bar":   { "type": "TopBar", "props": { "title": { "i18n": "shop.name" } }, "on": { "actionPress": "goCart" } },
     "grid":  { "type": "Grid", "props": { "minItemWidth": 240 }, "children": ["tile"] },
-    "tile":  { "type": "Card", "props": { "pressable": true }, "on": { "press": "goCardDetail" }, "children": ["img", "name", "add"] },
-    "img":   { "type": "Image", "props": { "src": "", "alt": "", "ratio": "5:7" } },
-    "name":  { "type": "Heading", "props": { "value": "", "level": "3", "size": "sm" } },
-    "add":   { "type": "Button", "props": { "label": "Add to cart", "size": "sm" }, "on": { "press": "addToCart" } },
+    "tile":  { "type": "Card", "repeat": { "path": "/cards", "as": "card" }, "props": { "pressable": true }, "on": { "press": "goCardDetail" }, "children": ["img", "name", "add"] },
+    "img":   { "type": "Image", "props": { "src": { "path": "card/imageUrl" }, "alt": "", "ratio": "5:7" } },
+    "name":  { "type": "Heading", "props": { "value": { "path": "card/name" }, "level": "3", "size": "sm" } },
+    "add":   { "type": "Button", "props": { "label": { "i18n": "common.addToCart" }, "size": "sm" }, "on": { "press": "addToCart" } },
     "pager": { "type": "Pagination", "props": { "page": { "path": "/page" }, "pageCount": { "path": "/pageCount" } }, "on": { "change": "changePage" } }
   }
 }
@@ -462,10 +509,37 @@ The agent writes one JSON file per screen before any code. Flat map, parent–ch
 
 - `data` and actions come from `ui-spec/screens/home.ts`; the spec does not repeat them (1.0 specs that
   declare `"data"` / `"actions"` still work).
-- A prop value is a literal, or `{ "path": "/dataName" }` bound to the screen's `data`.
+- A prop value is one of:
+
+  | value | meaning |
+  |---|---|
+  | a literal | `"xl"`, `240`, `true`, `[{ … }]` |
+  | `{ "path": "/card/set/name" }` | screen data; every segment is typed through `domain.ts` |
+  | `{ "path": "card/name" }` | the current item of a `repeat` (no leading slash) |
+  | `{ "i18n": "cart.line", "params": { "price": { "path": "line/card/priceLabel" } } }` | translated text (text props only, see *Languages*) |
+
+  These work at any depth: `TopBar.actions[0].label` can be `{ "i18n": … }`.
+- `"repeat": { "path": "/cards", "as": "card" }` renders the element once per item. Inside it (and its
+  children) `card/…` reads the item. A list is never indexed into: `/cart/items/0` is an error that
+  points to `repeat`.
+- An enum value may go into a string prop (`Badge.label` ← `card/rarity`).
 - `on` maps a component event to one of the screen's **action names** (`goCardDetail`, `addToCart`,
   `goBack`…). Never code.
-- A repeated element (a card in a grid) is written once as a template.
+- An element has one parent; reuse means a second element with its own id.
+
+**`fw docs <Screen>`** prints a screen for people: its description, the layout as a tree, and where it leads.
+
+```
+Container
+├─ TopBar   title "Your cart" · back → goHome
+└─ Stack
+   ├─ List
+   │  └─ ListItem   for each /cart/items as line: title line/card/name · trailing line/lineTotalLabel · press → goCardDetail
+   ├─ EmptyState   title "Your cart is empty" · actionLabel "Continue shopping" · action → goHome
+   └─ Inline
+      ├─ Stat   label "Subtotal" · value /cart/subtotalLabel
+      └─ Button   label "Checkout" · press → goCheckout
+```
 
 `fw check <spec>` reports, with a location for every finding:
 
@@ -473,7 +547,9 @@ The agent writes one JSON file per screen before any code. Flat map, parent–ch
 |---|---|
 | unknown component / prop / event | `elements.hero.type` |
 | missing required prop, wrong literal type | `elements.add.props.label` |
-| binding to undeclared or mistyped data | `elements.txt.props.value` |
+| binding to undeclared or mistyped data, unknown field (with *Did you mean*) | `elements.txt.props.value` |
+| repeat over a non-list, repeat variable out of scope or clashing | `elements.row.repeat.path` |
+| unknown string key, missing / extra `{placeholder}` param, hard-coded text in a multi-language project | `elements.bar.props.title.i18n` |
 | action not declared by the screen | `elements.inner.on.press` |
 | composition violation (Button in Button, Text in List) | `elements.inner` |
 | cycle, unreachable element, missing child id | `elements.page` |
@@ -522,7 +598,9 @@ Paths are classified by extension: `*.ui.json` → spec, `*.tsx`/`*.jsx` → scr
 Output: one `PASS`/`FAIL` line per file, findings with locations, then a summary. Exit `0` clean, `1`
 findings, `2` usage error.
 
-### `fw docs <Name>` *(agent-side)*
+### `fw docs <Name>`
+
+With a screen name, prints the screen for people (description, layout tree, navigation). With a component name:
 
 Prints a contract as markdown: props table, events, states, rules, a11y, composition, platform hints,
 examples. The agent reads this before writing `ui/<Name>.tsx`.
@@ -662,7 +740,7 @@ shell with router and store, and a `.fixtures/` folder with deliberately broken 
 ```sh
 git clone https://github.com/Himz-Hung/Gen-UI && cd genui-fw && npm install
 cd examples/pokemon-shop
-npm run check                 # fw check: 40 passed
+npm run check                 # fw check: 42 passed
 npx vite && open http://localhost:5173
 node ../../packages/core/bin/fw.js check .fixtures   # 2 failed, on purpose
 ```

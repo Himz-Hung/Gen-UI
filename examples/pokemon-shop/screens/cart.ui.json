@@ -1,16 +1,19 @@
 {
   "screen": "Cart",
-  "data": { "cart": "Cart" },
   "root": "page",
   "elements": {
     "page":    { "type": "Container", "props": { "maxWidth": "md" }, "children": ["bar", "body"] },
-    "bar":     { "type": "TopBar", "props": { "title": "Your cart", "showBack": true }, "on": { "back": "goHome" } },
+    "bar":     { "type": "TopBar", "props": { "title": { "i18n": "cart.title" }, "showBack": true }, "on": { "back": "goHome" } },
     "body":    { "type": "Stack", "props": { "gap": "5" }, "children": ["items", "empty", "summary"] },
     "items":   { "type": "List", "children": ["row"] },
-    "row":     { "type": "ListItem", "props": { "title": "", "subtitle": "", "trailing": "", "pressable": true }, "on": { "press": "goCardDetail" } },
-    "empty":   { "type": "EmptyState", "props": { "title": "Your cart is empty", "actionLabel": "Continue shopping" }, "on": { "action": "goHome" } },
+    "row":     { "type": "ListItem", "repeat": { "path": "/cart/items", "as": "line" },
+                 "props": { "title": { "path": "line/card/name" },
+                            "subtitle": { "i18n": "cart.line", "params": { "set": { "path": "line/card/set/name" }, "condition": { "path": "line/card/condition" }, "price": { "path": "line/card/priceLabel" } } },
+                            "trailing": { "path": "line/lineTotalLabel" }, "pressable": true },
+                 "on": { "press": "goCardDetail" } },
+    "empty":   { "type": "EmptyState", "props": { "title": { "i18n": "cart.empty.title" }, "description": { "i18n": "cart.empty.description" }, "actionLabel": { "i18n": "common.continueShopping" } }, "on": { "action": "goHome" } },
     "summary": { "type": "Inline", "props": { "justify": "between" }, "children": ["subtotal", "checkout"] },
-    "subtotal":{ "type": "Stat", "props": { "label": "Subtotal", "value": "" } },
-    "checkout":{ "type": "Button", "props": { "label": "Checkout", "size": "lg" }, "on": { "press": "goCheckout" } }
+    "subtotal":{ "type": "Stat", "props": { "label": { "i18n": "common.subtotal" }, "value": { "path": "/cart/subtotalLabel" } } },
+    "checkout":{ "type": "Button", "props": { "label": { "i18n": "cart.checkout" }, "size": "lg" }, "on": { "press": "goCheckout" } }
   }
 }

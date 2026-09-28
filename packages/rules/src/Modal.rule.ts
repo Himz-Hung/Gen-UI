@@ -4,7 +4,7 @@ export default defineComponent({
   purpose: 'Blocking dialog over the current screen. For confirmations use ConfirmDialog (planned); for non-blocking messages use Alert.',
   props: {
     open: t.boolean(),
-    title: t.string(),
+    title: t.text(),
     size: t.enum(['sm', 'md', 'lg']).def('md'),
   },
   events: { close: t.void().desc('emitted by the close control, Escape, and backdrop press') },

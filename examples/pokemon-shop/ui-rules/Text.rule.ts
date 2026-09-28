@@ -3,7 +3,7 @@ export default defineComponent({
   name: 'Text', category: 'typography',
   purpose: 'Body text. Not for headings — use Heading.',
   props: {
-    value: t.string(),
+    value: t.text(),
     size: t.enum(['xs', 'sm', 'md', 'lg']).def('md'),
     weight: t.enum(['regular', 'medium', 'bold']).def('regular'),
     color: t.enum(['text', 'muted', 'primary', 'danger']).def('text').desc('token name'),

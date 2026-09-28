@@ -16,6 +16,7 @@ import { EmptyState } from '../../ui/EmptyState';
 import { Pagination } from '../../ui/Pagination';
 import { CARDS, SETS } from '../data';
 import { useStore } from '../store';
+import { t } from '../i18n';
 
 const PAGE_SIZE = 8;
 const RARITY_TONE = { common: 'neutral', uncommon: 'neutral', rare: 'primary', holo: 'primary', ultra: 'warning' } as const;
@@ -34,11 +35,11 @@ export function HomeScreen({ cartCount, onGoCardDetail, onGoCart }: { cartCount:
 
   return (
     <Container maxWidth="xl">
-      <TopBar title="PokéCards Shop" actions={[{ icon: 'cart', label: `Cart (${cartCount})`, action: 'goCart' }]} onActionPress={() => onGoCart()} />
+      <TopBar title={t('shop.name')} actions={[{ icon: 'cart', label: t('nav.cart', { count: cartCount }), action: 'goCart' }]} onActionPress={() => onGoCart()} />
       <Stack gap="5">
         <Inline gap="3" align="end" wrap>
-          <SearchBox value={draft} placeholder="Search cards" onChange={setDraft} onSearch={search} onClear={() => search('')} />
-          <Select label="Set" value={setId} placeholder="All sets" options={[{ value: '', label: 'All sets' }, ...SETS.map((s) => ({ value: s.id, label: `${s.name} (${s.releaseYear})` }))]} onChange={(v) => { setSetId(v); setPage(1); }} />
+          <SearchBox value={draft} placeholder={t('home.search')} onChange={setDraft} onSearch={search} onClear={() => search('')} />
+          <Select label={t('home.set')} value={setId} placeholder={t('home.allSets')} options={[{ value: '', label: t('home.allSets') }, ...SETS.map((s) => ({ value: s.id, label: `${s.name} (${s.releaseYear})` }))]} onChange={(v) => { setSetId(v); setPage(1); }} />
         </Inline>
         {cards.length > 0 ? (
           <Grid minItemWidth={240} gap="4">
@@ -51,18 +52,18 @@ export function HomeScreen({ cartCount, onGoCardDetail, onGoCart }: { cartCount:
                     <Text value={c.set.name} size="sm" color="muted" truncate />
                     <Badge label={c.rarity} tone={RARITY_TONE[c.rarity]} />
                     <Badge label={c.condition} />
-                    {c.stock === 0 && <Badge label="Out of stock" tone="danger" />}
+                    {c.stock === 0 && <Badge label={t('common.outOfStock')} tone="danger" />}
                   </Inline>
                   <Inline justify="between">
                     <Text value={c.priceLabel} weight="bold" />
-                    <Button label="Add to cart" size="sm" icon="plus" disabled={c.stock === 0} onPress={() => add(c.id)} />
+                    <Button label={t('common.addToCart')} size="sm" icon="plus" disabled={c.stock === 0} onPress={() => add(c.id)} />
                   </Inline>
                 </Stack>
               </Card>
             ))}
           </Grid>
         ) : (
-          <EmptyState title="No cards match" description="Try another name or clear the set filter." actionLabel="Clear search" onAction={() => { setDraft(''); search(''); setSetId(''); }} />
+          <EmptyState title={t('home.empty.title')} description={t('home.empty.description')} actionLabel={t('home.empty.action')} onAction={() => { setDraft(''); search(''); setSetId(''); }} />
         )}
         <Pagination page={page} pageCount={pageCount} onChange={setPage} />
       </Stack>

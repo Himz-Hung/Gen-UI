@@ -16,6 +16,8 @@ export interface TypeNode {
   optional?: boolean;
   default?: unknown;
   description?: string;
+  /** string the user reads (label, title…): translated when the project has several languages */
+  text?: boolean;
 }
 
 class Builder implements TypeNode {
@@ -27,6 +29,7 @@ class Builder implements TypeNode {
   optional?: boolean;
   default?: unknown;
   description?: string;
+  text?: boolean;
 
   constructor(node: TypeNode) {
     this.kind = node.kind;
@@ -42,6 +45,8 @@ class Builder implements TypeNode {
 
 export const t = {
   string: () => new Builder({ kind: 'string' }),
+  /** A string the user reads: label, title, description, placeholder, alt… Translated per language. */
+  text: () => new Builder({ kind: 'string', text: true }),
   number: () => new Builder({ kind: 'number' }),
   boolean: () => new Builder({ kind: 'boolean' }),
   enum: (values: readonly string[]) => new Builder({ kind: 'enum', values: [...values] }),
@@ -66,6 +71,7 @@ export function plain(node: TypeNode): TypeNode {
   if (node.optional) out.optional = true;
   if (node.default !== undefined) out.default = node.default;
   if (node.description) out.description = node.description;
+  if (node.text) out.text = true;
   return out;
 }
 
@@ -137,7 +143,7 @@ export function checkLiteral(value: unknown, node: TypeNode): string | null {
       for (const k of Object.keys(v)) if (!node.fields![k]) return `unknown field "${k}"`;
       return null;
     }
-    case 'ref': return `type ${node.ref} must be bound with { "path": "/..." }, not written inline`;
+    case 'ref': return `type ${node.ref} is data: bind it with { "path": … } (screen data "/name/…", or a repeat item "item/…"), not written inline`;
     case 'void': return 'void has no value';
     case 'node': return 'slot content must be given as children ids, not as a prop value';
   }

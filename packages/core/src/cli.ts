@@ -8,8 +8,11 @@ import { checkSpec } from './check.ts';
 import { checkFlows } from './flowcheck.ts';
 import { checkCode } from './codecheck.ts';
 import { checkApp, progress, APP_FILE } from './appcheck.ts';
+import { checkStrings, i18nContext } from './i18ncheck.ts';
+import type { CodeI18n } from './codecheck.ts';
 import { verifyReact } from './verify.ts';
-import { renderDocs } from './docs.ts';
+import { renderDocs, renderScreen } from './docs.ts';
+import { didYouMean } from './suggest.ts';
 import { addReactComponent } from './add.ts';
 import { init } from './init.ts';
 import type { Catalog } from './define.ts';
@@ -30,10 +33,10 @@ const HELP = `fw — contract-driven UI for coding agents
   fw init --agent <claude|cursor|codex|copilot> --platform <react|flutter> [--name "App"] [--create vite|next|flutter]
   fw add <file.tsx> [--name X]     register an existing component as a contract
   fw check                          check everything: outline, components, screens, specs, navigation, screen code
-  fw check <path...>                check just these: *.ui.json specs, *.tsx screens, folders, ui-spec/screens, ui-spec/flows, ui-spec/app.ts
+  fw check <path...>                check just these: *.ui.json specs, *.tsx screens, folders, ui-spec/screens, ui-spec/strings, ui-spec/app.ts
 
 agent-side:
-  fw docs <Name>                    print a contract (read before writing ui/<Name>)
+  fw docs <Name>                    print a contract (read before writing ui/<Name>), or a screen as a readable tree
   fw verify [<Name>...]             components in ui/ against their contracts (all when no name)
 
 Every command refreshes ui.catalog.json and the agent rules first. Exit 0 pass · 1 findings · 2 usage.
@@ -71,10 +74,25 @@ async function main() {
 
     case 'docs': {
       const name = args[0]; if (!name) fail('fw docs <Name>');
-      const { project } = await sync(findRoot());
-      const c = project.contracts.get(name); if (!c) fail(`no contract named ${name}. Known: ${[...project.contracts.keys()].join(', ')}`);
-      console.log(renderDocs(c.contract, project.config.platforms[0]));
-      return;
+      const { project, catalog } = await sync(findRoot());
+      const screenNames = [...new Set([...Object.keys(project.app?.screens ?? {}), ...project.screens.map((x) => x.name)])];
+      const c = project.contracts.get(name);
+      if (c) {
+        if (screenNames.includes(name)) console.log(`> ${name} is both a component and a screen; showing the component. Give the screen another name.\n`);
+        console.log(renderDocs(c.contract, project.config.platforms[0]));
+        return;
+      }
+      if (screenNames.includes(name)) {
+        const specFile = collect([resolve(project.root, DIRS.screens)], project.root).specs.find((f) => readSpec(f).screen === name);
+        const langs = project.config.languages ?? [];
+        console.log(renderScreen({
+          name, purpose: project.app?.screens[name], info: project.screens.find((x) => x.name === name), catalog,
+          spec: specFile ? { file: relative(project.root, specFile), spec: readSpec(specFile) } : undefined,
+          strings: langs.length ? project.strings.get(langs[0])?.flat : undefined,
+        }));
+        return;
+      }
+      fail(`no component or screen named ${name}.${didYouMean(name, [...project.contracts.keys(), ...screenNames])} Components: ${[...project.contracts.keys()].join(', ')}. Screens: ${screenNames.join(', ') || 'none'}`);
     }
 
     case 'verify': {
@@ -96,7 +114,8 @@ async function main() {
         const specs = collect([resolve(project.root, DIRS.screens)], project.root).specs;
         reports.push(...checkSpecs(project, catalog, specs));
         reports.push(...checkFlows(project, specs.map((f) => ({ file: f, spec: readSpec(f) }))));
-        reports.push(...checkCode(project.root, ['src/screens', 'screens'], allowedImpl(catalog), outline));
+        reports.push(...checkStrings(project, specs.map(readSpec)));
+        reports.push(...checkCode(project.root, ['src/screens', 'screens'], allowedImpl(catalog), outline, codeI18n(project, catalog)));
         const notes = project.app
           ? progress(project, catalog, specs.map(readSpec), platformOf(project))
           : [`hint  no ${APP_FILE}: outline checks skipped. Add one (defineApp) to list every screen and component up front.`];
@@ -109,8 +128,9 @@ async function main() {
         }
         reports.push(...checkSpecs(project, catalog, targets.specs));
         if (targets.flow) reports.push(...checkFlows(project, collect([resolve(project.root, DIRS.screens)], project.root).specs.map((f) => ({ file: f, spec: readSpec(f) }))));
-        if (targets.code.length) reports.push(...checkCode(project.root, targets.code, allowedImpl(catalog), outline));
-        if (!targets.app && !targets.specs.length && !targets.flow && !targets.code.length) fail(`nothing to check in: ${args.join(' ')} (expected *.ui.json, *.tsx/*.jsx, folders, ui-spec/screens, ui-spec/flows or ${APP_FILE})`);
+        if (targets.strings) reports.push(...checkStrings(project, collect([resolve(project.root, DIRS.screens)], project.root).specs.map(readSpec)));
+        if (targets.code.length) reports.push(...checkCode(project.root, targets.code, allowedImpl(catalog), outline, codeI18n(project, catalog)));
+        if (!targets.app && !targets.strings && !targets.specs.length && !targets.flow && !targets.code.length) fail(`nothing to check in: ${args.join(' ')} (expected *.ui.json, *.tsx/*.jsx, folders, ui-spec/screens, ui-spec/strings, ui-spec/flows or ${APP_FILE})`);
         finish(reports);
       }
     }
@@ -158,7 +178,14 @@ function verifyMany(project: Project, catalog: Catalog, names?: string[]): Repor
 
 function checkSpecs(project: Project, catalog: Catalog, files: string[]): Report[] {
   const platform = platformOf(project);
-  return files.map((f) => checkSpec(readSpec(f), catalog, relative(project.root, f), { domain: project.domain, platform, app: project.app, screens: project.screens }));
+  return files.map((f) => checkSpec(readSpec(f), catalog, relative(project.root, f), { domain: project.domain, platform, app: project.app, screens: project.screens, i18n: i18nContext(project) }));
+}
+
+/** Hard-coded text is only an error in code when the project has several languages. */
+function codeI18n(project: Project, catalog: Catalog): CodeI18n | undefined {
+  const langs = project.config.languages ?? [];
+  if (langs.length < 2) return undefined;
+  return { props: (n) => catalog.components[n]?.props, languages: langs, library: project.config.i18nLibrary };
 }
 
 function allowedImpl(catalog: Catalog): string[] {
@@ -166,13 +193,15 @@ function allowedImpl(catalog: Catalog): string[] {
 }
 
 /** Classify paths: *.ui.json → specs, *.tsx/*.jsx → code, anything under ui-spec/screens or ui-spec/flows → navigation, ui-spec/app.ts → outline. Folders recurse. */
-function collect(paths: string[], root: string): { specs: string[]; code: string[]; flow: boolean; app: boolean } {
-  const out = { specs: [] as string[], code: [] as string[], flow: false, app: false };
+function collect(paths: string[], root: string): { specs: string[]; code: string[]; flow: boolean; app: boolean; strings: boolean } {
+  const out = { specs: [] as string[], code: [] as string[], flow: false, app: false, strings: false };
   const navDirs = [resolve(root, DIRS.spec, 'flows'), resolve(root, DIRS.spec, 'screens'), resolve(root, DIRS.spec, 'domain.ts')];
   const appFile = resolve(root, APP_FILE);
   const visit = (p: string) => {
     if (!existsSync(p)) fail(`not found: ${relative(root, p)}`);
     if (p === appFile) { out.app = true; return; }
+    const stringsDir = resolve(root, DIRS.spec, 'strings');
+    if (p === stringsDir || p.startsWith(stringsDir + sep)) { out.strings = true; return; }
     if (navDirs.some((d) => p === d || p.startsWith(d + sep))) { out.flow = true; return; }
     if (statSync(p).isDirectory()) {
       if (basename(p) === 'node_modules' || basename(p) === DIRS.ui) return;

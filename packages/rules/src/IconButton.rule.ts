@@ -4,7 +4,7 @@ export default defineComponent({
   purpose: 'Compact button showing only an icon. Requires an accessible label.',
   props: {
     icon: t.string(),
-    label: t.string().desc('accessible name, not shown visually'),
+    label: t.text().desc('accessible name, not shown visually'),
     variant: t.enum(['ghost', 'secondary']).def('ghost'),
     size: t.enum(['sm', 'md', 'lg']).def('md'),
     disabled: t.boolean().def(false),

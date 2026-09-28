@@ -13,6 +13,13 @@
 - Agent rules: when an outlined screen has no description, the agent drafts one, plus any domain types it needs, and waits for the user's approval before writing its spec.
 - Progress gains a `domain` line (types used by screens, specs or other types but not declared). A domain type referring to an undeclared type is an error; `fw check ui-spec/domain.ts` checks just that.
 - 1.0 descriptions (`name` / `purpose` / `actions` / `needs`) with `ui-spec/flows/*.ts` still work unchanged; one screen may not be described both ways. The Pokemon shop example is migrated to the new format.
+- **Bindings typed at every depth:** `{ "path": "/cart/subtotalLabel" }` follows the domain types field by field, with *Did you mean* on unknown fields; indexing into a list points to `repeat`. An enum value may be bound to a string prop.
+- **`repeat`** on a spec element: `"repeat": { "path": "/cart/items", "as": "line" }` renders it per item; inside, `{ "path": "line/card/name" }` reads the item. Replaces the `""` placeholders templates needed before. An element may have only one parent.
+- Prop values (literal, binding, translated text) are checked at any depth, e.g. `TopBar.actions[0].label`.
+- **Languages:** `languages` and `i18nLibrary` in `project.ts`, one `ui-spec/strings/<lang>.ts` per language (`defineStrings`, nested keys, `{placeholder}`s). Contracts mark readable props with `t.text()` (all 29 shipped contracts updated; no version bump). Specs use `{ "i18n": "key", "params": { … } }`. `fw check` reports missing languages and translations, extra keys, placeholder mismatches, unknown keys and params, `i18n` on non-text props, hard-coded text on text props in specs and in screen code (string and template literals with letters, JSX text), and unused keys (warning). Progress shows one `strings <lang>` line per extra language. `fw check ui-spec/strings` checks just the strings.
+- **`fw docs <Screen>`** prints a screen for people: description, the spec as a tree (text, bindings, repeats, events) and navigation. A name that is both a component and a screen shows the component, with a note.
+- Pokemon shop: specs use `repeat` and real bindings, all UI text is in `ui-spec/strings/en.ts` and `vi.ts`, a small hand-written `src/i18n.ts` (`?lang=vi`).
+- Upgrading from 1.0: `ui-rules/` is a copy, so re-copy the contracts from `@himz-genui/rules` to get `t.text()`.
 - `fw check ui-spec/app.ts` checks just the outline.
 - Library API (`@himz-genui/core/node`): `Project.descriptions` is replaced by `Project.screens` (normalized `ScreenInfo[]`, both formats), and `checkFlows` returns `Report[]` (one per screen file, plus one for 1.0 flows). `fw init` writes an `app.ts` template. Agent rules gain rule 0 (outline first).
 

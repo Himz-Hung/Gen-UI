@@ -58,8 +58,18 @@ export interface ProjectConfig {
   guards?: string[];
   /** Convention only: one state library for the whole project. */
   stateLibrary?: string;
+  /** Languages the UI is shown in; the first is the default. Omit for a single-language app. */
+  languages?: string[];
+  /** Convention only: how code looks up a translated string (a library such as 'i18next', or a file such as 'src/i18n.ts'). */
+  i18nLibrary?: string;
 }
 export const defineProject = (p: ProjectConfig): ProjectConfig => p;
+
+// ---------- Strings (one file per language: ui-spec/strings/<lang>.ts) ----------
+
+/** Nested keys → text. "{count}" is a placeholder filled from params. */
+export interface Strings { [key: string]: string | Strings }
+export const defineStrings = (s: Strings): Strings => s;
 
 // ---------- App outline (written first) ----------
 
@@ -172,6 +182,8 @@ export interface SpecElement {
   children?: string[];
   /** event name → action name */
   on?: Record<string, string>;
+  /** Render this element once per item of a list. Inside, "<as>/field" paths read the item. */
+  repeat?: { path: string; as: string };
 }
 export interface ScreenSpec {
   screen: string;

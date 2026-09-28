@@ -3,7 +3,7 @@ export default defineComponent({
   name: 'Tabs', category: 'navigation',
   purpose: 'Switch between views within the same screen. For moving between screens use the flow and TopBar/BottomNav.',
   props: {
-    tabs: t.array(t.object({ value: t.string(), label: t.string() })),
+    tabs: t.array(t.object({ value: t.string(), label: t.text() })),
     value: t.string(),
   },
   events: { change: t.string() },

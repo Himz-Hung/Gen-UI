@@ -18,7 +18,7 @@ Design tokens live in \`ui-spec/project.ts\`. Never hard-code colors, spacing, r
 
 ## The rules
 
-${rules(hasOutline).map((r, i) => `${i + 1}. ${r}`).join('\n')}
+${rules(hasOutline, config).map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
 Before finishing, run \`fw check\` with no arguments: it checks everything and prints what is still to do for each outline entry.
 If a needed component has no contract, write one in \`ui-spec/components/<Name>.rule.ts\` (compose from existing primitives), then follow the rule for a component not yet in \`ui/\`. Every \`fw\` command refreshes the catalog.
@@ -34,7 +34,8 @@ ${[...byCat.entries()].map(([cat, ns]) => `- **${cat}**: ${ns.join(', ')}`).join
 }
 
 /** The numbered rules. The outline rules change when the project has no ui-spec/app.ts yet. */
-function rules(hasOutline: boolean): string[] {
+function rules(hasOutline: boolean, config: ProjectConfig): string[] {
+  const langs = config.languages ?? [];
   return [
     hasOutline
       ? `**\`ui-spec/app.ts\` is the outline.** Only the screens and components listed there exist for this app. Need a new screen or component? Add its name to the outline first (a new component also needs a contract), then \`fw check ui-spec/app.ts\`. When \`fw check\` says *Did you mean …?* and it is a typo, fix the name; do not add the misspelled one.`
@@ -42,9 +43,10 @@ function rules(hasOutline: boolean): string[] {
     `**${hasOutline ? 'Screen in the outline' : 'Screen'} with no \`ui-spec/screens/<name>.ts\` yet?** Draft it from ${hasOutline ? 'its purpose in \`ui-spec/app.ts\`' : 'what the user asked for'}, \`ui-spec/domain.ts\` and the screens around it: \`shows\` (what the user sees), \`local\` (actions that stay on the screen), \`when\` (empty / loading / error / disabled cases), \`data\`, \`goTo\` (target screen → how the user gets there), \`back\`, \`params\`. If \`data\` or \`params\` need a type that \`ui-spec/domain.ts\` does not declare yet, draft that type too (\`t.object\`, \`t.array\`, \`t.ref\`; values shown as text are pre-formatted strings such as \`priceLabel: t.string()\`). Run \`fw check ui-spec/screens\`, then **show the drafts (screen and any new types) to the user and wait for approval** before writing its spec.`,
     `**Need a component that is not yet in \`ui/\`?** Run \`fw docs <Name>\`, read the contract, write the implementation into \`ui/<Name>.<ext>\`, then run \`fw verify <Name>\` until it passes. Never write a component anywhere else. Never rewrite one that already exists in \`ui/\`.`,
     `**Building a screen?** Write \`screens/<name>.ui.json\` first, from \`ui-spec/screens/<name>.ts\`. No code yet.`,
-    `**Specs only use names from \`ui.catalog.json\`.** Run \`fw check screens/<name>.ui.json\` until it passes. Props are literals or \`{ "path": "/dataName" }\`; events map to the screen's actions — never code. Actions are: \`go<Target>\` for each \`goTo\` (or its \`action\`), each \`local\` key, and \`goBack\` unless \`back: false\` or first screen. Do not repeat \`data\` / \`actions\` in the spec when the description has them.`,
+    `**Specs only use names from \`ui.catalog.json\`.** Run \`fw check screens/<name>.ui.json\` until it passes. Props are literals or bindings: \`{ "path": "/cart/subtotalLabel" }\` reads screen data (every segment is typed through \`domain.ts\`); to show each item of a list put \`"repeat": { "path": "/cart/items", "as": "line" }\` on the element and read \`{ "path": "line/card/name" }\` inside it — never leave \`""\` placeholders. Events map to the screen's actions — never code. Actions are: \`go<Target>\` for each \`goTo\` (or its \`action\`), each \`local\` key, and \`goBack\` unless \`back: false\` or first screen. Do not repeat \`data\` / \`actions\` in the spec when the description has them.`,
     `**Compose the screen in \`src/screens/<Name>Screen.tsx\` from \`ui/\` only.** No raw markup/widgets outside \`ui/\`. Run \`fw check src/screens/<Name>Screen.tsx\`. App shell (router, store, main) lives in \`src/\` outside \`screens/\` and is hand-written.`,
     `**Tokens** come from \`ui-spec/project.ts\`.`,
+    ...(langs.length > 1 ? [`**Languages: ${langs.join(', ')}** (${langs[0]} is the default). Props marked _(text)_ in \`fw docs\` are never hard-coded: in specs write \`{ "i18n": "cart.title" }\` (with \`"params": { "count": { "path": "/cart/count" } }\` for \`{count}\` placeholders); in code call the project's i18n function${config.i18nLibrary ? ` (\`${config.i18nLibrary}\`)` : ''} with the same key. Add every new key to \`ui-spec/strings/${langs[0]}.ts\`, draft the other languages, and show the new strings to the user. \`fw check ui-spec/strings\` checks them.`] : []),
     `**Navigation** follows \`goTo\` / \`back\` / \`params\` in \`ui-spec/screens/*.ts\` (or \`ui-spec/flows/\` in older projects). Do not invent routes. \`fw check ui-spec/screens\` checks them.`,
   ];
 }

@@ -4,8 +4,8 @@ export default defineComponent({
   purpose: 'Inline message about the current screen: info, success, warning or error. Not a toast.',
   props: {
     tone: t.enum(['info', 'success', 'warning', 'danger']).def('info'),
-    title: t.string(),
-    description: t.string().opt(),
+    title: t.text(),
+    description: t.text().opt(),
     dismissible: t.boolean().def(false),
   },
   events: { dismiss: t.void() },

@@ -3,9 +3,9 @@ export default defineComponent({
   name: 'ListItem', category: 'data',
   purpose: 'One row in a List: title, optional subtitle and trailing text, optionally pressable.',
   props: {
-    title: t.string(),
-    subtitle: t.string().opt(),
-    trailing: t.string().opt().desc('pre-formatted, e.g. a price'),
+    title: t.text(),
+    subtitle: t.text().opt(),
+    trailing: t.text().opt().desc('pre-formatted, e.g. a price'),
     pressable: t.boolean().def(false),
   },
   events: { press: t.void() },

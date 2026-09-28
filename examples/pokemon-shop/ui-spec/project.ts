@@ -12,4 +12,6 @@ export default defineProject({
   },
   guards: ['requireCartNotEmpty'],
   stateLibrary: 'zustand',
+  languages: ['en', 'vi'],
+  i18nLibrary: 'src/i18n.ts (t(key, params))',
 });

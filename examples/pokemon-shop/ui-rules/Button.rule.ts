@@ -3,7 +3,7 @@ export default defineComponent({
   name: 'Button', category: 'action',
   purpose: 'Triggers an action. Not for navigation to another screen — use Link.',
   props: {
-    label: t.string(),
+    label: t.text(),
     variant: t.enum(['primary', 'secondary', 'ghost', 'danger']).def('primary'),
     size: t.enum(['sm', 'md', 'lg']).def('md'),
     disabled: t.boolean().def(false),

@@ -1,5 +1,6 @@
 import type { AppOutline, Catalog, CatalogEntry, ScreenDetail, ScreenSpec } from './define.ts';
-import { checkLiteral, parseTypeString, sameType, typeText, type TypeNode } from './types.ts';
+import { parseTypeString, typeText, type TypeNode } from './types.ts';
+import { checkValue, resolvePath, deref, type ValueCtx } from './values.ts';
 import { Report } from './diagnostics.ts';
 import { didYouMean, suggest } from './suggest.ts';
 import { notInOutline } from './appcheck.ts';
@@ -9,7 +10,7 @@ import { BACK_ACTION, type ScreenInfo } from './screens.ts';
  * Validate one screen spec against the catalog.
  * Every error carries a location such as elements.kpi.props.totals.
  */
-export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts: { domain?: Record<string, TypeNode>; platform?: string; app?: AppOutline; screens?: ScreenInfo[] } = {}): Report {
+export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts: { domain?: Record<string, TypeNode>; platform?: string; app?: AppOutline; screens?: ScreenInfo[]; i18n?: ValueCtx['i18n'] } = {}): Report {
   const r = new Report(file);
   const els = spec.elements ?? {};
   // The screen description is the source of truth for actions and data; the spec may omit both.
@@ -36,14 +37,35 @@ export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts
   if (!spec.root) { r.error('root', 'missing root'); return r; }
   if (!els[spec.root]) { r.error('root', `root "${spec.root}" is not in elements`); return r; }
 
-  // Walk the tree from root: reachability, cycles, composition.
+  const domain = opts.domain ?? {};
+  // Walk the tree from root: reachability, cycles, composition, repeat scopes.
   const seen = new Set<string>();
-  const walk = (id: string, ancestors: string[]) => {
+  const scopes = new Map<string, Map<string, TypeNode>>(); // element → repeat variables its props can use
+  const parentOf = new Map<string, string>();
+  const walk = (id: string, ancestors: string[], outer: Map<string, TypeNode>) => {
     if (ancestors.includes(id)) { r.error(`elements.${id}`, `cycle: ${[...ancestors, id].join(' → ')}`); return; }
-    seen.add(id);
-    const el = els[id];
-    const entry = catalog.components[el.type];
     const parentId = ancestors[ancestors.length - 1];
+    if (seen.has(id)) { r.error(`elements.${id}`, `has two parents ("${parentOf.get(id)}" and "${parentId}"); an element appears once, give the copy its own id`); return; }
+    seen.add(id);
+    if (parentId) parentOf.set(id, parentId);
+    const el = els[id];
+    const scope = new Map(outer);
+    if (el.repeat !== undefined) {
+      const rw = `elements.${id}.repeat`;
+      const rp = el.repeat as { path?: unknown; as?: unknown };
+      if (typeof rp !== 'object' || rp === null || typeof rp.path !== 'string' || typeof rp.as !== 'string') r.error(rw, 'repeat is { "path": "/list", "as": "item" }');
+      else {
+        const list = resolvePath(rp.path, { data, scope: outer, domain });
+        const concrete = typeof list === 'string' ? null : deref(list, domain);
+        if (typeof list === 'string') r.error(`${rw}.path`, list);
+        else if (concrete!.kind !== 'array') r.error(`${rw}.path`, `"${rp.path}" is ${typeText(list)}, repeat needs a list`);
+        if (!/^[a-z][A-Za-z0-9]*$/.test(rp.as)) r.error(`${rw}.as`, 'a repeat variable is a camelCase name: item, card, line');
+        else if (data[rp.as] || outer.has(rp.as)) r.error(`${rw}.as`, `"${rp.as}" is already ${data[rp.as] ? 'screen data' : 'a repeat variable above'}; pick another name`);
+        else if (concrete?.kind === 'array') scope.set(rp.as, concrete.of!);
+      }
+    }
+    scopes.set(id, scope);
+    const entry = catalog.components[el.type];
     const parent = parentId ? catalog.components[els[parentId].type] : undefined;
 
     if (entry) {
@@ -60,10 +82,10 @@ export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts
     }
     for (const c of el.children ?? []) {
       if (!els[c]) { r.error(`elements.${id}.children`, `child "${c}" is not in elements`); continue; }
-      walk(c, [...ancestors, id]);
+      walk(c, [...ancestors, id], scope);
     }
   };
-  walk(spec.root, []);
+  walk(spec.root, [], new Map());
   for (const id of Object.keys(els)) if (!seen.has(id)) r.warn(`elements.${id}`, 'not reachable from root');
 
   // Per element: type, props, events.
@@ -98,18 +120,12 @@ export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts
     for (const [p, ty] of Object.entries(entry.props)) {
       if (props[p] === undefined && !ty.optional) r.error(`${where}.props.${p}`, `required prop missing (${typeText(ty)})`);
     }
+    const ctx: ValueCtx = { data, scope: scopes.get(id) ?? new Map(), domain, i18n: opts.i18n };
     for (const [p, val] of Object.entries(props)) {
       const ty = entry.props[p];
       const pw = `${where}.props.${p}`;
       if (!ty) { r.error(pw, `unknown prop on ${el.type}.${didYouMean(p, Object.keys(entry.props))} Known: ${Object.keys(entry.props).join(', ')}`); continue; }
-      if (isBinding(val)) {
-        const bound = resolvePath(val.path, data);
-        if (!bound) { r.error(pw, `path "${val.path}" does not resolve in screen data (${Object.keys(data).join(', ') || 'none'})`); continue; }
-        if (!sameType(bound, ty)) r.error(pw, `path "${val.path}" is ${typeText(bound)}, prop expects ${typeText(ty)}`);
-      } else {
-        const e = checkLiteral(val, ty);
-        if (e) r.error(pw, e);
-      }
+      checkValue(val, ty, pw, ctx, r);
     }
 
     for (const [ev, action] of Object.entries(el.on ?? {})) {
@@ -128,21 +144,10 @@ function brokenNav(info: ScreenInfo, app: AppOutline, action: string): string | 
   return hit ? broken.find((e) => e.action === hit.name)!.where : null;
 }
 
-function isBinding(v: unknown): v is { path: string } {
-  return typeof v === 'object' && v !== null && typeof (v as { path?: unknown }).path === 'string';
-}
-
 function leafRef(t: TypeNode): string | null {
   if (t.kind === 'ref') return t.ref!;
   if (t.kind === 'array') return leafRef(t.of!);
   return null;
-}
-
-/** Resolve a JSON-pointer-like path "/cards" or "/order/items" against screen data. Only the first segment is typed; deeper segments are trusted. */
-function resolvePath(path: string, data: Record<string, TypeNode>): TypeNode | null {
-  if (!path.startsWith('/')) return null;
-  const [head] = path.slice(1).split('/');
-  return data[head] ?? null;
 }
 
 export function entryFor(catalog: Catalog, name: string): CatalogEntry | undefined {

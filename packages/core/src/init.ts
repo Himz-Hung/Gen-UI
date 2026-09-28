@@ -66,6 +66,8 @@ export default defineProject({
     font: { body: 'Inter', heading: 'Inter' },
   },
   guards: [],
+  // Several languages? List them (the first is the default), add ui-spec/strings/<lang>.ts per language,
+  // and say how code translates: languages: ['en', 'vi'], i18nLibrary: 'i18next',
 });
 `);
   w(`${DIRS.spec}/app.ts`, `import { defineApp } from '@himz-genui/core';

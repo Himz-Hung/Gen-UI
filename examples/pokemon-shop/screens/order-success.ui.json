@@ -1,12 +1,11 @@
 {
   "screen": "OrderSuccess",
-  "data": { "order": "Order" },
   "root": "page",
   "elements": {
     "page":  { "type": "Container", "props": { "maxWidth": "sm" }, "children": ["body"] },
     "body":  { "type": "Stack", "props": { "gap": "5", "align": "center" }, "children": ["alert", "note", "back"] },
-    "alert": { "type": "Alert", "props": { "tone": "success", "title": "Order placed", "description": "" } },
-    "note":  { "type": "Text", "props": { "value": "", "color": "muted", "align": "center" } },
-    "back":  { "type": "Button", "props": { "label": "Continue shopping", "variant": "secondary" }, "on": { "press": "goHome" } }
+    "alert": { "type": "Alert", "props": { "tone": "success", "title": { "i18n": "order.placed" }, "description": { "i18n": "order.summary", "params": { "id": { "path": "/order/id" }, "total": { "path": "/order/totalLabel" } } } } },
+    "note":  { "type": "Text", "props": { "value": { "i18n": "order.receipt", "params": { "email": { "path": "/order/email" } } }, "color": "muted", "align": "center" } },
+    "back":  { "type": "Button", "props": { "label": { "i18n": "common.continueShopping" }, "variant": "secondary" }, "on": { "press": "goHome" } }
   }
 }

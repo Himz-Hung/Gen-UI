@@ -14,7 +14,7 @@ export default defineScreen({
   when: {
     'narrow screen': 'stack the image above the details',
   },
-  data: { card: 'Card', cartCount: 'number', qty: 'number' },
+  data: { card: 'Card', cartCount: 'number', qty: 'string' },
   params: { cardId: 'string' },
   goTo: {
     Cart: 'press the cart action in the top bar',

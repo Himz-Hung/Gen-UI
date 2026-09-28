@@ -32,6 +32,7 @@ Sinh ra:
 | `ui-spec/project.ts` | tên, nền tảng, agent, token, guard | **bạn** |
 | `ui-spec/domain.ts` | kiểu dữ liệu nghiệp vụ | **bạn** |
 | `ui-spec/screens/*.ts` | mỗi màn một file: thấy gì, làm được gì, đi tới đâu | **bạn** (hoặc agent viết nháp để bạn duyệt) |
+| `ui-spec/strings/<lang>.ts` | chữ hiển thị theo từng ngôn ngữ (chỉ khi có `languages`) | agent thêm key, **bạn** duyệt bản dịch |
 | `ui-spec/components/` | hợp đồng thêm | bạn / agent |
 | `ui-spec/added/` | hợp đồng từ `fw add` | sinh, sửa được |
 | `ui/` | code component | **agent**, qua `fw verify` |
@@ -180,20 +181,73 @@ Quy ước: `ui/<Name>.tsx`, `export function <Name>(props: <Name>Props)`, event
 
 ## 5. Pha B — agent ráp màn
 
-Viết spec `screens/home.ui.json`: danh sách phẳng, cha–con bằng id, prop là literal hoặc
-`{ "path": "/tênData" }`, event → **tên** action.
+Agent viết spec `screens/home.ui.json`. **Bạn không cần viết hay đọc file này**; muốn xem agent dựng
+màn ra sao thì chạy `npx fw docs Home` (xem bên dưới). Spec là danh sách phẳng, cha–con bằng id, event →
+**tên** action. Giá trị prop là một trong:
+
+| Viết | Nghĩa |
+|---|---|
+| literal | `"xl"`, `240`, `true` |
+| `{ "path": "/card/set/name" }` | dữ liệu của màn; mỗi đoạn được kiểm kiểu theo `domain.ts` |
+| `{ "path": "card/name" }` | phần tử hiện tại của `repeat` (không có `/` đầu) |
+| `{ "i18n": "cart.line", "params": { … } }` | chữ đã dịch (chỉ cho prop chữ, xem mục đa ngôn ngữ) |
 
 ```json
-"add":   { "type": "Button", "props": { "label": "Add to cart", "size": "sm" }, "on": { "press": "addToCart" } },
-"pager": { "type": "Pagination", "props": { "page": { "path": "/page" }, "pageCount": { "path": "/pageCount" } }, "on": { "change": "changePage" } }
+"tile": { "type": "Card", "repeat": { "path": "/cards", "as": "card" }, "on": { "press": "goCardDetail" }, "children": ["name", "add"] },
+"name": { "type": "Heading", "props": { "value": { "path": "card/name" }, "level": "3" } },
+"add":  { "type": "Button", "props": { "label": { "i18n": "common.addToCart" } }, "on": { "press": "addToCart" } }
 ```
+
+`repeat` lặp một phần tử cho từng món trong danh sách; bên trong đọc món đó bằng `card/…`.
 
 ```sh
 npx fw check screens/home.ui.json
 ```
 
-Bắt: component / prop / event lạ, thiếu prop bắt buộc, sai kiểu, bind sai, action chưa khai, Button
-lồng Button, List chứa Text, vòng, không tới được, component chưa vật chất hoá. Mỗi lỗi có vị trí.
+Bắt: component / prop / event lạ, thiếu prop bắt buộc, sai kiểu, bind sai hoặc field không có (có gợi ý),
+repeat trên thứ không phải danh sách, key chữ không có, thiếu param, chữ viết cứng khi app có nhiều ngôn
+ngữ, action chưa khai, Button lồng Button, List chứa Text, vòng, không tới được, component chưa vật chất
+hoá. Mỗi lỗi có vị trí.
+
+**Xem màn ở dạng dễ đọc:** `npx fw docs Cart` in mô tả màn, bố cục agent dựng (dạng cây) và màn đi tới:
+
+```
+Container
+├─ TopBar   title "Giỏ hàng của bạn" · back → goHome
+└─ Stack
+   ├─ List
+   │  └─ ListItem   for each /cart/items as line: title line/card/name · press → goCardDetail
+   └─ Inline
+      ├─ Stat   label "Tạm tính" · value /cart/subtotalLabel
+      └─ Button   label "Thanh toán" · press → goCheckout
+```
+
+### Đa ngôn ngữ
+
+App một ngôn ngữ không cần làm gì. Nhiều ngôn ngữ thì:
+
+```ts
+// ui-spec/project.ts
+languages: ['en', 'vi'],       // ngôn ngữ đầu là mặc định
+i18nLibrary: 'i18next',        // quy ước: code dịch bằng gì (thư viện, hoặc file tự viết)
+
+// ui-spec/strings/vi.ts: mỗi ngôn ngữ một file, cùng bộ key
+export default defineStrings({
+  cart: { title: 'Giỏ hàng của bạn', line: '{set} · {condition} · {price} mỗi thẻ' },
+});
+```
+
+- Contract đánh dấu prop người dùng đọc bằng `t.text()` (`label`, `title`, `description`, `placeholder`,
+  `alt`…). `fw docs` hiện là *(text)*.
+- Spec dùng `{ "i18n": "cart.title" }`; code màn gọi hàm dịch của project với cùng key.
+- Agent thêm key mới vào ngôn ngữ mặc định, viết nháp bản dịch cho các ngôn ngữ khác và đưa bạn duyệt.
+- `fw check` báo: thiếu file ngôn ngữ, thiếu bản dịch, key thừa, placeholder lệch nhau giữa các ngôn ngữ,
+  key không có (có gợi ý), thiếu param, `i18n` trên prop không phải chữ, **chữ viết cứng** trong spec và
+  code màn. Key không ai dùng là warning. Tiến độ có dòng `strings vi  34/35   todo: …`.
+- Không bắt được: chữ đi qua biến hay `setState('…')`; warning key không dùng chỉ là gợi ý (chữ nào trong `src/` trùng key đều bị tính là có dùng); và giá trị mặc định trong contract (ví dụ
+  `SearchBox.placeholder = 'Search'`, hãy truyền prop). Tiền, ngày, số do app tự format; dữ liệu từ API không dịch.
+- Nâng từ 1.0: `ui-rules/` là bản copy, nên copy lại contract từ `node_modules/@himz-genui/rules/src/`
+  để có `t.text()`.
 
 Rồi ráp `src/screens/HomeScreen.tsx` chỉ import từ `ui/`:
 
@@ -274,7 +328,7 @@ store, `.fixtures/` cố tình sai.
 
 ```sh
 cd examples/pokemon-shop
-npm run check                                  # 40 passed
+npm run check                                  # 42 passed
 npx vite                                       # mở http://localhost:5173
 node ../../packages/core/bin/fw.js check .fixtures   # 2 failed, cố tình
 ```

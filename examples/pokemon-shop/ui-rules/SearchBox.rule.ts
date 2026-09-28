@@ -4,7 +4,7 @@ export default defineComponent({
   purpose: 'Text search with a search icon and a clear control. Emits search on submit, not on every keystroke.',
   props: {
     value: t.string(),
-    placeholder: t.string().def('Search'),
+    placeholder: t.text().def('Search'),
     loading: t.boolean().def(false),
   },
   events: { change: t.string(), search: t.string().desc('committed query'), clear: t.void() },
