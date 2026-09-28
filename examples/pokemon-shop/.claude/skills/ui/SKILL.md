@@ -27,14 +27,16 @@ If a needed component has no contract, write one in `ui-spec/components/<Name>.r
 ## Catalog (names only — read details with `fw docs <Name>`)
 
 - **action**: Button, IconButton, Link
+- **chart**: BarChart, LineChart, PieChart
 - **composite**: PriceTag
-- **data**: Badge, Card, List, ListItem, Stat, Tag
-- **feedback**: Alert, EmptyState, Skeleton
-- **input**: Checkbox, Input, SearchBox, Select
-- **layout**: Container, Divider, Grid, Inline, Spacer, Stack
-- **media**: Image
-- **navigation**: Pagination, Tabs, TopBar
-- **overlay**: Modal
+- **data**: Accordion, Avatar, Badge, Card, DescriptionList, List, ListItem, Stat, SwipeActions, Table, Tag, Timeline
+- **feedback**: Alert, EmptyState, ProgressBar, Skeleton, Spinner, Toast, Tooltip
+- **form**: FormField
+- **input**: Checkbox, ChipGroup, Combobox, DatePicker, FileUpload, Input, NumberInput, PinInput, RadioGroup, Rating, SearchBox, Select, Slider, Switch, Textarea
+- **layout**: Container, Divider, Grid, InfiniteScroll, Inline, PullToRefresh, SectionHeader, Spacer, Stack
+- **media**: Carousel, Icon, Image, Video
+- **navigation**: BottomNav, Breadcrumbs, Pagination, SegmentedControl, Sidebar, Stepper, Tabs, TopBar
+- **overlay**: ConfirmDialog, Drawer, Menu, Modal
 - **typography**: Heading, Text
 
 ## Commands

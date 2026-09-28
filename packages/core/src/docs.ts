@@ -3,6 +3,17 @@ import { typeText, type TypeNode } from './types.ts';
 import type { ScreenInfo } from './screens.ts';
 import { isBinding, isI18n } from './values.ts';
 
+/** "- columns[].label — (text)" for fields inside array / object props that carry a text flag or a description. */
+function nestedNotes(path: string, node: TypeNode): string[] {
+  if (node.kind === 'array') return nestedNotes(`${path}[]`, node.of!);
+  if (node.kind !== 'object') return [];
+  return Object.entries(node.fields ?? {}).flatMap(([k, f]) => {
+    const here = `${path}.${k}`;
+    const own = f.text || f.description ? [`- \`${here}\`${f.text ? ' (text)' : ''}${f.description ? ` — ${f.description}` : ''}`] : [];
+    return [...own, ...nestedNotes(here, f)];
+  });
+}
+
 /** Markdown the agent reads before materializing a component. */
 export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter'): string {
   const L: string[] = [];
@@ -12,7 +23,9 @@ export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter')
     const def = v.default !== undefined ? `\`${JSON.stringify(v.default)}\`` : v.optional ? '—' : '**required**';
     L.push(`| ${k} | \`${typeText(v)}\`${v.text ? ' (text)' : ''} | ${def} | ${v.description ?? ''} |`);
   }
-  if (Object.values(c.props).some((v) => v.text)) L.push('', '_(text)_ = a string the user reads. In a multi-language project it is never hard-coded: specs use `{ "i18n": "key" }`, code uses the project\'s i18n function.');
+  const nested = Object.entries(c.props).flatMap(([k, v]) => nestedNotes(k, v));
+  if (nested.length) L.push('', 'Fields inside props:', '', ...nested);
+  if (Object.values(c.props).some((v) => v.text) || nested.some((n) => n.includes('(text)'))) L.push('', '_(text)_ = a string the user reads. In a multi-language project it is never hard-coded: specs use `{ "i18n": "key" }`, code uses the project\'s i18n function.');
   if (c.children) L.push('', 'Accepts children.');
   if (c.events && Object.keys(c.events).length) {
     L.push('', '## Events', '');

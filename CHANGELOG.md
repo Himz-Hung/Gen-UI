@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased (1.2.0)
+
+- **39 new contracts, 68 in total.** input: Textarea, RadioGroup, Switch, Slider, NumberInput, DatePicker, FileUpload, Rating, Combobox, ChipGroup, PinInput · form: FormField · data: Table, Avatar, Accordion, DescriptionList, Timeline, SwipeActions · media: Icon, Carousel, Video · feedback: Toast, Spinner, ProgressBar, Tooltip · navigation: BottomNav, SegmentedControl, Sidebar, Breadcrumbs, Stepper · overlay: Drawer, Menu, ConfirmDialog · chart: LineChart, BarChart, PieChart · layout: SectionHeader, PullToRefresh, InfiniteScroll. `List` may now contain `SwipeActions`. Each has props, events, states, rules, a11y, composition, `t.text()` on readable props, and React and Flutter hints. No new `t` kinds, so they work with core 1.1.
+- `fw docs` lists fields inside array / object props that are text or have a description (`columns[].label (text)`).
+- Existing projects: copy the new contracts from `@himz-genui/rules/src/` into `ui-rules/` to use them.
+
 ## 1.1.0 — 2026-09-28
 
 Requires `@himz-genui/core` 1.1.0 for `@himz-genui/rules` 1.1.0 (contracts use `t.text()`).

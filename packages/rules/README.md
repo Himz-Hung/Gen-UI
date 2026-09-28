@@ -7,19 +7,21 @@ then `npx fw init` copies these files into your project's `ui-rules/`.
 npm i -D @himz-genui/core @himz-genui/rules
 ```
 
-29 platform-neutral contracts:
+68 platform-neutral contracts:
 
 | category | components |
 |---|---|
-| layout | Stack, Inline, Grid, Container, Spacer, Divider |
+| layout | Stack, Inline, Grid, Container, Spacer, Divider, SectionHeader, PullToRefresh, InfiniteScroll |
 | typography | Text, Heading |
 | action | Button, IconButton, Link |
-| input | Input, Select, SearchBox, Checkbox |
-| data | Card, Badge, Tag, Stat, List, ListItem |
-| media | Image |
-| feedback | EmptyState, Skeleton, Alert |
-| navigation | Pagination, Tabs, TopBar |
-| overlay | Modal |
+| input | Input, Textarea, Select, SearchBox, Checkbox, RadioGroup, Switch, Slider, NumberInput, DatePicker, FileUpload, Rating, Combobox, ChipGroup, PinInput |
+| form | FormField |
+| data | Card, Badge, Tag, Stat, List, ListItem, Table, Avatar, Accordion, DescriptionList, Timeline, SwipeActions |
+| media | Image, Icon, Carousel, Video |
+| feedback | EmptyState, Skeleton, Alert, Toast, Spinner, ProgressBar, Tooltip |
+| navigation | Pagination, Tabs, TopBar, BottomNav, SegmentedControl, Sidebar, Breadcrumbs, Stepper |
+| overlay | Modal, Drawer, Menu, ConfirmDialog |
+| chart | LineChart, BarChart, PieChart |
 
 Each contract declares props, events, states, behaviour rules, accessibility requirements, composition
 constraints and optional per-platform hints. See the core README for the contract format and how the

@@ -1,7 +1,7 @@
 import { defineComponent, t } from '@himz-genui/core';
 export default defineComponent({
   name: 'Modal', category: 'overlay',
-  purpose: 'Blocking dialog over the current screen. For confirmations use ConfirmDialog (planned); for non-blocking messages use Alert.',
+  purpose: 'Blocking dialog over the current screen. For confirming one action use ConfirmDialog; for a side panel or sheet use Drawer; for non-blocking messages use Alert or Toast.',
   props: {
     open: t.boolean(),
     title: t.text(),

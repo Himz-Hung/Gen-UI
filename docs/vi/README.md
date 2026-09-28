@@ -27,7 +27,7 @@ Sinh ra:
 
 | Đường dẫn | Là gì | Ai sửa |
 |---|---|---|
-| `ui-rules/*.rule.ts` | 29 hợp đồng ship sẵn | không — override trong `ui-spec/components/` |
+| `ui-rules/*.rule.ts` | 68 hợp đồng ship sẵn | không — override trong `ui-spec/components/` |
 | `ui-spec/app.ts` | outline: mọi màn và component, theo tên | **bạn**, viết đầu tiên |
 | `ui-spec/project.ts` | tên, nền tảng, agent, token, guard | **bạn** |
 | `ui-spec/domain.ts` | kiểu dữ liệu nghiệp vụ | **bạn** |

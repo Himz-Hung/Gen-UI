@@ -18,7 +18,7 @@ Two packages:
 | package | what |
 |---|---|
 | `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
-| `@himz-genui/rules` | 29 platform-neutral component contracts |
+| `@himz-genui/rules` | 68 platform-neutral component contracts |
 
 > Status: **1.1.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
 
@@ -463,19 +463,21 @@ export default defineComponent({
 | `platform.<name>` | advisory hints for one platform — never a shared rule |
 | `version` | bump to force re-verification of existing implementations |
 
-**Shipped contracts** (`@himz-genui/rules`, 29):
+**Shipped contracts** (`@himz-genui/rules`, 68):
 
 | category | components |
 |---|---|
-| layout | Stack, Inline, Grid, Container, Spacer, Divider |
+| layout | Stack, Inline, Grid, Container, Spacer, Divider, SectionHeader, PullToRefresh, InfiniteScroll |
 | typography | Text, Heading |
 | action | Button, IconButton, Link |
-| input | Input, Select, SearchBox, Checkbox |
-| data | Card, Badge, Tag, Stat, List, ListItem |
-| media | Image |
-| feedback | EmptyState, Skeleton, Alert |
-| navigation | Pagination, Tabs, TopBar |
-| overlay | Modal |
+| input | Input, Textarea, Select, SearchBox, Checkbox, RadioGroup, Switch, Slider, NumberInput, DatePicker, FileUpload, Rating, Combobox, ChipGroup, PinInput |
+| form | FormField |
+| data | Card, Badge, Tag, Stat, List, ListItem, Table, Avatar, Accordion, DescriptionList, Timeline, SwipeActions |
+| media | Image, Icon, Carousel, Video |
+| feedback | EmptyState, Skeleton, Alert, Toast, Spinner, ProgressBar, Tooltip |
+| navigation | Pagination, Tabs, TopBar, BottomNav, SegmentedControl, Sidebar, Breadcrumbs, Stepper |
+| overlay | Modal, Drawer, Menu, ConfirmDialog |
+| chart | LineChart, BarChart, PieChart |
 
 **Your own contracts** go in `ui-spec/components/<Name>.rule.ts`. A file with the same `name` as a shipped
 contract overrides it. Never edit `ui-rules/` directly — upgrades would clobber it.
@@ -717,7 +719,7 @@ tokens and *your* platform idioms while still passing the same assertions.
 exhaustively (names, types, composition), it is easy to review, and it stays next to the code as the
 screen's documentation.
 
-**What if I need a component that isn't in the 29?** Write a contract in `ui-spec/components/`, composing
+**What if I need a component that isn't in the 68?** Write a contract in `ui-spec/components/`, composing
 from existing primitives where possible. The agent can do this too. The catalog grows with the project.
 
 **Can I change a shipped contract?** Override it: same `name` in `ui-spec/components/`. Don't edit
