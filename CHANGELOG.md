@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 — 2026-09-28
+
+Requires `@himz-genui/core` 1.1.0 for `@himz-genui/rules` 1.1.0 (contracts use `t.text()`).
 
 - **Outline file `ui-spec/app.ts`** (`defineApp`): every screen and component of the app, by name, written first. `fw check` enforces it: screen descriptions, flows, specs and screen code may only use names listed there; outline components must have a contract; `ui/X` not in the outline is a warning. Optional: projects without it get one hint line and no outline checks.
 - **Progress lines** after `fw check`: per outline entry, whether it is described, has a spec, has screen code, and (components) is in `ui/`. Missing work is listed as *todo*, never as an error.

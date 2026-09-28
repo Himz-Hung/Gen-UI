@@ -20,7 +20,7 @@ Two packages:
 | `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
 | `@himz-genui/rules` | 29 platform-neutral component contracts |
 
-> Status: **1.0.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
+> Status: **1.1.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
 
 ---
 
@@ -32,6 +32,7 @@ Two packages:
 - [How it works](#how-it-works)
 - [Project layout](#project-layout)
 - [Describing your app (`ui-spec/`)](#describing-your-app-ui-spec)
+- [Languages](#languages)
 - [Contracts](#contracts)
 - [Screen specs](#screen-specs)
 - [Commands](#commands)
@@ -61,7 +62,7 @@ fixed set of building blocks:
   verified against the contract, then reused. Never rewritten per screen.
 - **A JSON spec per screen** that may only reference catalog components, checked before any code exists.
 - **A lint on screen code**: compose from `ui/` only, no raw markup, no foreign component libraries.
-- **A flow declaration** for navigation, so the agent cannot invent routes.
+- **Navigation declared per screen** (`goTo`, `back`, `params`), so the agent cannot invent routes.
 
 The promise is precise: *within one project, every component and screen the agent produces matches its
 contract and is consistent with the others.* It does not promise that two different projects produce
@@ -94,37 +95,51 @@ app first.
 
 ## Quick start
 
-**1. Describe the app** in `ui-spec/` (you write these; no code, no JSON):
+**1. Describe the app** in `ui-spec/` (you write these; no code, no JSON). Start with the outline, the whole
+app by name, then fill in details:
 
 ```ts
+// ui-spec/app.ts: written first
+export default defineApp({
+  screens: {
+    Home: 'Browse and search the card catalog',
+    CardDetail: 'One card with all details',
+    Cart: 'Review items and go to checkout',
+  },
+  components: ['Container', 'Stack', 'Grid', 'TopBar', 'Card', 'Image', 'Heading', 'Text', 'Button', 'Pagination'],
+});
+
 // ui-spec/domain.ts
 export default defineDomain({
   Card: t.object({ id: t.string(), name: t.string(), imageUrl: t.string(), priceLabel: t.string(), stock: t.number() }),
 });
 
-// ui-spec/screens/home.ts
+// ui-spec/screens/home.ts: one file per screen, the file name is the screen name
 export default defineScreen({
-  name: 'Home',
-  purpose: 'Browse and search the card catalog, open a card, jump to the cart.',
-  data: { cards: 'Card[]', cartCount: 'number', page: 'number', pageCount: 'number' },
-  actions: ['openCard', 'openCart', 'search', 'changePage', 'addToCart'],
-  needs: [
+  shows: [
     'Top bar with the shop name and a cart action showing the item count',
     'Responsive grid of cards: image, name, rarity badge, price, add-to-cart button',
     'Pagination below the grid',
   ],
+  local: { search: 'search cards by name', changePage: 'go to another page', addToCart: 'add a card to the cart' },
+  when: { 'nothing matches': 'show an empty state that clears the search' },
+  data: { cards: 'Card[]', cartCount: 'number', page: 'number', pageCount: 'number' },
+  goTo: { CardDetail: 'tap a card', Cart: 'press the cart action' },
 });
 
-// ui-spec/flows/shop.ts
-export default defineFlow({
-  name: 'Shop', entry: 'Home',
-  screens: {
-    Home:       { on: { openCard: { go: 'CardDetail', params: { cardId: 'string' } }, openCart: { go: 'Cart' } } },
-    CardDetail: { params: { cardId: 'string' }, back: 'Home', on: { goBack: { back: true } } },
-    Cart:       { back: 'Home', on: { checkout: { go: 'Checkout' } } },
-  },
+// ui-spec/screens/card-detail.ts
+export default defineScreen({
+  shows: ['Large card image with name, rarity, price', 'Add-to-cart button'],
+  params: { cardId: 'string' },
+  goTo: { Cart: 'press the cart action' },
+  back: 'Home',   // back to the previous screen; Home when opened from a link
 });
 ```
+
+Not sure what to put in a screen file or in `domain.ts`? Write only the outline and ask the agent
+(*"Draft the Cart screen for me to review"*): it drafts `ui-spec/screens/<name>.ts` plus any domain types
+the screen needs, runs `fw check`, and shows you both before building anything. Waiting for your approval is
+an instruction in the agent rules, not something `fw check` can enforce.
 
 **2. Ask your agent** for a screen:
 
@@ -138,6 +153,20 @@ until it passes; writes `screens/home.ui.json` → `fw check screens/home.ui.jso
 
 ```sh
 npx fw check
+```
+
+Besides findings, `fw check` prints what is left for every outline entry:
+
+```
+Outline  ui-spec/app.ts: 3 screens, 10 components
+  described      3/3
+  spec           1/3   todo: CardDetail, Cart  (screens/<name>.ui.json)
+  code           1/3   todo: CardDetail, Cart  (src/screens/<Name>Screen.tsx)
+  in ui/         8/10  todo: Pagination, Image  (fw docs <Name>, write ui/<Name>, fw verify <Name>)
+Navigation
+  Home        → CardDetail, Cart   [no back]   (first screen)
+  CardDetail  → Cart   [back, else Home]
+  Cart        → Checkout   [back]
 ```
 
 ---
@@ -176,10 +205,10 @@ raw markup in a screen, `fw check` fails.
 my-app/
 ├─ ui-rules/                 shipped contracts (copied by fw init; do not edit — override instead)
 ├─ ui-spec/                  ← YOU write this
+│   ├─ app.ts                the outline: every screen and component, by name (write it first)
 │   ├─ project.ts            name, platform, agent, design tokens, guard names
 │   ├─ domain.ts             business types (Card, Cart, Order…)
-│   ├─ flows/*.ts            which screen leads where, on which action, with which params
-│   ├─ screens/*.ts          what each screen needs, in plain language
+│   ├─ screens/*.ts          one per screen: what it shows, what the user can do, where it leads
 │   ├─ components/*.rule.ts  extra contracts (yours or the agent's); same-name overrides ui-rules/
 │   └─ added/*.rule.ts       contracts generated by `fw add`
 ├─ ui/                       ← AGENT writes: one implementation per contract, verified
@@ -193,6 +222,44 @@ my-app/
 ---
 
 ## Describing your app (`ui-spec/`)
+
+### `app.ts`: the outline
+
+The whole app on one screen: every screen with a one-line purpose, and every component it uses. Write it
+before anything else. Every other file may only use names listed here:
+
+```ts
+import { defineApp } from '@himz-genui/core';
+
+export default defineApp({
+  name: 'PokéCards Shop',
+  screens: {
+    Home: 'Browse and search the card catalog, open a card, jump to the cart',
+    Cart: 'Review items, change quantities, proceed to checkout',
+  },
+  components: ['Container', 'Stack', 'TopBar', 'List', 'ListItem', 'Button', 'EmptyState', 'Stat'],
+});
+```
+
+| check | level |
+|---|---|
+| an outline component has no contract | error |
+| a screen description, `goTo` / `back` target or spec uses a screen not in the outline | error |
+| a spec or screen file uses a component not in the outline | error |
+| `ui/X` exists but `X` is not in the outline | warning |
+| an outline screen or component with no detail yet | **not an error**: listed as *todo* in the progress lines |
+
+Every unknown name (component, screen, prop, event, action, domain type, guard) comes with a suggestion
+when one is close, including wrong case and swapped words:
+
+```
+unknown component "itemlisst", not in the catalog. Did you mean "ListItem"?
+action "opencard" is not declared in this screen's actions [...]. Wrong case: it is "openCard".
+Button is not in ui-spec/app.ts components, which lists "Buton" (no such contract). Fix the typo in ui-spec/app.ts.
+```
+
+`app.ts` is optional: without it `fw check` skips outline checks and prints one hint, so 1.0 projects keep
+working.
 
 ### `project.ts`
 
@@ -210,7 +277,7 @@ export default defineProject({
     radius:  { sm: 4, md: 8, lg: 16, full: 9999 },
     font:    { body: 'Inter', heading: 'Inter' },
   },
-  guards: ['requireCartNotEmpty'],       // names flows may use; bodies are hand-written
+  guards: ['requireCartNotEmpty'],       // names screens may use as guard; bodies are hand-written
   stateLibrary: 'zustand',               // convention: one store library for the project
 });
 ```
@@ -234,6 +301,7 @@ Screens reference these by name: `"Card[]"`, `"Cart"`.
 | | |
 |---|---|
 | `t.string()` `t.number()` `t.boolean()` | primitives |
+| `t.text()` | a string the user reads (label, title…): translated in multi-language projects |
 | `t.enum(['a', 'b'])` | one of |
 | `t.ref('Card')` | a domain type |
 | `t.array(x)` `t.object({ … })` | containers |
@@ -243,48 +311,106 @@ Screens reference these by name: `"Card[]"`, `"Cart"`.
 | `.def(value)` | optional with default |
 | `.desc('…')` | description shown to the agent |
 
-### `flows/*.ts`
+### `screens/*.ts`
+
+One file per screen. The file name is the screen name (`card-detail.ts` → `CardDetail`), the purpose is
+in `app.ts`. Every field answers one question:
 
 ```ts
-export default defineFlow({
-  name: 'Shop',
-  entry: 'Home',
-  screens: {
-    Home:         { on: { openCard: { go: 'CardDetail', params: { cardId: 'string' } }, openCart: { go: 'Cart' } } },
-    CardDetail:   { params: { cardId: 'string' }, back: 'Home', on: { goBack: { back: true } } },
-    Cart:         { back: 'Home', on: { checkout: { go: 'Checkout' }, continueShopping: { go: 'Home', mode: 'replace' } } },
-    Checkout:     { guard: 'requireCartNotEmpty', on: { placeOrder: { go: 'OrderSuccess', mode: 'replace', params: { orderId: 'string' } } } },
-    OrderSuccess: { params: { orderId: 'string' }, on: { continueShopping: { go: 'Home', mode: 'replace' } } },
+// ui-spec/screens/cart.ts
+export default defineScreen({
+  // What does the user see here?
+  shows: ['Each item: thumbnail, name, quantity, line total, remove', 'Subtotal and a checkout button'],
+
+  // What can the user do here that does NOT change screen? action → what it does
+  local: { changeQty: 'change the quantity of an item', removeItem: 'remove an item' },
+
+  // Special cases: situation → what the screen does
+  when: { 'cart is empty': 'show an empty state with "Continue shopping"; checkout is disabled' },
+
+  // Which data does the screen receive? Types come from domain.ts
+  data: { cart: 'Cart' },
+
+  // Where can the user go from here, and how? target screen → what the user does
+  goTo: {
+    CardDetail: 'tap an item',
+    Checkout: 'press Checkout',
+    Home: { how: 'press Continue shopping', replace: true },
   },
 });
 ```
 
-- `on` maps an action to a transition: `{ go, mode?, params? }` or `{ back: true }`. `mode` is `push`
-  (default), `modal` or `replace`.
-- Actions **not** listed in `on` are local by definition (search, changeQty…).
-- Flows never mention a router. That is the shell's job.
+| field | meaning | required |
+|---|---|---|
+| `shows` | what the user sees, plain language | yes |
+| `local` | actions that stay on the screen: name → what it does | no |
+| `when` | special cases: situation → what the screen does | no |
+| `data` | data the screen receives: name → type string (`"Card[]"`) | no |
+| `goTo` | target screen → how: a string, or `{ how, action?, replace?, modal? }` | no |
+| `back` | omit: back to the previous screen · `false`: no back · `'Home'`: back, to Home when there is no previous screen | no |
+| `params` | what the screen receives when opened: name → type string. Declared here only, never by the caller | no |
+| `guard` | a guard from `project.ts` that must pass to open the screen | no |
 
-### `screens/*.ts`
+**Navigation is part of each screen.** There is no flow file:
+
+- Each `goTo` target becomes an action `go<Target>` (`goCheckout`). Name it yourself with `action` when it
+  does more than navigate: `OrderSuccess: { how: 'press Place order', action: 'placeOrder', replace: true }`.
+- Every screen has `goBack`, except the first screen of the outline and screens with `back: false`.
+- The screen's actions, the only ones a spec may bind, are the `goTo` actions, the `local` keys and `goBack`.
+  The spec does not repeat them.
+- The first screen in `app.ts` is where the app starts. Screens no `goTo` leads to are reported as unreachable.
+- `shows`, `local` descriptions and `when` are for the agent to read; `fw check` checks the structure and
+  every name (targets, actions, types, guards), with *Did you mean …?* on typos.
+
+**1.0 projects:** descriptions with `name` / `purpose` / `actions` / `needs` plus `ui-spec/flows/*.ts`
+(`defineFlow`) are still accepted and checked as before. Don't mix them for one screen: a screen described
+with `goTo` must not also appear in a flow.
+
+---
+
+## Languages
+
+Single-language apps need nothing. For several languages:
 
 ```ts
-export default defineScreen({
-  name: 'Cart',
-  purpose: 'Review items, change quantities, remove, proceed to checkout.',
-  data: { cart: 'Cart' },
-  actions: ['openCard', 'changeQty', 'removeItem', 'checkout', 'continueShopping'],
-  needs: [
-    'Top bar with back',
-    'List of items: name, condition, quantity, line total, remove',
-    'Subtotal and a checkout button, disabled when the cart is empty',
-    'Empty state with a continue-shopping action',
-  ],
+// ui-spec/project.ts
+languages: ['en', 'vi'],        // the first is the default
+i18nLibrary: 'i18next',         // convention: how code translates (a library, or your own file)
+
+// ui-spec/strings/en.ts (one file per language, same keys)
+export default defineStrings({
+  cart: { title: 'Your cart', line: '{set} · {condition} · {price} each' },
 });
 ```
 
-`data` and `actions` are the only names the agent may bind to in the spec. `needs` is for the agent to
-read; the validators are what actually enforce.
+- Contracts mark the props a user reads with `t.text()` (`label`, `title`, `description`, `placeholder`,
+  `alt`, `Text.value`…). `fw docs` shows them as *(text)*.
+- In specs a text prop takes `{ "i18n": "cart.title" }`; `{placeholders}` are filled from `params`.
+- In screen code the agent calls the project's i18n function with the same key.
+- The agent adds new keys to the default language, drafts the others, and shows you the new strings.
 
----
+`fw check` (and `fw check ui-spec/strings`):
+
+| check | level |
+|---|---|
+| a language in `languages` has no strings file | error |
+| a key of the default language missing in another language, or an extra key | error |
+| `{placeholders}` differ between languages | error |
+| a spec key that does not exist (with *Did you mean*), a missing or unknown param | error |
+| `{ "i18n": … }` on a prop that is not text, or in a project without `languages` | error |
+| hard-coded text on a text prop, in a spec or in screen code (string or template literal with letters, at any depth; `` `${a} × ${b}` `` passes) | error |
+| text written directly between JSX tags in a screen | error |
+| a key no spec or source file uses | warning |
+
+Progress gains one line per extra language: `strings vi  34/35   todo: cart.oneLess`.
+
+Not caught: text that reaches a prop through a variable or `setState('…')`, and the unused-key warning is a hint only (any quoted word in `src/` that equals a key counts as a use); and contract defaults such as
+`SearchBox.placeholder = 'Search'` (pass the prop). Currency, dates and numbers are formatted by the app
+(domain values are pre-formatted strings such as `priceLabel`); data from an API is not translated.
+
+**Upgrading a 1.0 project:** `ui-rules/` is a copy made by `fw init`, so it does not get `t.text()` by
+itself. Copy the new contracts from `node_modules/@himz-genui/rules/src/` into `ui-rules/` (they change no
+props, so implementations stay verified).
 
 ## Contracts
 
@@ -361,30 +487,59 @@ props interface named `<Name>Props`, event `x` → prop `onX`, children via `chi
 
 ## Screen specs
 
-The agent writes one JSON file per screen before any code. Flat map, parent–child by id:
+The agent writes one JSON file per screen before any code, and `fw check` verifies it. **People do not
+write or read this file**: to see what the agent built, run `fw docs Home` (below). Flat map, parent–child by id:
 
 ```json
 {
   "screen": "Home",
-  "data": { "cards": "Card[]", "page": "number", "pageCount": "number" },
-  "actions": ["openCard", "openCart", "changePage", "addToCart"],
   "root": "page",
   "elements": {
     "page":  { "type": "Container", "props": { "maxWidth": "xl" }, "children": ["bar", "grid", "pager"] },
-    "bar":   { "type": "TopBar", "props": { "title": "PokéCards Shop", "actions": [{ "icon": "cart", "label": "Cart", "action": "openCart" }] }, "on": { "actionPress": "openCart" } },
+    "bar":   { "type": "TopBar", "props": { "title": { "i18n": "shop.name" } }, "on": { "actionPress": "goCart" } },
     "grid":  { "type": "Grid", "props": { "minItemWidth": 240 }, "children": ["tile"] },
-    "tile":  { "type": "Card", "props": { "pressable": true }, "on": { "press": "openCard" }, "children": ["img", "name", "add"] },
-    "img":   { "type": "Image", "props": { "src": "", "alt": "", "ratio": "5:7" } },
-    "name":  { "type": "Heading", "props": { "value": "", "level": "3", "size": "sm" } },
-    "add":   { "type": "Button", "props": { "label": "Add to cart", "size": "sm" }, "on": { "press": "addToCart" } },
+    "tile":  { "type": "Card", "repeat": { "path": "/cards", "as": "card" }, "props": { "pressable": true }, "on": { "press": "goCardDetail" }, "children": ["img", "name", "add"] },
+    "img":   { "type": "Image", "props": { "src": { "path": "card/imageUrl" }, "alt": "", "ratio": "5:7" } },
+    "name":  { "type": "Heading", "props": { "value": { "path": "card/name" }, "level": "3", "size": "sm" } },
+    "add":   { "type": "Button", "props": { "label": { "i18n": "common.addToCart" }, "size": "sm" }, "on": { "press": "addToCart" } },
     "pager": { "type": "Pagination", "props": { "page": { "path": "/page" }, "pageCount": { "path": "/pageCount" } }, "on": { "change": "changePage" } }
   }
 }
 ```
 
-- A prop value is a literal, or `{ "path": "/dataName" }` bound to the screen's `data`.
-- `on` maps a component event to an **action name**. Never code.
-- A repeated element (a card in a grid) is written once as a template.
+- `data` and actions come from `ui-spec/screens/home.ts`; the spec does not repeat them (1.0 specs that
+  declare `"data"` / `"actions"` still work).
+- A prop value is one of:
+
+  | value | meaning |
+  |---|---|
+  | a literal | `"xl"`, `240`, `true`, `[{ … }]` |
+  | `{ "path": "/card/set/name" }` | screen data; every segment is typed through `domain.ts` |
+  | `{ "path": "card/name" }` | the current item of a `repeat` (no leading slash) |
+  | `{ "i18n": "cart.line", "params": { "price": { "path": "line/card/priceLabel" } } }` | translated text (text props only, see *Languages*) |
+
+  These work at any depth: `TopBar.actions[0].label` can be `{ "i18n": … }`.
+- `"repeat": { "path": "/cards", "as": "card" }` renders the element once per item. Inside it (and its
+  children) `card/…` reads the item. A list is never indexed into: `/cart/items/0` is an error that
+  points to `repeat`.
+- An enum value may go into a string prop (`Badge.label` ← `card/rarity`).
+- `on` maps a component event to one of the screen's **action names** (`goCardDetail`, `addToCart`,
+  `goBack`…). Never code.
+- An element has one parent; reuse means a second element with its own id.
+
+**`fw docs <Screen>`** prints a screen for people: its description, the layout as a tree, and where it leads.
+
+```
+Container
+├─ TopBar   title "Your cart" · back → goHome
+└─ Stack
+   ├─ List
+   │  └─ ListItem   for each /cart/items as line: title line/card/name · trailing line/lineTotalLabel · press → goCardDetail
+   ├─ EmptyState   title "Your cart is empty" · actionLabel "Continue shopping" · action → goHome
+   └─ Inline
+      ├─ Stat   label "Subtotal" · value /cart/subtotalLabel
+      └─ Button   label "Checkout" · press → goCheckout
+```
 
 `fw check <spec>` reports, with a location for every finding:
 
@@ -392,7 +547,9 @@ The agent writes one JSON file per screen before any code. Flat map, parent–ch
 |---|---|
 | unknown component / prop / event | `elements.hero.type` |
 | missing required prop, wrong literal type | `elements.add.props.label` |
-| binding to undeclared or mistyped data | `elements.txt.props.value` |
+| binding to undeclared or mistyped data, unknown field (with *Did you mean*) | `elements.txt.props.value` |
+| repeat over a non-list, repeat variable out of scope or clashing | `elements.row.repeat.path` |
+| unknown string key, missing / extra `{placeholder}` param, hard-coded text in a multi-language project | `elements.bar.props.title.i18n` |
 | action not declared by the screen | `elements.inner.on.press` |
 | composition violation (Button in Button, Text in List) | `elements.inner` |
 | cycle, unreachable element, missing child id | `elements.page` |
@@ -428,19 +585,22 @@ it. The original file is not touched. Fill in `purpose` and `rules` afterwards.
 
 | invocation | checks |
 |---|---|
-| `fw check` | **everything**: every implementation in `ui/`, every spec in `screens/`, flows, screen code in `src/screens/` and `screens/` |
+| `fw check` | **everything**: the outline, every implementation in `ui/`, every spec in `screens/`, screen descriptions and navigation, screen code in `src/screens/` and `screens/`, then the progress lines |
+| `fw check ui-spec/app.ts` | the outline |
 | `fw check screens/home.ui.json` | that spec |
 | `fw check src/screens/HomeScreen.tsx` | that screen file |
 | `fw check screens/ src/screens/` | every spec / screen file under those folders |
-| `fw check ui-spec/flows` | flows against screens, actions, params, guards |
+| `fw check ui-spec/screens` | screen descriptions and navigation: targets, actions, back, params, guards, reachability |
 
 Paths are classified by extension: `*.ui.json` → spec, `*.tsx`/`*.jsx` → screen code, anything under
-`ui-spec/flows` → flows, folders recurse. Mix freely.
+`ui-spec/screens` (or 1.0 `ui-spec/flows`) → descriptions and navigation, `ui-spec/app.ts` → outline, folders recurse. Mix freely.
 
 Output: one `PASS`/`FAIL` line per file, findings with locations, then a summary. Exit `0` clean, `1`
 findings, `2` usage error.
 
-### `fw docs <Name>` *(agent-side)*
+### `fw docs <Name>`
+
+With a screen name, prints the screen for people (description, layout tree, navigation). With a component name:
 
 Prints a contract as markdown: props table, events, states, rules, a11y, composition, platform hints,
 examples. The agent reads this before writing `ui/<Name>.tsx`.
@@ -476,17 +636,19 @@ spec that uses the component. Without names, verifies every contract that has an
 | GitHub Copilot | `.github/copilot-instructions.md` |
 
 Content is wrapped in `<!-- fw:start -->` … `<!-- fw:end -->`; anything you write outside the markers is
-preserved. The file is ~40 lines: six rules, the catalog names grouped by category, and the commands.
+preserved. The file is ~40 lines: eight rules, the catalog names grouped by category, and the commands.
 Contract details are *not* inlined — the agent reads them on demand with `fw docs`.
 
-The six rules, in short:
+The rules, in short:
 
-1. Need a component not in `ui/`? `fw docs` → write `ui/<Name>.tsx` → `fw verify` until pass. Never elsewhere, never rewrite.
-2. Building a screen? Write `screens/<name>.ui.json` first.
-3. Specs use catalog names only. `fw check <spec>` until pass.
-4. Compose `src/screens/<Name>Screen.tsx` from `ui/` only. `fw check <file>`.
-5. Tokens from `ui-spec/project.ts`, never hard-coded.
-6. Navigation from `ui-spec/flows/`, never invented.
+1. `ui-spec/app.ts` is the outline. New screen or component? Add it there first. *Did you mean …?* on a typo means fix the name.
+2. Screen in the outline with no description? Draft `ui-spec/screens/<name>.ts`, show it to the user, wait for approval.
+3. Need a component not in `ui/`? `fw docs` → write `ui/<Name>.tsx` → `fw verify` until pass. Never elsewhere, never rewrite.
+4. Building a screen? Write `screens/<name>.ui.json` first.
+5. Specs use catalog names and the screen's actions only. `fw check <spec>` until pass.
+6. Compose `src/screens/<Name>Screen.tsx` from `ui/` only. `fw check <file>`.
+7. Tokens from `ui-spec/project.ts`, never hard-coded.
+8. Navigation from `goTo` / `back` in `ui-spec/screens/`, never invented.
 
 ---
 
@@ -562,23 +724,23 @@ from existing primitives where possible. The agent can do this too. The catalog 
 `ui-rules/`.
 
 **Where do routes, stores and API calls go?** In `src/` outside `src/screens/`, hand-written. `fw` deliberately
-does not check them; flows declare *what* navigates where, the shell decides *how*.
+does not check them; `goTo` / `back` declare *what* navigates where, the shell decides *how*.
 
 **Does it work with Next.js?** Yes for the framework's part (contracts, specs, `ui/`, screens). Wire screens
-into the App Router yourself; flows tell you the graph.
+into the App Router yourself; the *Navigation* lines of `fw check` give you the graph.
 
 ---
 
 ## Example
 
 [`examples/pokemon-shop`](./examples/pokemon-shop) is a trading-card shop built entirely through the loop:
-5 screen descriptions, 1 flow, 5 specs, 25 materialized components, 5 composed screens, a hand-written Vite
+an outline, 5 screen descriptions with their navigation, 5 specs, 22 materialized components, 5 composed screens, a hand-written Vite
 shell with router and store, and a `.fixtures/` folder with deliberately broken inputs.
 
 ```sh
 git clone https://github.com/Himz-Hung/Gen-UI && cd genui-fw && npm install
 cd examples/pokemon-shop
-npm run check                 # fw check: 36 passed
+npm run check                 # fw check: 42 passed
 npx vite && open http://localhost:5173
 node ../../packages/core/bin/fw.js check .fixtures   # 2 failed, on purpose
 ```

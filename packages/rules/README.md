@@ -25,4 +25,9 @@ Each contract declares props, events, states, behaviour rules, accessibility req
 constraints and optional per-platform hints. See the core README for the contract format and how the
 `fw` CLI uses them.
 
+Props a user reads (`label`, `title`, `description`, `placeholder`, `alt`, `Text.value`…) are marked
+`t.text()`, so multi-language projects can require translated text for them. Since 1.1.0 these contracts
+need `@himz-genui/core` 1.1.0 or later. Upgrading an existing project: copy the files from this package's
+`src/` into your `ui-rules/` again (no props changed, implementations stay verified).
+
 MIT © Himz

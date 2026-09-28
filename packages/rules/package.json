@@ -1,6 +1,6 @@
 {
   "name": "@himz-genui/rules",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Shipped UI component contracts for @himz-genui/core (29 platform-neutral contracts: layout, typography, actions, inputs, data display, feedback, navigation, overlay).",
   "keywords": [
     "ui",
@@ -31,6 +31,6 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@himz-genui/core": "^1.0.0"
+    "@himz-genui/core": "^1.1.0"
   }
 }
