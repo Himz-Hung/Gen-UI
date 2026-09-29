@@ -20,7 +20,7 @@ Two packages:
 | `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
 | `@himz-genui/rules` | 76 platform-neutral component contracts |
 
-> Status: **1.1.0** on npm (1.2.0 with Flutter in progress on main) ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
+> Status: **1.2.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React and Flutter, 76 contracts. Behavioural test generation is on the roadmap (see [Limitations](#limitations)).
 
 ---
 
@@ -469,7 +469,7 @@ reach a prop through a variable are not inspected.
 Generated files (`lib/ui/ui.dart`, `lib/ui/tokens.g.dart`, `lib/l10n/strings.g.dart`) are rewritten by every
 `fw` command; do not edit them. They need no pub dependencies.
 
-[`examples/gallery-flutter`](./examples/gallery-flutter) implements every shipped contract in Flutter, with a widget test each (`npm run test:flutter`); its README lists the contract rules those implementations do not fully meet.
+[`examples/gallery-flutter`](./examples/gallery-flutter) and [`examples/gallery-react`](./examples/gallery-react) implement every shipped contract on both platforms from the same `ui-spec/`, with a test per component on each side. `npm run test:parity` fails if they drift apart; the gallery READMEs list where the two still differ.
 
 ## Contracts
 

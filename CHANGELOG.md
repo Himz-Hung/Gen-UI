@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased (1.2.0)
+## 1.2.0 — 2026-09-29
+
+Flutter support, 76 contracts, and React and Flutter galleries kept in sync. `@himz-genui/rules` 1.2.0 requires `@himz-genui/core` ^1.2.0 (contracts use `.int()`); upgrading projects re-copy `ui-rules/` from the package.
 
 - **47 new contracts, 76 in total.** booking: DateRangePicker (ranges never cross booked nights, min / max nights), AvailabilityCalendar (available / limited / booked / closed days with prices) · site chrome for web and mobile: SiteHeader (links collapse into a drawer menu on narrow screens), SiteFooter (columns stack and collapse on narrow screens) · action: FloatingActionButton · typography: RichText (a safe Markdown subset) · layout: HorizontalScroll · media: ImageViewer · and input: Textarea, RadioGroup, Switch, Slider, NumberInput, DatePicker, FileUpload, Rating, Combobox, ChipGroup, PinInput · form: FormField · data: Table, Avatar, Accordion, DescriptionList, Timeline, SwipeActions · media: Icon, Carousel, Video · feedback: Toast, Spinner, ProgressBar, Tooltip · navigation: BottomNav, SegmentedControl, Sidebar, Breadcrumbs, Stepper · overlay: Drawer, Menu, ConfirmDialog · chart: LineChart, BarChart, PieChart · layout: SectionHeader, PullToRefresh, InfiniteScroll. `List` may now contain `SwipeActions`; `IconButton` gets a `badge` (count or dot). `Input` with `type: 'password'` always has a show / hide toggle, named by the new `revealLabel` (translatable). Each has props, events, states, rules, a11y, composition, `t.text()` on readable props, and React and Flutter hints. No new `t` kinds, so they work with core 1.1.
 - `fw docs` lists fields inside array / object props that are text or have a description (`columns[].label (text)`).
@@ -15,6 +17,9 @@
 - `fw verify` (Flutter) also checks callback payload types (`ValueChanged<int>` is not `ValueChanged<double>`) and the field types of item classes.
 - `Table` gets a `loading` prop (its `loading` state had no way to be set).
 - `examples/gallery-flutter`: all 76 contracts materialized in Flutter, a Home screen composed from `lib/ui`, 86 widget tests; `npm run test:flutter` runs fw check, flutter analyze and flutter test. Its README lists the contract rules the implementations do not fully meet.
+- `examples/gallery-react`: all 76 contracts in React from **the same ui-spec and Home spec as gallery-flutter**, 92 tests (vitest + Testing Library) mirroring the Flutter ones. `scripts/parity.mjs` (`npm run test:parity`, also part of `npm test`) fails when the two galleries drift: different ui-spec or specs, a contract missing on one platform, or a component without a test on one side. Pagination now uses the same seven slots on both platforms; Flutter Toast pauses on hover and focus.
+- `fw docs` prints a **React signature** (props interface and export) next to the Dart one, both generated from the contract.
+- Dev: `jsdom` pinned to 25 (30 needs a newer Node than 20).
 - Existing projects: copy the new contracts from `@himz-genui/rules/src/` into `ui-rules/` to use them.
 
 ## 1.1.0 — 2026-09-28

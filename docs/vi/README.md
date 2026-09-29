@@ -340,9 +340,9 @@ Mọi lệnh tự làm mới `ui.catalog.json` và file chỉ dẫn trước khi
 | `nothing to check in: …` | đường dẫn không phải `.ui.json`, `.tsx`, folder, `ui-spec/screens`, `ui-spec/flows` hay `ui-spec/app.ts` |
 | tsc `TS5097 allowImportingTsExtensions` | thêm `"allowImportingTsExtensions": true` vào tsconfig |
 
-## 10. Giới hạn 1.0
+## 10. Giới hạn 1.2
 
-React và Flutter. `fw verify` kiểm bề mặt (không chạy hành vi). `fw add` chỉ cho React. Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Đã publish npm 25/09/2026.
+React và Flutter. `fw verify` kiểm bề mặt (không chạy hành vi). `fw add` chỉ cho React. Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Bản 1.2.0 (React và Flutter, 76 contract) phát hành 29/09/2026.
 Hứa nhất quán **trong một project**, không hứa hai project ra code giống nhau.
 
 ## 11. Ví dụ
