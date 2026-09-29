@@ -372,6 +372,24 @@ kết đó vẫn là chữ trong `rules` / `a11y`. React không có trình duy�
 `fw add` đọc được component React (kể cả bọc MUI, shadcn `forwardRef`) và widget Flutter; prop kế thừa từ thư viện chỉ được liệt kê, bạn chọn cái nào đưa vào contract. `screenDirs` / `freeformDirs` trong `project.ts` quyết định thư mục nào áp luật màn (landing page để ở `freeformDirs`). Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Bản 1.3.0 (check hành vi, core build sẵn ra JS) sau 1.2.0 (React và Flutter, 76 contract).
 Hứa nhất quán **trong một project**, không hứa hai project ra code giống nhau.
 
+## 10b. Tương thích package
+
+Một luật cho cả hai nền tảng: **màn hình không được tạo UI lấy từ ngoài `ui/` (`lib/ui/`)**. Hook, lời gọi hàm,
+accessor tĩnh (`X.of(context)`) và wrapper không vẽ gì đều tự do; kit UI thì bọc trong `ui/` hoặc `fw add`.
+Bảng đầy đủ (đã test / chạy được / theo công thức / không hỗ trợ): mục **Compatibility** của README gốc.
+
+| Nhóm | React | Flutter |
+|---|---|---|
+| State | Zustand, Redux, TanStack Query (đã test); Jotai, Recoil, MobX… | bloc, GetX, riverpod + hooks, flutter_hooks (đã test); provider, MobX, signals |
+| Data | Apollo, SWR (đã test); urql, Relay | get_it (đã test) |
+| Router | React Router (đã test); Next.js, TanStack Router theo công thức; `Link` bọc trong `ui/Link` | go_router, auto_route, Navigator (đã test) |
+| Form | react-hook-form `Controller`, TanStack Form, Formik (đã test) | reactive_forms, flutter_form_builder (đã test) |
+| i18n | react-intl (đã test); i18next, next-intl, Lingui | ARB / `AppLocalizations` (fw sinh ARB), easy_localization (đã test) |
+| UI | MUI, shadcn qua `fw add` (thử tay với package thật); Tailwind / MUI theme lấy từ tokens | Material / Cupertino trong `lib/ui`; `uiTheme()` sinh từ tokens |
+| Không hỗ trợ | React Native / Expo | màn tự dựng `Scaffold` (shell giữ `Scaffold`) |
+
+"đã test" = có màn mẫu trong `tests/compat/` chạy mỗi lần `npm test` / `npm run test:flutter`.
+
 ## 11. Ví dụ
 
 `examples/pokemon-shop`: outline, 5 mô tả màn kèm điều hướng, 5 spec, 22 component, 5 màn, shell Vite có router và
