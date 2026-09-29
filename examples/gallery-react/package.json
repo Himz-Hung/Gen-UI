@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Every shipped contract materialized in React, checked by fw verify, tsc and a Testing Library test each. Same ui-spec as gallery-flutter.",
   "dependencies": {
-    "@himz-genui/core": "1.2.0",
+    "@himz-genui/core": "1.2.1",
     "@himz-genui/rules": "1.2.0"
   },
   "devDependencies": {

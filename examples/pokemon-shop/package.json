@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@himz-genui/core": "1.2.0",
+    "@himz-genui/core": "1.2.1",
     "@himz-genui/rules": "1.2.0",
     "zustand": "^4.5.7"
   },

@@ -13,6 +13,7 @@ import type { CodeI18n } from './codecheck.ts';
 import { verifyReact } from './verify.ts';
 import { verifyFlutter } from './dart.ts';
 import { checkDartScreens } from './dartcheck.ts';
+import { screenWrappers } from './wrappers.ts';
 import { FLUTTER, writeFlutterFiles, dartFile } from './flutter.ts';
 import { renderDocs, renderScreen } from './docs.ts';
 import { didYouMean } from './suggest.ts';
@@ -204,9 +205,11 @@ function screenCode(project: Project, catalog: Catalog, paths: string[]): Report
   const dart = paths.filter(isDart), web = paths.filter((p) => !isDart(p));
   const langs = project.config.languages ?? [];
   const out: Report[] = [];
-  if (web.length) out.push(...checkCode(project.root, web, allowedImpl(catalog), outline, codeI18n(project, catalog)));
+  const wrappers = screenWrappers(project.config);
+  if (web.length) out.push(...checkCode(project.root, web, allowedImpl(catalog), outline, codeI18n(project, catalog), wrappers));
   if (dart.length) out.push(...checkDartScreens(project.root, dart, {
     outline,
+    wrappers,
     text: langs.length > 1 ? { props: (n) => catalog.components[n]?.props, languages: langs } : undefined,
   }));
   return out;

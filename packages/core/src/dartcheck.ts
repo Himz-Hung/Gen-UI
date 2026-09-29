@@ -18,6 +18,8 @@ export interface DartScreenCtx {
   outline?: { app: AppOutline; hasContract: (n: string) => boolean };
   /** Ui<Name> → props of the contract, for hard-coded text; undefined when the project has one language */
   text?: { props: (component: string) => Record<string, TypeNode> | undefined; languages: string[] };
+  /** state-library wrappers a screen may construct (BlocBuilder, Obx…); what they build is still checked */
+  wrappers?: string[];
 }
 
 export function checkDartScreens(root: string, paths: string[], ctx: DartScreenCtx = {}): Report[] {
@@ -57,6 +59,7 @@ export function checkDartScreens(root: string, paths: string[], ctx: DartScreenC
       const name = x[1];
       const before = m.slice(Math.max(0, x.index! - 12), x.index!);
       if (/\b(class|extends|with|implements|enum|typedef)\s+$/.test(before)) continue;
+      if (ctx.wrappers?.includes(name)) continue;
       if (uiClasses.has(name) || appClasses.has(name) || ownNames.has(name) || CORE.has(name)) {
         if (uiClasses.has(name) && ctx.outline && name.startsWith('Ui')) {
           const comp = name.slice(2);
@@ -66,8 +69,8 @@ export function checkDartScreens(root: string, paths: string[], ctx: DartScreenC
         if (ctx.text && name.startsWith('Ui')) hardCodedText(src, m, x.index! + x[0].length - 1, name, ctx.text, r, line);
         continue;
       }
-      const hint = didYouMean(`Ui${name}`, [...uiClasses.keys()]);
-      r.error(`line ${line(x.index!)} ${name}(…)`, `${name} is not a lib/ui component or one of the app's own classes: raw Flutter and third-party widgets belong inside lib/ui/ behind a contract.${hint}`);
+      const hint = uiClasses.has(`Ui${name}`) ? ` Use Ui${name} from lib/ui instead.` : didYouMean(`Ui${name}`, [...uiClasses.keys()]) || didYouMean(name, ctx.wrappers ?? []);
+      r.error(`line ${line(x.index!)} ${name}(…)`, `${name} is not a lib/ui component or one of the app's own classes: raw Flutter and third-party widgets belong inside lib/ui/ behind a contract. A state-library wrapper that draws nothing (BlocBuilder, Obx…) is allowed when listed by stateLibrary or screenWrappers in ui-spec/project.ts.${hint}`);
     }
     return r;
   });

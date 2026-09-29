@@ -281,6 +281,18 @@ spec màn giữ nguyên, chỉ phần code khác đi:
 - File sinh tự động (`ui.dart`, `tokens.g.dart`, `strings.g.dart`) không cần gói pub nào; đừng sửa tay.
 - Ví dụ: `examples/gallery-flutter` vật chất hoá cả 76 contract.
 
+## 5c. Thư viện state và form
+
+`fw` chỉ lo phần giao diện. Component nhận giá trị qua props và báo thay đổi qua `onX`, nên thư viện state hay
+validation nào cũng dùng được: màn đọc state bằng hook hoặc hàm của thư viện, rồi truyền kết quả validate vào prop
+`error` của ô nhập. Hook và hàm gọi (`useStore`, `useForm`, `context.watch`, `ref.watch`) không cần khai gì.
+
+Riêng các **wrapper** mà thư viện bọc quanh UI (`BlocBuilder`, `Obx`, `<FormProvider>`…) thì được phép trong màn khi
+`stateLibrary` trong `project.ts` có tên thư viện đó (`bloc`, `getx`, `mobx`, `riverpod`, `provider`, `signals`,
+`react-hook-form`, `react-redux`, `jotai`, `@tanstack/react-query`), hoặc khi khai thêm trong `screenWrappers`.
+UI bên trong wrapper vẫn phải lấy từ `ui/`: `BlocBuilder(builder: (_, s) => Text('…'))` vẫn bị báo ở `Text`.
+Component tự vẽ ô nhập (như `Field` của Formik) không phải wrapper.
+
 ## 6. Kiểm hết trước khi commit
 
 ```sh

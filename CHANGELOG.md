@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1 — 2026-09-29
+
+- **State and form libraries in screens.** `stateLibrary` in `project.ts` now allows the non-visual wrappers of known libraries in screen code: Bloc (`BlocBuilder`, `BlocListener`…), GetX (`Obx`, `GetBuilder`), MobX (`Observer`), Riverpod (`Consumer`), Provider (`Consumer`, `Selector`), signals (`Watch`), react-hook-form (`FormProvider`, `Controller`), react-redux / jotai (`Provider`), TanStack Query (`QueryClientProvider`). `screenWrappers: [...]` adds your own. What a wrapper renders is still checked, so the UI inside must come from `ui/`. Hook-only libraries (zustand, Redux hooks, Jotai, TanStack Query, XState, MobX `observer()`) already worked.
+- Error messages for unknown screen components mention wrappers and suggest the closest one (`BlocBulder` → `BlocBuilder`); a raw Flutter widget with a `Ui` counterpart suggests it (`Text` → `UiText`).
+- Agent rules list the allowed wrappers when there are any.
+- Only `@himz-genui/core` changes; `@himz-genui/rules` stays 1.2.0.
+
 ## 1.2.0 — 2026-09-29
 
 Flutter support, 76 contracts, and React and Flutter galleries kept in sync. `@himz-genui/rules` 1.2.0 requires `@himz-genui/core` ^1.2.0 (contracts use `.int()`); upgrading projects re-copy `ui-rules/` from the package.

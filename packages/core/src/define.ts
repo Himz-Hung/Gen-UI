@@ -56,8 +56,12 @@ export interface ProjectConfig {
   };
   /** Named guards the flows may reference. Bodies are hand-written. */
   guards?: string[];
-  /** Convention only: one state library for the whole project. */
+  /** The project's state (and form) libraries, e.g. 'bloc' or 'zustand, react-hook-form'. Known ones allow their
+   *  non-visual wrappers in screens (BlocBuilder, Obx, <FormProvider>…); see WRAPPER_PRESETS. */
   stateLibrary?: string;
+  /** Extra components / widgets screens may use although they are not in ui/: wrappers that pass state and draw
+   *  nothing. What they render is still checked. */
+  screenWrappers?: string[];
   /** Languages the UI is shown in; the first is the default. Omit for a single-language app. */
   languages?: string[];
   /** Convention only: how code looks up a translated string (a library such as 'i18next', or a file such as 'src/i18n.ts'). */

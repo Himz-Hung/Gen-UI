@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { Catalog, ProjectConfig } from './define.ts';
+import { screenWrappers } from './wrappers.ts';
 
 /**
  * Agent rules: one source, rendered per agent dialect.
@@ -37,6 +38,7 @@ ${[...byCat.entries()].map(([cat, ns]) => `- **${cat}**: ${ns.join(', ')}`).join
 function rules(hasOutline: boolean, config: ProjectConfig): string[] {
   const langs = config.languages ?? [];
   const react = config.platforms.includes('react'), flutter = config.platforms.includes('flutter');
+  const wrappers = screenWrappers(config);
   return [
     hasOutline
       ? `**\`ui-spec/app.ts\` is the outline.** Only the screens and components listed there exist for this app. Need a new screen or component? Add its name to the outline first (a new component also needs a contract), then \`fw check ui-spec/app.ts\`. When \`fw check\` says *Did you mean …?* and it is a typo, fix the name; do not add the misspelled one.`
@@ -49,6 +51,7 @@ function rules(hasOutline: boolean, config: ProjectConfig): string[] {
     ...(react ? [`**Compose the React screen in \`src/screens/<Name>Screen.tsx\` from \`ui/\` only.** No raw markup outside \`ui/\`. Run \`fw check src/screens/<Name>Screen.tsx\`. App shell (router, store, main) lives in \`src/\` outside \`screens/\` and is hand-written.`] : []),
     ...(flutter ? [`**Compose the Flutter screen in \`lib/screens/<snake_name>_screen.dart\` (\`class <Name>Screen\`) from \`lib/ui/\` only.** Import \`lib/ui/ui.dart\` and \`package:flutter/widgets.dart show StatelessWidget, StatefulWidget, State, Widget, BuildContext\`; never \`material.dart\` or \`cupertino.dart\`, never another widget class in the screen file. Run \`fw check lib/screens/<snake_name>_screen.dart\`. The app shell (\`main.dart\`, routing, state) lives in \`lib/\` outside \`screens/\` and \`ui/\`.`] : []),
     `**Tokens** come from \`ui-spec/project.ts\`.`,
+    ...(wrappers.length ? [`**State and forms** use ${config.stateLibrary ? `\`${config.stateLibrary}\`` : 'the project libraries'}. In screens, only these wrappers may appear besides ui components: ${wrappers.map((w) => `\`${w}\``).join(', ')}. They pass state and draw nothing; the UI inside them still comes from ${flutter && !react ? '\`lib/ui/\`' : '\`ui/\`'}. Hooks and calls (\`useStore\`, \`useForm\`, \`context.watch\`, \`ref.watch\`) need no listing. Validation results go into the \`error\` prop of the input.`] : []),
     ...(langs.length > 1 ? [`**Languages: ${langs.join(', ')}** (${langs[0]} is the default). Props marked _(text)_ in \`fw docs\` are never hard-coded: in specs write \`{ "i18n": "cart.title" }\` (with \`"params": { "count": { "path": "/cart/count" } }\` for \`{count}\` placeholders); in React code call the project's i18n function${config.i18nLibrary ? ` (\`${config.i18nLibrary}\`)` : ''} with the same key${flutter ? '; in Flutter code use the generated \`UiStrings\` (\`cart.empty.title\` → \`UiStrings.cartEmptyTitle\`, placeholders are named arguments)' : ''}. Add every new key to \`ui-spec/strings/${langs[0]}.ts\`, draft the other languages, and show the new strings to the user. \`fw check ui-spec/strings\` checks them.`] : []),
     `**Navigation** follows \`goTo\` / \`back\` / \`params\` in \`ui-spec/screens/*.ts\` (or \`ui-spec/flows/\` in older projects). Do not invent routes. \`fw check ui-spec/screens\` checks them.`,
   ];

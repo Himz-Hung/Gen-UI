@@ -4,6 +4,7 @@ import { join, relative, resolve, dirname } from 'node:path';
 import { Report } from './diagnostics.ts';
 import { DIRS } from './loader.ts';
 import { notInOutline } from './appcheck.ts';
+import { didYouMean } from './suggest.ts';
 import type { AppOutline } from './define.ts';
 import type { TypeNode } from './types.ts';
 
@@ -16,7 +17,7 @@ export interface CodeI18n { props: (component: string) => Record<string, TypeNod
  * Lowercase (raw) markup is an error outside ui/.
  */
 /** `dirs` may be folders or single .tsx/.jsx files, relative to root. With `outline`, tags must also be listed in ui-spec/app.ts. */
-export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }, i18n?: CodeI18n): Report[] {
+export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }, i18n?: CodeI18n, wrappers: string[] = []): Report[] {
   const reports: Report[] = [];
   const uiDir = resolve(root, DIRS.ui);
   const allowed = allowedImpl.map((p) => resolve(root, p).replace(/\.(tsx|ts|jsx|js)$/, ''));
@@ -45,9 +46,11 @@ export function checkCode(root: string, dirs = ['src/screens', 'screens'], allow
         const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
         const where = `line ${line + 1} <${tag}>`;
         if (/^[a-z]/.test(tag)) r.error(where, 'raw markup outside ui/ — compose from ui/ components instead');
+        // Wrappers of the project's state / form libraries pass state and draw nothing; what they render is still checked.
+        else if (wrappers.includes(tag.split('.')[0]) && !fromUi.has(tag.split('.')[0])) { /* allowed */ }
         else if (!fromUi.has(tag.split('.')[0])) {
           const from = fromElsewhere.get(tag.split('.')[0]);
-          r.error(where, from ? `imported from "${from}", which is not ui/ or a registered impl` : 'not imported from ui/ (locally defined component?) — move it to ui/ and verify it');
+          r.error(where, from ? `imported from "${from}", which is not ui/ or a registered impl (a state / form wrapper that draws nothing, like <FormProvider>, is allowed when listed by stateLibrary or screenWrappers in ui-spec/project.ts)${didYouMean(tag.split('.')[0], wrappers)}` : `not imported from ui/ (locally defined component?) — move it to ui/ and verify it.${didYouMean(tag.split('.')[0], [...fromUi, ...wrappers])}`);
         } else if (outline && !outline.app.components.includes(tag.split('.')[0])) {
           r.error(where, notInOutline(tag.split('.')[0], outline.app, outline.hasContract));
         }

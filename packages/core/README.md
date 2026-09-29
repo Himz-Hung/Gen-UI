@@ -20,7 +20,7 @@ Two packages:
 | `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
 | `@himz-genui/rules` | 76 platform-neutral component contracts |
 
-> Status: **1.2.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React and Flutter, 76 contracts. Behavioural test generation is on the roadmap (see [Limitations](#limitations)).
+> Status: **1.2.1** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React and Flutter, 76 contracts. Behavioural test generation is on the roadmap (see [Limitations](#limitations)).
 
 ---
 
@@ -34,6 +34,7 @@ Two packages:
 - [Describing your app (`ui-spec/`)](#describing-your-app-ui-spec)
 - [Languages](#languages)
 - [Flutter](#flutter)
+- [State and form libraries](#state-and-form-libraries)
 - [Contracts](#contracts)
 - [Screen specs](#screen-specs)
 - [Commands](#commands)
@@ -470,6 +471,42 @@ Generated files (`lib/ui/ui.dart`, `lib/ui/tokens.g.dart`, `lib/l10n/strings.g.d
 `fw` command; do not edit them. They need no pub dependencies.
 
 [`examples/gallery-flutter`](./examples/gallery-flutter) and [`examples/gallery-react`](./examples/gallery-react) implement every shipped contract on both platforms from the same `ui-spec/`, with a test per component on each side. `npm run test:parity` fails if they drift apart; the gallery READMEs list where the two still differ.
+
+## State and form libraries
+
+`fw` owns the UI layer only. Components are controlled (values in through props, changes out through `onX`),
+so any state or validation library works: the screen reads state with the library's hooks or calls and
+passes validation results to the `error` prop of the input.
+
+```tsx
+const email = useCheckout((s) => s.email);                        // zustand, Redux, Jotai, TanStack Query…
+const error = z.string().email().safeParse(email).success ? undefined : t('checkout.emailInvalid');   // zod, yup…
+<Input label={t('checkout.email')} value={email} error={error} onChange={setEmail} />
+```
+
+Hooks and calls need nothing. **Wrappers** that libraries put around UI (`BlocBuilder`, `Obx`, `<FormProvider>`)
+are allowed in screens when `stateLibrary` in `project.ts` names the library, or when listed in `screenWrappers`:
+
+| `stateLibrary` contains | allowed in screens |
+|---|---|
+| `bloc` | `BlocBuilder`, `BlocListener`, `BlocConsumer`, `BlocSelector`, `BlocProvider`, `MultiBlocProvider`, `MultiBlocListener`, `RepositoryProvider` |
+| `getx` | `Obx`, `GetBuilder`, `GetX` |
+| `mobx` / `mobx-react(-lite)` | `Observer` |
+| `riverpod` / `hooks_riverpod` | `Consumer` (`HookConsumer`), `ProviderScope` |
+| `provider` | `Consumer`, `Selector`, `ChangeNotifierProvider`, `MultiProvider` |
+| `signals` | `Watch` |
+| `react-hook-form` | `FormProvider`, `Controller` |
+| `react-redux` / `redux`, `jotai` | `Provider` |
+| `@tanstack/react-query` | `QueryClientProvider` |
+
+```ts
+stateLibrary: 'bloc',                 // or 'zustand, react-hook-form'
+screenWrappers: ['MyStoreScope'],     // your own non-visual wrappers
+```
+
+What a wrapper renders is still screen code: `BlocBuilder(builder: (_, s) => Text('…'))` still fails on `Text`.
+Components that draw inputs themselves (Formik's `Field`) are not wrappers; put them behind a contract or use
+the library's hooks (`useField`).
 
 ## Contracts
 
