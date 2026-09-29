@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.2 — 2026-09-29
+
+Both packages move to 1.3.2; `@himz-genui/rules` 1.3.2 requires `@himz-genui/core` ^1.3.2 (its contracts use the new check kinds, which older cores reject as unknown). Upgrading projects re-copy `ui-rules/` from the package to get the new checks.
+
+- **Three new check kinds:** `types` (typing into the component's text field emits the event: `userEvent.type` / `tester.enterText`), `selects` (opening the component, or the visible `open` text, and choosing an option by its visible text emits the event; a native `<select>` is chosen directly), `tokenColor` (the root or a part inside it is painted with a color token: `background` or `text`; warning by default). On Flutter, `tokenColor` also reads the color property of Material controls (Checkbox, Switch, Radio, Slider, progress indicators, Icon), which paint with CustomPaint; on React it also reads `accent-color`, how native checkboxes and radios are colored.
+- **13 new checks** (137 in total, on 54 contracts): typing into Input, Textarea, SearchBox, NumberInput, PinInput; choosing in Select and Combobox; token colors of Button (primary, danger), Link text, Card surface, checked Checkbox and Switch. The inputs whose only check was `neverEmits` when disabled now also prove they emit. All pass on both galleries; each new kind was checked against a deliberately broken component.
+
 ## 1.3.1 — 2026-09-29
 
 - **`@himz-genui/rules` ships a built entry.** `exports` point at `dist/index.js` + `dist/index.d.ts` instead of `src/index.ts`, so `import { SHIPPED } from '@himz-genui/rules'` works in plain Node (it failed with `ERR_UNKNOWN_FILE_EXTENSION`); the contracts stay in `src/` for `fw init` to copy. `./package.json` is exported too: `fw init` found the contracts only through a fallback path that happened to match npm's layout (pnpm could miss it).

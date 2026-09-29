@@ -22,6 +22,7 @@ export default defineComponent({
     { kind: 'emits', event: 'press', props: { pressable: true }, on: ['press', 'enter'] },
     { kind: 'neverEmits', event: 'press', props: { pressable: false }, on: ['press', 'enter'] },
     { kind: 'role', role: 'button', props: { pressable: true } },
+    { kind: 'tokenColor', token: 'surface' },
   ],
   platform: { react: ["<div> surface; <button> semantics when pressable, nested buttons stop propagation"], flutter: ["Material + InkWell when pressable; children in a Column"] },
 });

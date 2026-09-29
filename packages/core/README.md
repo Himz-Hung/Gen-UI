@@ -709,12 +709,15 @@ Testing Library, `test/fw/<snake>_contract_test.dart` with `flutter_test`) and r
 | `key` | Tab, then a key (Escape, arrows…); the event fires |
 | `rendersNothing` | with `props` (e.g. `open: false`) nothing is drawn |
 | `minTarget` | the pointer target is at least N in both directions (warning by default) |
+| `types` | types `text` into the component's text field; the event fires |
+| `selects` | opens the component (or presses the visible `open` text) and chooses the option with that visible text; the event fires (a native `<select>` is chosen directly) |
+| `tokenColor` | the root or a part inside it is painted with a color token: `background` (surfaces, and the color property of Material controls / `accent-color` of native inputs) or `text` (warning by default) |
 
 Render props are the first example merged with the check's `props` (`null` leaves an optional prop out).
 `level: 'warn'` reports without failing; warnings run only under `fw verify`, so a plain `vitest` / `flutter test`
 stays green on them. React runs in jsdom, which has no layout: `size`, `keepsSize` and `minTarget` are reported
 as skipped there and measured on Flutter. `fw check` validates checks statically (unknown kinds, props, events,
-enum values, wrong value types) but never runs tests. 53 of the 76 shipped contracts carry checks (124 in total);
+enum values, wrong value types) but never runs tests. 54 of the 76 shipped contracts carry checks (137 in total);
 the rest have nothing a current kind can measure.
 
 **Shipped contracts** (`@himz-genui/rules`, 76):
@@ -993,12 +996,11 @@ and your build.
   from `lib/ui` (a `defineShell` contract is designed, not implemented).
 - **UI kits are wrapped, not imported in screens.** MUI, Ant Design, Material widgets… live inside `ui/` (`lib/ui/`)
   or are registered with `fw add`; see [Compatibility](#compatibility).
-- **Behavioural checks cover what eight kinds can express.** Typing into a field, opening a list and picking
-  an option, dragging, pressing an icon-only control (no visible text to target), ARIA states (expanded,
-  selected, sort), list / menu / combobox roles and sizes keyed by a boolean prop are not expressible yet; those
-  commitments stay in `rules` / `a11y` as prose. React has no browser in the loop, so layout checks run on
-  Flutter only. Where a contract only has a `neverEmits` check (Select, DatePicker, Combobox, Input…), it
-  proves little: pressing the component would not emit even when enabled, until typing / picking kinds exist.
+- **Behavioural checks cover what eleven kinds can express.** Dragging and swiping, pressing an icon-only control
+  (no visible text to target), ARIA states (expanded, selected, sort), list / menu / combobox roles, focus rings,
+  radius, and sizes keyed by a boolean prop are not expressible yet; those commitments stay in `rules` / `a11y` as
+  prose. React has no browser in the loop, so layout checks run on Flutter only, and `tokenColor` on React reads the
+  computed style jsdom knows (inline styles and `accent-color`), not stylesheets it cannot apply.
 - **No shell contracts yet.** `defineShell` (tabs / sidebar layout) and `defineSources` (where data comes
   from, loading/error states) are designed but not implemented. The app shell is hand-written.
 - **`fw init --create`** shells out to `npm create vite` / `create-next-app` / `flutter create`. The Flutter

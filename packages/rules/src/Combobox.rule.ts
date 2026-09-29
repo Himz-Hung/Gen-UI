@@ -26,6 +26,7 @@ export default defineComponent({
   composition: { canContain: [] },
   checks: [
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'selects', option: 'Vietnam', emits: 'change' },
   ],
   platform: { react: ['<input role="combobox"> + <ul role="listbox"> in a popover'], flutter: ['m.Autocomplete / m.SearchAnchor with options from props'] },
   examples: [{ label: 'Country', value: '', query: 'vi', options: [{ value: 'VN', label: 'Vietnam' }] }],

@@ -29,6 +29,8 @@ export default defineComponent({
     { kind: 'neverEmits', event: 'press', props: { disabled: true }, on: ['press', 'enter'] },
     { kind: 'neverEmits', event: 'press', props: { loading: true }, on: ['press', 'enter'] },
     { kind: 'role', role: 'button', name: { fromProp: 'label' } },
+    { kind: 'tokenColor', token: 'primary', props: { variant: 'primary' } },
+    { kind: 'tokenColor', token: 'danger', props: { variant: 'danger' } },
   ],
   platform: { react: ['use <button type="button">, never a div with onClick', 'aria-busy while loading'], flutter: ['FilledButton / OutlinedButton / TextButton by variant', 'onPressed null when disabled or loading'] },
   examples: [{ label: 'Add to cart' }, { label: 'Remove', variant: 'danger', size: 'sm' }, { label: 'Saving…', loading: true }],

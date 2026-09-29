@@ -12,6 +12,7 @@ export default defineComponent({
     { kind: 'emits', event: 'change', on: ['press', 'space'] },
     { kind: 'emits', event: 'change', target: 'Accept terms', props: { label: 'Accept terms' } },
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'tokenColor', token: 'primary', props: { checked: true } },
   ],
   platform: { react: ["<input type=\"checkbox\"> inside its <label>"], flutter: ["CheckboxListTile, or Checkbox with a tappable label"] },
 });

@@ -24,6 +24,7 @@ export default defineComponent({
   checks: [
     { kind: 'role', role: 'textbox', name: { fromProp: 'label' } },
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'types', text: '1', emits: 'change' },
   ],
   platform: { react: ['one <input autocomplete="one-time-code" inputMode="numeric"> drawn as boxes'], flutter: ['one m.TextField (autofillHints: oneTimeCode) drawn as boxes'] },
   examples: [{ label: 'Verification code', value: '', length: 6 }],

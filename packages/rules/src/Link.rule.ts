@@ -14,6 +14,7 @@ export default defineComponent({
   checks: [
     { kind: 'role', role: 'link', name: { fromProp: 'label' } },
     { kind: 'emits', event: 'press', on: ['press', 'enter'] },
+    { kind: 'tokenColor', token: 'primary', part: 'text' },
   ],
   platform: { react: ['use <a> (router Link) so middle-click and open-in-new-tab work'], flutter: ["TextButton styled as a link; Semantics(link: true)"] },
 });

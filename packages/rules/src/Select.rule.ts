@@ -16,6 +16,7 @@ export default defineComponent({
   a11y: ['Keyboard operable: arrows move, Enter selects, Escape closes.'],
   checks: [
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'selects', option: 'Jungle', emits: 'change', props: { label: 'Set', value: '', options: [{ value: 'base', label: 'Base Set' }, { value: 'jungle', label: 'Jungle' }] } },
   ],
   platform: { react: ['native <select> is acceptable and preferred for v0'], flutter: ["DropdownButtonFormField / DropdownMenu"] },
 });

@@ -25,6 +25,7 @@ export default defineComponent({
   checks: [
     { kind: 'role', role: 'textbox', name: { fromProp: 'label' } },
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'types', text: 'Fragile', emits: 'change' },
   ],
   platform: { react: ['<textarea>; autoGrow by resizing to scrollHeight'], flutter: ['m.TextField with minLines: rows, maxLines: autoGrow ? 10 : rows, maxLength'] },
   examples: [{ label: 'Note to seller', rows: 4, maxLength: 300 }],

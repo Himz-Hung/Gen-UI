@@ -76,6 +76,12 @@ export type Check = CheckBase & (
   | { kind: 'rendersNothing'; props: CheckProps }
   /** Pointer target at least this many logical pixels in both directions. Default level: warn. */
   | { kind: 'minTarget'; size: number }
+  /** Typing into the component's text field emits the event (change on every keystroke, or once per entry on Flutter). */
+  | { kind: 'types'; text: string; emits: string }
+  /** Opening the component (pressing it, or the visible \`open\` text) and choosing the option with this visible text emits the event. */
+  | { kind: 'selects'; option: string; emits: string; open?: string }
+  /** A part is painted with a color token of ui-spec/project.ts (the root's background / its text). Default level: warn. */
+  | { kind: 'tokenColor'; token: string; part?: 'background' | 'text' }
 );
 export type CheckKind = Check['kind'];
 

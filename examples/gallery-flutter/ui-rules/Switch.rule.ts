@@ -21,6 +21,7 @@ export default defineComponent({
     { kind: 'emits', event: 'change', on: ['press', 'space'] },
     { kind: 'emits', event: 'change', target: 'Notify me', props: { label: 'Notify me' } },
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'tokenColor', token: 'primary', props: { checked: true } },
   ],
   platform: { react: ['<button role="switch" aria-checked>'], flutter: ['m.SwitchListTile, or m.Switch with a tappable label'] },
   examples: [{ label: 'Email me when an order ships', checked: true }],

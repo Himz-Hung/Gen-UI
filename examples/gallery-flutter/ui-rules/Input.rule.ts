@@ -26,6 +26,7 @@ export default defineComponent({
   checks: [
     { kind: 'role', role: 'textbox', name: { fromProp: 'label' } },
     { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+    { kind: 'types', text: 'ash', emits: 'change' },
   ],
   platform: { react: ['use <label for> + <input>', 'aria-invalid and aria-describedby for error'], flutter: ['TextField with InputDecoration'] },
 });
