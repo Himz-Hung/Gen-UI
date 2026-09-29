@@ -8,4 +8,5 @@ export default defineComponent({
   },
   rules: ['Height 20–24 logical pixels, radius tokens.radius.full, text size xs, weight medium.', 'Tone is conveyed by both color and text — never color alone.'],
   composition: { canContain: [] },
+  platform: { react: ["<span> styled from tokens"], flutter: ["a small Container with Text; never interactive"] },
 });

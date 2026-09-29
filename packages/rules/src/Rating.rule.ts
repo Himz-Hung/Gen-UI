@@ -5,11 +5,11 @@ export default defineComponent({
   props: {
     label: t.text().desc('accessible name, and visible label when not readOnly'),
     value: t.number().desc('0 = none; readOnly may show halves'),
-    max: t.number().def(5),
+    max: t.number().int().def(5),
     readOnly: t.boolean().def(false),
     size: t.enum(['sm', 'md', 'lg']).def('md'),
   },
-  events: { change: t.number() },
+  events: { change: t.number().int() },
   states: ['default', 'hover', 'focused', 'readOnly'],
   rules: [
     'Filled stars use tokens.color.warning when defined, else tokens.color.primary; empty stars are outlined.',

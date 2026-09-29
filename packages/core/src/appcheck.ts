@@ -6,6 +6,7 @@ import { DIRS, type Project } from './loader.ts';
 import { didYouMean, suggest } from './suggest.ts';
 import { parseTypeString, refsIn } from './types.ts';
 import { stringsProgress } from './i18ncheck.ts';
+import { FLUTTER, dartScreenFile, snake } from './flutter.ts';
 
 export const APP_FILE = `${DIRS.spec}/app.ts`;
 
@@ -32,7 +33,7 @@ export function checkApp(project: Project): Report {
   }
 
   const listed = new Set(app.components);
-  for (const name of uiFiles(project.root)) {
+  for (const name of uiFiles(project.root, [...project.contracts.keys()])) {
     if (project.contracts.has(name) && !listed.has(name)) {
       const typo = suggest(name, app.components.filter((c) => !project.contracts.has(c)));
       r.warn(`${DIRS.ui}/${name}`, typo
@@ -58,13 +59,14 @@ export function notInOutline(name: string, app: AppOutline, hasContract: (n: str
  * What is done and what is left, per outline entry. Informational only:
  * an outlined screen with no spec yet is work to do, not a failure.
  */
-export function progress(project: Project, catalog: Catalog, specs: ScreenSpec[], platform: 'react' | 'flutter'): string[] {
+export function progress(project: Project, catalog: Catalog, specs: ScreenSpec[], platforms: ('react' | 'flutter')[]): string[] {
   const app = project.app!;
   const screens = Object.keys(app.screens);
   const described = new Set(project.screens.map((d) => d.name));
   const specced = new Set(specs.map((s) => s.screen));
-  const coded = new Set(screens.filter((s) => existsSync(join(project.root, 'src', DIRS.screens, `${s}Screen.tsx`))));
-  const built = new Set(app.components.filter((c) => catalog.components[c]?.impl[platform]));
+  const coded = (p: 'react' | 'flutter') => new Set(screens.filter((s) => existsSync(join(project.root, p === 'react' ? `src/${DIRS.screens}/${s}Screen.tsx` : dartScreenFile(s)))));
+  const built = (p: 'react' | 'flutter') => new Set(app.components.filter((c) => catalog.components[c]?.impl[p]));
+  const tag = (p: string) => (platforms.length > 1 ? ` ${p}` : '');
 
   const stage = (label: string, done: Set<string>, of: string[], hint: string) => {
     const missing = of.filter((n) => !done.has(n));
@@ -83,8 +85,8 @@ export function progress(project: Project, catalog: Catalog, specs: ScreenSpec[]
     ...(used.size ? [stage('domain', declared, [...used].sort(), `${DIRS.spec}/domain.ts`)] : []),
     stage('described', described, screens, `${DIRS.spec}/screens/<name>.ts`),
     stage('spec', specced, screens, `${DIRS.screens}/<name>.ui.json`),
-    stage('code', coded, screens, `src/${DIRS.screens}/<Name>Screen.tsx`),
-    stage('in ui/', built, app.components, 'fw docs <Name>, write ui/<Name>, fw verify <Name>'),
+    ...platforms.map((p) => stage(`code${tag(p)}`, coded(p), screens, p === 'react' ? `src/${DIRS.screens}/<Name>Screen.tsx` : `${FLUTTER.screens}/<name>_screen.dart`)),
+    ...platforms.map((p) => stage(p === 'react' ? 'in ui/' : 'in lib/ui/', built(p), app.components, `fw docs <Name>, write ${p === 'react' ? 'ui/<Name>.tsx' : `${FLUTTER.ui}/<name>.dart`}, fw verify <Name>`)),
     ...stringsProgress(project),
     ...navigationMap(project),
   ];
@@ -111,8 +113,15 @@ function navigationMap(project: Project): string[] {
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-function uiFiles(root: string): string[] {
-  const dir = join(root, DIRS.ui);
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir).filter((f) => /\.(tsx|jsx|dart)$/.test(f)).map((f) => basename(f, extname(f)));
+/** Component names implemented in ui/ (React, file = Name) and lib/ui/ (Flutter, file = snake_name). */
+function uiFiles(root: string, contracts: string[]): string[] {
+  const out: string[] = [];
+  const web = join(root, DIRS.ui);
+  if (existsSync(web)) out.push(...readdirSync(web).filter((f) => /\.(tsx|jsx)$/.test(f)).map((f) => basename(f, extname(f))));
+  const lib = join(root, FLUTTER.ui);
+  if (existsSync(lib)) {
+    const bySnake = new Map(contracts.map((c) => [snake(c), c]));
+    for (const f of readdirSync(lib)) if (f.endsWith('.dart') && !f.endsWith('.g.dart')) { const n = bySnake.get(basename(f, '.dart')); if (n) out.push(n); }
+  }
+  return [...new Set(out)];
 }

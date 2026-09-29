@@ -5,12 +5,13 @@ import { Report } from './diagnostics.ts';
 import { didYouMean, suggest } from './suggest.ts';
 import { notInOutline } from './appcheck.ts';
 import { BACK_ACTION, type ScreenInfo } from './screens.ts';
+import { dartFile } from './flutter.ts';
 
 /**
  * Validate one screen spec against the catalog.
  * Every error carries a location such as elements.kpi.props.totals.
  */
-export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts: { domain?: Record<string, TypeNode>; platform?: string; app?: AppOutline; screens?: ScreenInfo[]; i18n?: ValueCtx['i18n'] } = {}): Report {
+export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts: { domain?: Record<string, TypeNode>; platforms?: ('react' | 'flutter')[]; app?: AppOutline; screens?: ScreenInfo[]; i18n?: ValueCtx['i18n'] } = {}): Report {
   const r = new Report(file);
   const els = spec.elements ?? {};
   // The screen description is the source of truth for actions and data; the spec may omit both.
@@ -111,8 +112,8 @@ export function checkSpec(spec: ScreenSpec, catalog: Catalog, file: string, opts
         r.error(`${where}.on.${ev}`, `action "${action}" is not declared for this screen [${[...actions].join(', ')}].${didYouMean(action, actions)}${info?.format === 'detail' ? ` Add it to goTo or local in ${info.file}.` : ''}`);
     }
     if (!entry) continue;
-    if (opts.platform && !entry.impl[opts.platform as 'react' | 'flutter'])
-      r.error(`${where}.type`, `${el.type} is not materialized for ${opts.platform} yet — run Phase A (write ui/${el.type}, then fw verify ${el.type})`);
+    for (const p of opts.platforms ?? []) if (!entry.impl[p])
+      r.error(`${where}.type`, `${el.type} is not materialized for ${p} yet — run Phase A (write ${p === 'react' ? `ui/${el.type}.tsx` : dartFile(el.type)}, then fw verify ${el.type})`);
 
     if (el.children?.length && !entry.children) r.error(`${where}.children`, `${el.type} does not accept children`);
 

@@ -27,7 +27,7 @@ Sinh ra:
 
 | Đường dẫn | Là gì | Ai sửa |
 |---|---|---|
-| `ui-rules/*.rule.ts` | 68 hợp đồng ship sẵn | không — override trong `ui-spec/components/` |
+| `ui-rules/*.rule.ts` | 76 hợp đồng ship sẵn | không — override trong `ui-spec/components/` |
 | `ui-spec/app.ts` | outline: mọi màn và component, theo tên | **bạn**, viết đầu tiên |
 | `ui-spec/project.ts` | tên, nền tảng, agent, token, guard | **bạn** |
 | `ui-spec/domain.ts` | kiểu dữ liệu nghiệp vụ | **bạn** |
@@ -257,6 +257,30 @@ npx fw check src/screens/HomeScreen.tsx
 
 Lỗi khi có `<div>`, import component ngoài, hay khai component ngay trong file màn.
 
+## 5b. Flutter
+
+`fw init --platform flutter` trong một project Flutter (hoặc thêm `--create flutter` để tạo mới). `ui-spec/` và
+spec màn giữ nguyên, chỉ phần code khác đi:
+
+| | React | Flutter |
+|---|---|---|
+| component | `ui/ListItem.tsx` | `lib/ui/list_item.dart`, `class UiListItem` |
+| màn | `src/screens/CartScreen.tsx` | `lib/screens/cart_screen.dart`, `class CartScreen` |
+| token | import thẳng `project.ts` | `lib/ui/tokens.g.dart` (`UiTokens.colorPrimary`), fw tự sinh |
+| chữ đã dịch | hàm dịch của project | `lib/l10n/strings.g.dart` (`UiStrings.cartEmptyTitle`), fw tự sinh |
+| kiểm kiểu | `tsc` | `flutter analyze` |
+
+- **Mọi class Flutter có tiền tố `Ui`**, vì 19 tên component trùng widget Flutter và `List` trùng `dart:core`.
+- **`fw docs <Tên>` in đúng chữ ký Dart** (enum, class con, constructor, field, callback `onX`,
+  `List<Widget> children`); agent chỉ viết `build()`. `fw verify` kiểm đúng chữ ký đó. Giá trị enum được đổi
+  thành tên Dart: `'5:7'` → `v5x7`, `'oldest-first'` → `oldestFirst`.
+- **Màn** chỉ import `lib/ui/ui.dart` (fw tự sinh) và các lớp nền `package:flutter/widgets.dart show StatelessWidget,
+  StatefulWidget, State, Widget, BuildContext`. `fw check` báo: import `material.dart`, dùng widget ngoài `lib/ui/`
+  (`Column`, `Text`, widget của thư viện khác), khai widget thứ hai trong file màn, và chữ viết cứng khi app có
+  nhiều ngôn ngữ.
+- File sinh tự động (`ui.dart`, `tokens.g.dart`, `strings.g.dart`) không cần gói pub nào; đừng sửa tay.
+- Ví dụ: `examples/gallery-flutter` vật chất hoá cả 76 contract.
+
 ## 6. Kiểm hết trước khi commit
 
 ```sh
@@ -318,7 +342,7 @@ Mọi lệnh tự làm mới `ui.catalog.json` và file chỉ dẫn trước khi
 
 ## 10. Giới hạn 1.0
 
-Chỉ React. `fw verify` kiểm bề mặt. Chưa có `defineShell`, `defineSources`, MCP. `--create` chưa thử. Đã publish npm 25/09/2026.
+React và Flutter. `fw verify` kiểm bề mặt (không chạy hành vi). `fw add` chỉ cho React. Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Đã publish npm 25/09/2026.
 Hứa nhất quán **trong một project**, không hứa hai project ra code giống nhau.
 
 ## 11. Ví dụ

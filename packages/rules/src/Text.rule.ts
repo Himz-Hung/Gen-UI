@@ -13,4 +13,5 @@ export default defineComponent({
   rules: ['Uses tokens.font.body.', 'truncate=true never wraps and shows an ellipsis; the full value remains available to assistive tech.'],
   a11y: ['Rendered as text, not as an image.'],
   examples: [{ value: 'Charizard · Holo Rare' }, { value: 'Out of stock', color: 'danger', size: 'sm' }],
+  platform: { react: ["<p> or <span> by context"], flutter: ["Text with a TextStyle from tokens; maxLines 1 + ellipsis when truncate"] },
 });

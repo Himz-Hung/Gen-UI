@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-28T09:55:05.766Z",
+  "generatedAt": "2026-09-29T02:08:02.856Z",
   "components": {
     "Accordion": {
       "name": "Accordion",
@@ -96,6 +96,113 @@
       "impl": {
         "react": "ui/Alert.tsx"
       }
+    },
+    "AvailabilityCalendar": {
+      "name": "AvailabilityCalendar",
+      "category": "data",
+      "purpose": "A month grid showing which days are available, limited, booked or closed, with an optional price per day. Pressing a day lets the screen start a booking.",
+      "props": {
+        "month": {
+          "kind": "string",
+          "description": "visible month, \"YYYY-MM\""
+        },
+        "days": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "date": {
+                "kind": "string",
+                "description": "ISO date"
+              },
+              "status": {
+                "kind": "enum",
+                "values": [
+                  "available",
+                  "limited",
+                  "booked",
+                  "closed"
+                ]
+              },
+              "priceLabel": {
+                "kind": "string",
+                "optional": true,
+                "description": "pre-formatted, e.g. \"$120\""
+              }
+            }
+          },
+          "description": "days not listed are shown as available without a price"
+        },
+        "selectedStart": {
+          "kind": "string",
+          "optional": true,
+          "description": "ISO date, start of the highlighted range"
+        },
+        "selectedEnd": {
+          "kind": "string",
+          "optional": true,
+          "description": "ISO date, end of the highlighted range"
+        },
+        "min": {
+          "kind": "string",
+          "optional": true,
+          "description": "earliest month that can be shown, \"YYYY-MM\""
+        },
+        "max": {
+          "kind": "string",
+          "optional": true,
+          "description": "latest month that can be shown, \"YYYY-MM\""
+        },
+        "weekStart": {
+          "kind": "enum",
+          "values": [
+            "monday",
+            "sunday"
+          ],
+          "optional": true,
+          "default": "monday"
+        },
+        "legend": {
+          "kind": "object",
+          "fields": {
+            "available": {
+              "kind": "string",
+              "text": true
+            },
+            "limited": {
+              "kind": "string",
+              "text": true
+            },
+            "booked": {
+              "kind": "string",
+              "text": true
+            },
+            "closed": {
+              "kind": "string",
+              "text": true
+            }
+          },
+          "optional": true,
+          "description": "when given, a legend with these labels is shown under the grid"
+        }
+      },
+      "events": {
+        "dayPress": {
+          "kind": "string",
+          "description": "ISO date of a pressed available or limited day"
+        },
+        "monthChange": {
+          "kind": "string",
+          "description": "requested month, \"YYYY-MM\""
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
     },
     "Avatar": {
       "name": "Avatar",
@@ -238,7 +345,8 @@
       "events": {
         "barPress": {
           "kind": "number",
-          "description": "index of the pressed bar"
+          "description": "index of the pressed bar",
+          "integer": true
         }
       },
       "children": false,
@@ -461,7 +569,8 @@
           "kind": "number",
           "optional": true,
           "default": 0,
-          "description": "visible slide, 0-based"
+          "description": "visible slide, 0-based",
+          "integer": true
         },
         "loop": {
           "kind": "boolean",
@@ -483,7 +592,8 @@
       "events": {
         "change": {
           "kind": "number",
-          "description": "new index"
+          "description": "new index",
+          "integer": true
         }
       },
       "children": true,
@@ -845,6 +955,103 @@
       "source": "rules",
       "impl": {}
     },
+    "DateRangePicker": {
+      "name": "DateRangePicker",
+      "category": "input",
+      "purpose": "Pick a start and an end date (check-in / check-out, a date range filter). Values are ISO dates; the component shows them in the user's locale. For one date use DatePicker.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "start": {
+          "kind": "string",
+          "description": "ISO date, \"\" for none"
+        },
+        "end": {
+          "kind": "string",
+          "description": "ISO date, \"\" for none"
+        },
+        "min": {
+          "kind": "string",
+          "optional": true,
+          "description": "earliest selectable ISO date"
+        },
+        "max": {
+          "kind": "string",
+          "optional": true,
+          "description": "latest selectable ISO date"
+        },
+        "disabledDates": {
+          "kind": "array",
+          "of": {
+            "kind": "string"
+          },
+          "optional": true,
+          "default": [],
+          "description": "ISO dates that cannot be picked and that a range may not cross (booked nights)"
+        },
+        "minNights": {
+          "kind": "number",
+          "optional": true,
+          "description": "shortest allowed range, in nights",
+          "integer": true
+        },
+        "maxNights": {
+          "kind": "number",
+          "optional": true,
+          "description": "longest allowed range, in nights",
+          "integer": true
+        },
+        "summary": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted, shown under the field, e.g. \"3 nights\"",
+          "text": true
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "object",
+          "fields": {
+            "start": {
+              "kind": "string"
+            },
+            "end": {
+              "kind": "string"
+            }
+          },
+          "description": "a complete range; both are ISO dates"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
     "DescriptionList": {
       "name": "DescriptionList",
       "category": "data",
@@ -1078,6 +1285,70 @@
       "source": "rules",
       "impl": {}
     },
+    "FloatingActionButton": {
+      "name": "FloatingActionButton",
+      "category": "action",
+      "purpose": "The one main action of a screen, floating over the content at the bottom corner (\"New order\", \"+\"). At most one per screen; for other actions use Button.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name; shown next to the icon when extended",
+          "text": true
+        },
+        "icon": {
+          "kind": "string",
+          "description": "icon name from the project set, e.g. \"plus\""
+        },
+        "extended": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "show the label next to the icon"
+        },
+        "position": {
+          "kind": "enum",
+          "values": [
+            "end",
+            "center",
+            "start"
+          ],
+          "optional": true,
+          "default": "end"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": [],
+        "cannotBeInside": [
+          "Button",
+          "Link",
+          "Card",
+          "List"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
     "FormField": {
       "name": "FormField",
       "category": "form",
@@ -1218,6 +1489,57 @@
         "react": "ui/Heading.tsx"
       }
     },
+    "HorizontalScroll": {
+      "name": "HorizontalScroll",
+      "category": "layout",
+      "purpose": "A row of items that scrolls sideways (\"New arrivals\", \"Recently viewed\"). Several items are visible at once; for one slide at a time use Carousel.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the row, usually the section title",
+          "text": true
+        },
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "3",
+          "description": "index into tokens.spacing"
+        },
+        "itemWidth": {
+          "kind": "number",
+          "optional": true,
+          "description": "fixed width of every item in logical pixels; omitted = each item keeps its own width"
+        },
+        "snap": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "scrolling settles on an item edge"
+        },
+        "showArrows": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "previous / next controls on pointer devices"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
     "Icon": {
       "name": "Icon",
       "category": "media",
@@ -1304,6 +1626,11 @@
           "kind": "boolean",
           "optional": true,
           "default": false
+        },
+        "badge": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted count shown on the icon, e.g. \"3\"; \"\" shows a dot; omitted = no badge"
         }
       },
       "events": {
@@ -1379,6 +1706,61 @@
       "impl": {
         "react": "ui/Image.tsx"
       }
+    },
+    "ImageViewer": {
+      "name": "ImageViewer",
+      "category": "media",
+      "purpose": "Full-screen view of one or more images with zoom and swipe (product photos, a card scan). Opened from an Image the user pressed.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "label": {
+          "kind": "string",
+          "description": "accessible name, e.g. \"Card photos\"",
+          "text": true
+        },
+        "images": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "src": {
+                "kind": "string"
+              },
+              "alt": {
+                "kind": "string",
+                "text": true
+              }
+            }
+          }
+        },
+        "index": {
+          "kind": "number",
+          "optional": true,
+          "default": 0,
+          "description": "image shown, 0-based",
+          "integer": true
+        }
+      },
+      "events": {
+        "close": {
+          "kind": "void",
+          "description": "close control, Escape, or swipe down"
+        },
+        "change": {
+          "kind": "number",
+          "description": "new index",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
     },
     "InfiniteScroll": {
       "name": "InfiniteScroll",
@@ -1521,6 +1903,12 @@
           "kind": "boolean",
           "optional": true,
           "default": false
+        },
+        "revealLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "type=password: accessible name of the show / hide control, e.g. \"Show password\"",
+          "text": true
         }
       },
       "events": {
@@ -1605,10 +1993,12 @@
           "kind": "object",
           "fields": {
             "series": {
-              "kind": "number"
+              "kind": "number",
+              "integer": true
             },
             "index": {
-              "kind": "number"
+              "kind": "number",
+              "integer": true
             }
           }
         }
@@ -1883,16 +2273,19 @@
       "props": {
         "page": {
           "kind": "number",
-          "description": "1-based current page"
+          "description": "1-based current page",
+          "integer": true
         },
         "pageCount": {
-          "kind": "number"
+          "kind": "number",
+          "integer": true
         }
       },
       "events": {
         "change": {
           "kind": "number",
-          "description": "requested page, 1-based"
+          "description": "requested page, 1-based",
+          "integer": true
         }
       },
       "children": false,
@@ -1948,7 +2341,8 @@
       "events": {
         "slicePress": {
           "kind": "number",
-          "description": "index of the pressed slice"
+          "description": "index of the pressed slice",
+          "integer": true
         }
       },
       "children": false,
@@ -1974,7 +2368,8 @@
         "length": {
           "kind": "number",
           "optional": true,
-          "default": 6
+          "default": 6,
+          "integer": true
         },
         "type": {
           "kind": "enum",
@@ -2175,7 +2570,8 @@
         "max": {
           "kind": "number",
           "optional": true,
-          "default": 5
+          "default": 5,
+          "integer": true
         },
         "readOnly": {
           "kind": "boolean",
@@ -2195,11 +2591,56 @@
       },
       "events": {
         "change": {
-          "kind": "number"
+          "kind": "number",
+          "integer": true
         }
       },
       "children": false,
       "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "RichText": {
+      "name": "RichText",
+      "category": "typography",
+      "purpose": "A block of formatted text written in a small Markdown subset: product descriptions, terms, help text. For a single plain line use Text.",
+      "props": {
+        "markdown": {
+          "kind": "string",
+          "description": "paragraphs, **bold**, *italic*, [links](url), \"- \" and \"1. \" lists, \"## \" / \"### \" headings",
+          "text": true
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "color": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "muted"
+          ],
+          "optional": true,
+          "default": "default"
+        }
+      },
+      "events": {
+        "link": {
+          "kind": "string",
+          "description": "url of a pressed link; the screen decides what to open"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
       "version": 1,
       "source": "rules",
       "impl": {}
@@ -2470,6 +2911,193 @@
       "source": "rules",
       "impl": {}
     },
+    "SiteFooter": {
+      "name": "SiteFooter",
+      "category": "navigation",
+      "purpose": "The footer shared by every page: columns of links, contact or social links, and the legal line. It stacks on narrow screens.",
+      "props": {
+        "brand": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "description": {
+          "kind": "string",
+          "optional": true,
+          "description": "one or two sentences under the brand",
+          "text": true
+        },
+        "columns": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "title": {
+                "kind": "string",
+                "text": true
+              },
+              "links": {
+                "kind": "array",
+                "of": {
+                  "kind": "object",
+                  "fields": {
+                    "value": {
+                      "kind": "string"
+                    },
+                    "label": {
+                      "kind": "string",
+                      "text": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "optional": true,
+          "default": []
+        },
+        "social": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string"
+              }
+            }
+          },
+          "optional": true,
+          "default": [],
+          "description": "icon buttons named by label"
+        },
+        "legal": {
+          "kind": "string",
+          "optional": true,
+          "description": "e.g. \"© 2026 Seaside Stays\"",
+          "text": true
+        }
+      },
+      "events": {
+        "navigate": {
+          "kind": "string",
+          "description": "value of a pressed link or social button"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
+    "SiteHeader": {
+      "name": "SiteHeader",
+      "category": "navigation",
+      "purpose": "The header shared by every page of a site or app: brand, main links and account actions. It adapts to narrow screens with a menu. For the title bar of one screen use TopBar.",
+      "props": {
+        "brand": {
+          "kind": "string",
+          "description": "site or app name, also the accessible name of the home link",
+          "text": true
+        },
+        "logo": {
+          "kind": "string",
+          "optional": true,
+          "description": "logo image src; the brand text is still the accessible name"
+        },
+        "links": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "active": {
+                "kind": "boolean",
+                "optional": true
+              }
+            }
+          },
+          "optional": true,
+          "default": []
+        },
+        "actions": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              },
+              "variant": {
+                "kind": "enum",
+                "values": [
+                  "primary",
+                  "secondary",
+                  "ghost"
+                ],
+                "optional": true
+              }
+            }
+          },
+          "optional": true,
+          "default": [],
+          "description": "e.g. \"Sign in\", a primary \"Book now\""
+        },
+        "menuLabel": {
+          "kind": "string",
+          "description": "accessible name of the narrow-screen menu button, e.g. \"Menu\"",
+          "text": true
+        },
+        "sticky": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "stays at the top while the page scrolls"
+        }
+      },
+      "events": {
+        "brandPress": {
+          "kind": "void"
+        },
+        "navigate": {
+          "kind": "string",
+          "description": "value of a pressed link"
+        },
+        "action": {
+          "kind": "string",
+          "description": "value of a pressed action"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {}
+    },
     "Skeleton": {
       "name": "Skeleton",
       "category": "feedback",
@@ -2490,7 +3118,8 @@
           "kind": "number",
           "optional": true,
           "default": 1,
-          "description": "for shape=text"
+          "description": "for shape=text",
+          "integer": true
         },
         "ratio": {
           "kind": "enum",
@@ -2735,7 +3364,8 @@
         },
         "current": {
           "kind": "number",
-          "description": "0-based index of the current step"
+          "description": "0-based index of the current step",
+          "integer": true
         },
         "orientation": {
           "kind": "enum",
@@ -2756,7 +3386,8 @@
       "events": {
         "press": {
           "kind": "number",
-          "description": "index of a pressed completed step"
+          "description": "index of a pressed completed step",
+          "integer": true
         }
       },
       "children": false,
@@ -2938,6 +3569,12 @@
           "kind": "boolean",
           "optional": true,
           "default": false
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "rows are being fetched"
         }
       },
       "events": {
@@ -3108,7 +3745,8 @@
           "kind": "number",
           "optional": true,
           "default": 3,
-          "description": "visible lines before it scrolls or grows"
+          "description": "visible lines before it scrolls or grows",
+          "integer": true
         },
         "autoGrow": {
           "kind": "boolean",
@@ -3118,7 +3756,8 @@
         },
         "maxLength": {
           "kind": "number",
-          "optional": true
+          "optional": true,
+          "integer": true
         },
         "hint": {
           "kind": "string",
@@ -3242,7 +3881,8 @@
           "kind": "number",
           "optional": true,
           "default": 4000,
-          "description": "milliseconds before it closes by itself; 0 = stays until closed"
+          "description": "milliseconds before it closes by itself; 0 = stays until closed",
+          "integer": true
         }
       },
       "events": {

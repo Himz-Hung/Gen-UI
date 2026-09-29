@@ -18,6 +18,8 @@ export interface TypeNode {
   description?: string;
   /** string the user reads (label, title…): translated when the project has several languages */
   text?: boolean;
+  /** number that is always whole (a page, an index, a count): int in Dart */
+  integer?: boolean;
 }
 
 class Builder implements TypeNode {
@@ -30,6 +32,7 @@ class Builder implements TypeNode {
   default?: unknown;
   description?: string;
   text?: boolean;
+  integer?: boolean;
 
   constructor(node: TypeNode) {
     this.kind = node.kind;
@@ -39,6 +42,8 @@ class Builder implements TypeNode {
   opt(): Builder { return new Builder({ ...this, optional: true }); }
   /** Prop may be omitted; this value is used when it is. */
   def(value: unknown): Builder { return new Builder({ ...this, optional: true, default: value }); }
+  /** Whole numbers only (page, index, count). Dart gets int; specs must not use decimals. */
+  int(): Builder { return new Builder({ ...this, integer: true }); }
   /** Human description, shown to the agent. */
   desc(text: string): Builder { return new Builder({ ...this, description: text }); }
 }
@@ -72,13 +77,15 @@ export function plain(node: TypeNode): TypeNode {
   if (node.default !== undefined) out.default = node.default;
   if (node.description) out.description = node.description;
   if (node.text) out.text = true;
+  if (node.integer) out.integer = true;
   return out;
 }
 
 /** Render a type as short text: string, 'a' | 'b', Card[], { x: number } */
 export function typeText(node: TypeNode): string {
   switch (node.kind) {
-    case 'string': case 'number': case 'boolean': case 'void': case 'node': return node.kind;
+    case 'number': return node.integer ? 'integer' : 'number';
+    case 'string': case 'boolean': case 'void': case 'node': return node.kind;
     case 'enum': return (node.values ?? []).map((v) => `'${v}'`).join(' | ');
     case 'ref': return node.ref ?? 'unknown';
     case 'array': return `${typeText(node.of!)}[]`;
@@ -124,7 +131,7 @@ export function sameType(a: TypeNode, b: TypeNode): boolean {
 export function checkLiteral(value: unknown, node: TypeNode): string | null {
   switch (node.kind) {
     case 'string': return typeof value === 'string' ? null : `expected string, got ${describe(value)}`;
-    case 'number': return typeof value === 'number' ? null : `expected number, got ${describe(value)}`;
+    case 'number': return typeof value !== 'number' ? `expected number, got ${describe(value)}` : node.integer && !Number.isInteger(value) ? `expected a whole number, got ${value}` : null;
     case 'boolean': return typeof value === 'boolean' ? null : `expected boolean, got ${describe(value)}`;
     case 'enum': return typeof value === 'string' && node.values!.includes(value)
       ? null : `expected one of ${typeText(node)}, got ${describe(value)}`;

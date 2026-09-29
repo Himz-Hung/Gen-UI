@@ -9,7 +9,7 @@ export default defineComponent({
     height: t.number().def(240),
     showValues: t.boolean().def(false),
   },
-  events: { barPress: t.number().desc('index of the pressed bar') },
+  events: { barPress: t.number().int().desc('index of the pressed bar') },
   states: ['default', 'empty'],
   rules: [
     'Bars start at 0; one color (tokens.color.primary) unless a bar is highlighted by the screen.',

@@ -1,6 +1,6 @@
 {
   "name": "@himz-genui/core",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Contract-driven UI for coding agents. Ship component contracts, let the agent materialize them once, compose screens from them, and gate every step with a deterministic check.",
   "keywords": [
     "ui",

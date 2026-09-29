@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+
+/// The project icon set: contract icon names → Material icons. Unknown names get a neutral placeholder.
+IconData uiIconData(String name) => _icons[name] ?? Icons.crop_square;
+
+const Map<String, IconData> _icons = {
+  'cart': Icons.shopping_cart_outlined,
+  'plus': Icons.add,
+  'minus': Icons.remove,
+  'trash': Icons.delete_outline,
+  'search': Icons.search,
+  'close': Icons.close,
+  'back': Icons.arrow_back,
+  'chevron-left': Icons.chevron_left,
+  'chevron-right': Icons.chevron_right,
+  'chevron-down': Icons.expand_more,
+  'check': Icons.check,
+  'info': Icons.info_outline,
+  'warning': Icons.warning_amber_outlined,
+  'error': Icons.error_outline,
+  'success': Icons.check_circle_outline,
+  'star': Icons.star,
+  'star-half': Icons.star_half,
+  'star-empty': Icons.star_border,
+  'home': Icons.home_outlined,
+  'user': Icons.person_outline,
+  'share': Icons.share_outlined,
+  'grid': Icons.grid_view,
+  'list': Icons.view_list,
+  'box': Icons.inventory_2_outlined,
+  'more': Icons.more_horiz,
+  'menu': Icons.menu,
+  'calendar': Icons.calendar_today_outlined,
+  'upload': Icons.upload_file,
+  'image': Icons.image_outlined,
+  'play': Icons.play_arrow,
+  'pause': Icons.pause,
+  'refresh': Icons.refresh,
+  'filter': Icons.filter_list,
+  'sort-asc': Icons.arrow_upward,
+  'sort-desc': Icons.arrow_downward,
+};

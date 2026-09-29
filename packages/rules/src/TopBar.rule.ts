@@ -11,4 +11,5 @@ export default defineComponent({
   rules: ['Height 56 logical pixels; sticks to the top while scrolling.', 'Title truncates on one line.', 'showBack=true shows a back control at the start that emits back.'],
   a11y: ['Landmark banner/header; back control labelled "Back".'],
   composition: { canContain: [] },
+  platform: { react: ["<header> with an <h1> title and buttons"], flutter: ["an AppBar-like Row (it is not the Scaffold appBar); back is an IconButton"] },
 });

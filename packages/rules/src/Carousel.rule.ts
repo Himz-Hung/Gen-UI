@@ -4,12 +4,12 @@ export default defineComponent({
   purpose: 'One slide at a time from a small set (photos of one card, onboarding). Children are the slides.',
   props: {
     label: t.text().desc('accessible name of the carousel, e.g. "Card photos"'),
-    index: t.number().def(0).desc('visible slide, 0-based'),
+    index: t.number().int().def(0).desc('visible slide, 0-based'),
     loop: t.boolean().def(false),
     showDots: t.boolean().def(true),
     showArrows: t.boolean().def(true).desc('on pointer devices'),
   },
-  events: { change: t.number().desc('new index') },
+  events: { change: t.number().int().desc('new index') },
   children: true,
   states: ['default', 'dragging'],
   rules: [

@@ -1,0 +1,33 @@
+import { defineComponent, t } from '@himz-genui/core';
+export default defineComponent({
+  name: 'DateRangePicker', category: 'input',
+  purpose: 'Pick a start and an end date (check-in / check-out, a date range filter). Values are ISO dates; the component shows them in the user\'s locale. For one date use DatePicker.',
+  props: {
+    label: t.text(),
+    start: t.string().desc('ISO date, "" for none'),
+    end: t.string().desc('ISO date, "" for none'),
+    min: t.string().opt().desc('earliest selectable ISO date'),
+    max: t.string().opt().desc('latest selectable ISO date'),
+    disabledDates: t.array(t.string()).def([]).desc('ISO dates that cannot be picked and that a range may not cross (booked nights)'),
+    minNights: t.number().int().opt().desc('shortest allowed range, in nights'),
+    maxNights: t.number().int().opt().desc('longest allowed range, in nights'),
+    summary: t.text().opt().desc('pre-formatted, shown under the field, e.g. "3 nights"'),
+    placeholder: t.text().opt(),
+    hint: t.text().opt(),
+    error: t.text().opt(),
+    disabled: t.boolean().def(false),
+  },
+  events: { change: t.object({ start: t.string(), end: t.string() }).desc('a complete range; both are ISO dates') },
+  states: ['empty', 'picking-start', 'picking-end', 'complete', 'disabled', 'error'],
+  rules: [
+    'The first pick sets the start, the second the end; a second pick before the start starts over from that date.',
+    'A range may not cross a disabled date, nor be shorter than minNights or longer than maxNights; such end dates look disabled while picking.',
+    'change is emitted only for a complete range; start and end stay ISO, the field shows them formatted for the locale.',
+    'The calendar shows two months side by side on wide screens and one on narrow screens.',
+    'Same label, hint, error and height as Input.',
+  ],
+  a11y: ['Keyboard: arrows move by day, Page by month, Enter picks; the chosen start and end are announced.'],
+  composition: { canContain: [] },
+  platform: { react: ['a button-like field opening a popover (sheet on narrow screens) with a month grid'], flutter: ['a read-only m.TextField opening m.showDateRangePicker (selectableDayPredicate for disabledDates), validating the range before emitting'] },
+  examples: [{ label: 'Stay', start: '2026-10-12', end: '2026-10-15', summary: '3 nights', disabledDates: ['2026-10-20'] }],
+});

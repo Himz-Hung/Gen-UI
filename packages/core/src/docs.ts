@@ -2,6 +2,7 @@ import { isScreenDetail, type Catalog, type ComponentContract, type ScreenDetail
 import { typeText, type TypeNode } from './types.ts';
 import type { ScreenInfo } from './screens.ts';
 import { isBinding, isI18n } from './values.ts';
+import { renderFlutterSignature } from './flutter.ts';
 
 /** "- columns[].label — (text)" for fields inside array / object props that carry a text flag or a description. */
 function nestedNotes(path: string, node: TypeNode): string[] {
@@ -15,7 +16,7 @@ function nestedNotes(path: string, node: TypeNode): string[] {
 }
 
 /** Markdown the agent reads before materializing a component. */
-export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter'): string {
+export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter' | ('react' | 'flutter')[]): string {
   const L: string[] = [];
   L.push(`# ${c.name}`, '', `_${c.category}_ · contract v${c.version ?? 1}`, '', c.purpose, '');
   L.push('## Props', '', '| prop | type | default | notes |', '|---|---|---|---|');
@@ -39,10 +40,14 @@ export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter')
     if (c.composition.canContain) L.push(`- May only contain: ${c.composition.canContain.join(', ')}`);
     if (c.composition.cannotBeInside) L.push(`- Never inside: ${c.composition.cannotBeInside.join(', ')}`);
   }
-  const plats = platform ? [platform] : (Object.keys(c.platform ?? {}) as ('react' | 'flutter')[]);
+  const plats = platform ? (Array.isArray(platform) ? platform : [platform]) : (Object.keys(c.platform ?? {}) as ('react' | 'flutter')[]);
   for (const p of plats) {
     const hints = c.platform?.[p];
     if (hints?.length) L.push('', `## ${p} hints (advisory)`, '', ...hints.map((x) => `- ${x}`));
+  }
+  if (plats.includes('flutter')) {
+    L.push('', '## Flutter signature (fw verify checks exactly this)', '', '```dart', renderFlutterSignature(c), '```', '',
+      'Screens get it through `lib/ui/ui.dart` (generated). Colors, spacing, radius and fonts come from `UiTokens` (lib/ui/tokens.g.dart, generated from ui-spec/project.ts).');
   }
   if (c.examples?.length) {
     L.push('', '## Examples', '', '```json', ...c.examples.map((e) => JSON.stringify(e)), '```');

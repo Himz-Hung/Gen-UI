@@ -10,7 +10,7 @@ export default defineComponent({
     height: t.number().def(240),
     showLegend: t.boolean().def(true).desc('only shown with more than one series'),
   },
-  events: { pointPress: t.object({ series: t.number(), index: t.number() }) },
+  events: { pointPress: t.object({ series: t.number().int(), index: t.number().int() }) },
   states: ['default', 'empty'],
   rules: [
     'Series colors come from the project tokens in a fixed order (primary, secondary, then success, warning, danger).',

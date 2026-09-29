@@ -7,4 +7,5 @@ export default defineComponent({
   states: ['unchecked', 'checked', 'focused', 'disabled'],
   rules: ['Pressing the label toggles the box.', 'Box is 20 logical pixels; checked fill tokens.color.primary.'],
   a11y: ['Role checkbox with label as accessible name.'],
+  platform: { react: ["<input type=\"checkbox\"> inside its <label>"], flutter: ["CheckboxListTile, or Checkbox with a tappable label"] },
 });

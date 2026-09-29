@@ -9,4 +9,5 @@ export default defineComponent({
     hint: t.text().opt(),
   },
   rules: ['label above value; value uses heading font, size lg.', 'trend shows an arrow and color (success/danger/muted) plus the arrow glyph — never color alone.'],
+  platform: { react: ["<div> with the label and value; no number formatting"], flutter: ["a Column of two Texts"] },
 });

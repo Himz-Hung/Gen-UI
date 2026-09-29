@@ -5,7 +5,7 @@ export default defineComponent({
   props: {
     label: t.text(),
     value: t.string(),
-    length: t.number().def(6),
+    length: t.number().int().def(6),
     type: t.enum(['numeric', 'alphanumeric']).def('numeric'),
     mask: t.boolean().def(false).desc('hide characters, for PINs'),
     error: t.text().opt(),

@@ -1,0 +1,4155 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-29T02:08:05.378Z",
+  "components": {
+    "Accordion": {
+      "name": "Accordion",
+      "category": "data",
+      "purpose": "Sections that expand and collapse under their titles: FAQs, long settings. Children are the section contents, one per item, in order.",
+      "props": {
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "title": {
+                "kind": "string",
+                "text": true
+              }
+            }
+          }
+        },
+        "open": {
+          "kind": "array",
+          "of": {
+            "kind": "string"
+          },
+          "description": "values of the open sections"
+        },
+        "multiple": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "false: opening one closes the others"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "array",
+          "of": {
+            "kind": "string"
+          },
+          "description": "new list of open values"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/accordion.dart"
+      }
+    },
+    "Alert": {
+      "name": "Alert",
+      "category": "feedback",
+      "purpose": "Inline message about the current screen: info, success, warning or error. Not a toast.",
+      "props": {
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "info"
+        },
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "description": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "dismissible": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "dismiss": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/alert.dart"
+      }
+    },
+    "AvailabilityCalendar": {
+      "name": "AvailabilityCalendar",
+      "category": "data",
+      "purpose": "A month grid showing which days are available, limited, booked or closed, with an optional price per day. Pressing a day lets the screen start a booking.",
+      "props": {
+        "month": {
+          "kind": "string",
+          "description": "visible month, \"YYYY-MM\""
+        },
+        "days": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "date": {
+                "kind": "string",
+                "description": "ISO date"
+              },
+              "status": {
+                "kind": "enum",
+                "values": [
+                  "available",
+                  "limited",
+                  "booked",
+                  "closed"
+                ]
+              },
+              "priceLabel": {
+                "kind": "string",
+                "optional": true,
+                "description": "pre-formatted, e.g. \"$120\""
+              }
+            }
+          },
+          "description": "days not listed are shown as available without a price"
+        },
+        "selectedStart": {
+          "kind": "string",
+          "optional": true,
+          "description": "ISO date, start of the highlighted range"
+        },
+        "selectedEnd": {
+          "kind": "string",
+          "optional": true,
+          "description": "ISO date, end of the highlighted range"
+        },
+        "min": {
+          "kind": "string",
+          "optional": true,
+          "description": "earliest month that can be shown, \"YYYY-MM\""
+        },
+        "max": {
+          "kind": "string",
+          "optional": true,
+          "description": "latest month that can be shown, \"YYYY-MM\""
+        },
+        "weekStart": {
+          "kind": "enum",
+          "values": [
+            "monday",
+            "sunday"
+          ],
+          "optional": true,
+          "default": "monday"
+        },
+        "legend": {
+          "kind": "object",
+          "fields": {
+            "available": {
+              "kind": "string",
+              "text": true
+            },
+            "limited": {
+              "kind": "string",
+              "text": true
+            },
+            "booked": {
+              "kind": "string",
+              "text": true
+            },
+            "closed": {
+              "kind": "string",
+              "text": true
+            }
+          },
+          "optional": true,
+          "description": "when given, a legend with these labels is shown under the grid"
+        }
+      },
+      "events": {
+        "dayPress": {
+          "kind": "string",
+          "description": "ISO date of a pressed available or limited day"
+        },
+        "monthChange": {
+          "kind": "string",
+          "description": "requested month, \"YYYY-MM\""
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/availability_calendar.dart"
+      }
+    },
+    "Avatar": {
+      "name": "Avatar",
+      "category": "data",
+      "purpose": "Picture of a person or account, falling back to initials.",
+      "props": {
+        "name": {
+          "kind": "string",
+          "description": "person or account name: used for initials and the accessible name"
+        },
+        "src": {
+          "kind": "string",
+          "optional": true
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "shape": {
+          "kind": "enum",
+          "values": [
+            "circle",
+            "square"
+          ],
+          "optional": true,
+          "default": "circle"
+        },
+        "status": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "online",
+            "away",
+            "offline"
+          ],
+          "optional": true,
+          "default": "none"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/avatar.dart"
+      }
+    },
+    "Badge": {
+      "name": "Badge",
+      "category": "data",
+      "purpose": "Small status label (e.g. \"Holo\", \"Out of stock\"). Not interactive.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "neutral",
+            "primary",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "neutral"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/badge.dart"
+      }
+    },
+    "BarChart": {
+      "name": "BarChart",
+      "category": "chart",
+      "purpose": "Compare a value across categories (orders per set).",
+      "props": {
+        "summary": {
+          "kind": "string",
+          "description": "one sentence stating what the chart shows",
+          "text": true
+        },
+        "bars": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "label": {
+                "kind": "string",
+                "description": "category name, pre-formatted"
+              },
+              "value": {
+                "kind": "number"
+              },
+              "valueLabel": {
+                "kind": "string",
+                "optional": true,
+                "description": "pre-formatted, shown on the bar"
+              }
+            }
+          }
+        },
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "vertical",
+            "horizontal"
+          ],
+          "optional": true,
+          "default": "vertical"
+        },
+        "height": {
+          "kind": "number",
+          "optional": true,
+          "default": 240
+        },
+        "showValues": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "barPress": {
+          "kind": "number",
+          "description": "index of the pressed bar",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/bar_chart.dart"
+      }
+    },
+    "BottomNav": {
+      "name": "BottomNav",
+      "category": "navigation",
+      "purpose": "The app's 3–5 top-level destinations at the bottom of the screen on phones. For views inside one screen use Tabs; on wide screens use Sidebar.",
+      "props": {
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string"
+              },
+              "badge": {
+                "kind": "string",
+                "optional": true,
+                "description": "pre-formatted count, e.g. \"3\""
+              }
+            }
+          }
+        },
+        "value": {
+          "kind": "string"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "value of the pressed item"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/bottom_nav.dart"
+      }
+    },
+    "Breadcrumbs": {
+      "name": "Breadcrumbs",
+      "category": "navigation",
+      "purpose": "Where the current screen sits in a hierarchy (Home › Sets › Base Set). The last item is the current screen.",
+      "props": {
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              }
+            }
+          }
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "string",
+          "description": "value of a pressed ancestor"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/breadcrumbs.dart"
+      }
+    },
+    "Button": {
+      "name": "Button",
+      "category": "action",
+      "purpose": "Triggers an action. Not for navigation to another screen — use Link.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "optional": true,
+          "default": "primary"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "icon": {
+          "kind": "string",
+          "optional": true,
+          "description": "icon name shown before the label"
+        },
+        "fullWidth": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": [],
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/button.dart"
+      }
+    },
+    "Card": {
+      "name": "Card",
+      "category": "data",
+      "purpose": "Bordered surface grouping related content. Optionally pressable as a whole.",
+      "props": {
+        "padding": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "optional": true,
+          "default": "4"
+        },
+        "pressable": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "whole card acts as one target and emits press"
+        },
+        "selected": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": true,
+      "composition": {
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/card.dart"
+      }
+    },
+    "Carousel": {
+      "name": "Carousel",
+      "category": "media",
+      "purpose": "One slide at a time from a small set (photos of one card, onboarding). Children are the slides.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the carousel, e.g. \"Card photos\"",
+          "text": true
+        },
+        "index": {
+          "kind": "number",
+          "optional": true,
+          "default": 0,
+          "description": "visible slide, 0-based",
+          "integer": true
+        },
+        "loop": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "showDots": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        },
+        "showArrows": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "on pointer devices"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "number",
+          "description": "new index",
+          "integer": true
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/carousel.dart"
+      }
+    },
+    "Checkbox": {
+      "name": "Checkbox",
+      "category": "input",
+      "purpose": "Boolean choice with a label. For a single on/off setting that applies immediately, use Switch.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "checked": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "boolean"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/checkbox.dart"
+      }
+    },
+    "ChipGroup": {
+      "name": "ChipGroup",
+      "category": "input",
+      "purpose": "Toggle chips for quick filters or picking a few options (\"Holo\", \"Rare\", \"Under $10\"). For removable active filters use Tag; for switching views use SegmentedControl.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the group",
+          "text": true
+        },
+        "options": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              },
+              "disabled": {
+                "kind": "boolean",
+                "optional": true
+              }
+            }
+          }
+        },
+        "value": {
+          "kind": "array",
+          "of": {
+            "kind": "string"
+          },
+          "description": "values of the selected chips"
+        },
+        "multiple": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "false: at most one selected, pressing it again clears it"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "wrap": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "false: one row that scrolls sideways"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "array",
+          "of": {
+            "kind": "string"
+          },
+          "description": "new list of selected values"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/chip_group.dart"
+      }
+    },
+    "Combobox": {
+      "name": "Combobox",
+      "category": "input",
+      "purpose": "Type to filter a long list, then pick one option (country, city, card name). For ≤ 15 fixed options use Select.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string",
+          "description": "value of the chosen option, \"\" for none"
+        },
+        "query": {
+          "kind": "string",
+          "description": "what the user has typed"
+        },
+        "options": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "description": {
+                "kind": "string",
+                "optional": true,
+                "text": true
+              }
+            }
+          },
+          "description": "already filtered for query by the screen"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "options are being fetched for query"
+        },
+        "emptyText": {
+          "kind": "string",
+          "optional": true,
+          "description": "shown when query is not empty and there are no options",
+          "text": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "search": {
+          "kind": "string",
+          "description": "query changed; the screen filters or fetches options"
+        },
+        "change": {
+          "kind": "string",
+          "description": "value of the chosen option"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/combobox.dart"
+      }
+    },
+    "ConfirmDialog": {
+      "name": "ConfirmDialog",
+      "category": "overlay",
+      "purpose": "Asks the user to confirm or cancel one consequential action (\"Delete this order?\"). For other content in a dialog use Modal.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "message": {
+          "kind": "string",
+          "text": true
+        },
+        "confirmLabel": {
+          "kind": "string",
+          "description": "names the action, e.g. \"Delete order\" — not \"OK\"",
+          "text": true
+        },
+        "cancelLabel": {
+          "kind": "string",
+          "text": true
+        },
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "danger"
+          ],
+          "optional": true,
+          "default": "default"
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "confirm": {
+          "kind": "void"
+        },
+        "cancel": {
+          "kind": "void",
+          "description": "cancel button, Escape or backdrop press"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/confirm_dialog.dart"
+      }
+    },
+    "Container": {
+      "name": "Container",
+      "category": "layout",
+      "purpose": "Constrains content width and centers it on wide screens; adds horizontal page padding on narrow screens. One per screen, at the top of the tree.",
+      "props": {
+        "maxWidth": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "full"
+          ],
+          "optional": true,
+          "default": "lg",
+          "description": "sm 640, md 768, lg 1024, xl 1280"
+        },
+        "padding": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "4"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/container.dart"
+      }
+    },
+    "DatePicker": {
+      "name": "DatePicker",
+      "category": "input",
+      "purpose": "Pick one calendar date. Values are ISO dates (YYYY-MM-DD); the component shows them in the user's locale.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string",
+          "description": "ISO date, \"\" for none"
+        },
+        "min": {
+          "kind": "string",
+          "optional": true,
+          "description": "earliest ISO date"
+        },
+        "max": {
+          "kind": "string",
+          "optional": true,
+          "description": "latest ISO date"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "ISO date"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/date_picker.dart"
+      }
+    },
+    "DateRangePicker": {
+      "name": "DateRangePicker",
+      "category": "input",
+      "purpose": "Pick a start and an end date (check-in / check-out, a date range filter). Values are ISO dates; the component shows them in the user's locale. For one date use DatePicker.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "start": {
+          "kind": "string",
+          "description": "ISO date, \"\" for none"
+        },
+        "end": {
+          "kind": "string",
+          "description": "ISO date, \"\" for none"
+        },
+        "min": {
+          "kind": "string",
+          "optional": true,
+          "description": "earliest selectable ISO date"
+        },
+        "max": {
+          "kind": "string",
+          "optional": true,
+          "description": "latest selectable ISO date"
+        },
+        "disabledDates": {
+          "kind": "array",
+          "of": {
+            "kind": "string"
+          },
+          "optional": true,
+          "default": [],
+          "description": "ISO dates that cannot be picked and that a range may not cross (booked nights)"
+        },
+        "minNights": {
+          "kind": "number",
+          "optional": true,
+          "description": "shortest allowed range, in nights",
+          "integer": true
+        },
+        "maxNights": {
+          "kind": "number",
+          "optional": true,
+          "description": "longest allowed range, in nights",
+          "integer": true
+        },
+        "summary": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted, shown under the field, e.g. \"3 nights\"",
+          "text": true
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "object",
+          "fields": {
+            "start": {
+              "kind": "string"
+            },
+            "end": {
+              "kind": "string"
+            }
+          },
+          "description": "a complete range; both are ISO dates"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/date_range_picker.dart"
+      }
+    },
+    "DescriptionList": {
+      "name": "DescriptionList",
+      "category": "data",
+      "purpose": "Label–value pairs about one thing: order details, card specs, profile facts.",
+      "props": {
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "value": {
+                "kind": "string",
+                "description": "pre-formatted"
+              }
+            }
+          }
+        },
+        "layout": {
+          "kind": "enum",
+          "values": [
+            "inline",
+            "stacked"
+          ],
+          "optional": true,
+          "default": "inline",
+          "description": "inline: label and value on one row; stacked: label above value"
+        },
+        "columns": {
+          "kind": "enum",
+          "values": [
+            "1",
+            "2"
+          ],
+          "optional": true,
+          "default": "1"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/description_list.dart"
+      }
+    },
+    "Divider": {
+      "name": "Divider",
+      "category": "layout",
+      "purpose": "Thin separating line between groups of content.",
+      "props": {
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "optional": true,
+          "default": "horizontal"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/divider.dart"
+      }
+    },
+    "Drawer": {
+      "name": "Drawer",
+      "category": "overlay",
+      "purpose": "Panel that slides over the screen from a side, or from the bottom as a sheet: filters, a cart preview, extra options. For a blocking question use ConfirmDialog.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "side": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "end",
+            "bottom"
+          ],
+          "optional": true,
+          "default": "end",
+          "description": "bottom = sheet"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        }
+      },
+      "events": {
+        "close": {
+          "kind": "void",
+          "description": "close control, Escape, backdrop press or swipe away"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/drawer.dart"
+      }
+    },
+    "EmptyState": {
+      "name": "EmptyState",
+      "category": "feedback",
+      "purpose": "Shown in place of a list or result that has nothing to show. Explains why and offers one next step.",
+      "props": {
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "description": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "icon": {
+          "kind": "string",
+          "optional": true
+        },
+        "actionLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "when present, a primary Button with this label is shown",
+          "text": true
+        }
+      },
+      "events": {
+        "action": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/empty_state.dart"
+      }
+    },
+    "FileUpload": {
+      "name": "FileUpload",
+      "category": "input",
+      "purpose": "Choose one or more files to attach, and see and remove what was chosen.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "buttonLabel": {
+          "kind": "string",
+          "description": "text of the choose button",
+          "text": true
+        },
+        "accept": {
+          "kind": "string",
+          "optional": true,
+          "description": "file types, e.g. \"image/*,.pdf\""
+        },
+        "multiple": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "files": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "name": {
+                "kind": "string"
+              },
+              "sizeLabel": {
+                "kind": "string",
+                "description": "pre-formatted, e.g. \"1.2 MB\""
+              }
+            }
+          },
+          "optional": true,
+          "default": []
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "select": {
+          "kind": "void",
+          "description": "the user chose files; the platform file objects are handed to the handler in code"
+        },
+        "remove": {
+          "kind": "string",
+          "description": "name of the file to remove"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/file_upload.dart"
+      }
+    },
+    "FloatingActionButton": {
+      "name": "FloatingActionButton",
+      "category": "action",
+      "purpose": "The one main action of a screen, floating over the content at the bottom corner (\"New order\", \"+\"). At most one per screen; for other actions use Button.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name; shown next to the icon when extended",
+          "text": true
+        },
+        "icon": {
+          "kind": "string",
+          "description": "icon name from the project set, e.g. \"plus\""
+        },
+        "extended": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "show the label next to the icon"
+        },
+        "position": {
+          "kind": "enum",
+          "values": [
+            "end",
+            "center",
+            "start"
+          ],
+          "optional": true,
+          "default": "end"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": [],
+        "cannotBeInside": [
+          "Button",
+          "Link",
+          "Card",
+          "List"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/floating_action_button.dart"
+      }
+    },
+    "FormField": {
+      "name": "FormField",
+      "category": "form",
+      "purpose": "One label, hint and error shared by several related controls (an address, a date range, a phone with country code). A single control already has its own label — do not wrap it.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "description": "when present the group is in error state and this text is shown",
+          "text": true
+        },
+        "required": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "direction": {
+          "kind": "enum",
+          "values": [
+            "vertical",
+            "horizontal"
+          ],
+          "optional": true,
+          "default": "vertical",
+          "description": "how the controls inside are laid out"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {
+        "canContain": [
+          "Input",
+          "Textarea",
+          "Select",
+          "NumberInput",
+          "DatePicker",
+          "Slider",
+          "Switch",
+          "Checkbox",
+          "RadioGroup",
+          "Rating",
+          "FileUpload",
+          "Inline",
+          "Stack"
+        ],
+        "cannotBeInside": [
+          "FormField"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/form_field.dart"
+      }
+    },
+    "Grid": {
+      "name": "Grid",
+      "category": "layout",
+      "purpose": "Responsive grid of equal-width cells. Use for product/card listings. Not for tabular data — use Table.",
+      "props": {
+        "minItemWidth": {
+          "kind": "number",
+          "optional": true,
+          "default": 220,
+          "description": "cells are at least this wide (px); column count follows from available width"
+        },
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "4"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/grid.dart"
+      }
+    },
+    "Heading": {
+      "name": "Heading",
+      "category": "typography",
+      "purpose": "Section or page title. Level is semantic (document outline), size is visual.",
+      "props": {
+        "value": {
+          "kind": "string",
+          "text": true
+        },
+        "level": {
+          "kind": "enum",
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "optional": true,
+          "default": "2",
+          "description": "semantic level; exactly one level 1 per screen"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "optional": true,
+          "description": "defaults follow level: 1→xl, 2→lg, 3→md, 4→sm"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/heading.dart"
+      }
+    },
+    "HorizontalScroll": {
+      "name": "HorizontalScroll",
+      "category": "layout",
+      "purpose": "A row of items that scrolls sideways (\"New arrivals\", \"Recently viewed\"). Several items are visible at once; for one slide at a time use Carousel.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the row, usually the section title",
+          "text": true
+        },
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "3",
+          "description": "index into tokens.spacing"
+        },
+        "itemWidth": {
+          "kind": "number",
+          "optional": true,
+          "description": "fixed width of every item in logical pixels; omitted = each item keeps its own width"
+        },
+        "snap": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "scrolling settles on an item edge"
+        },
+        "showArrows": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "previous / next controls on pointer devices"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/horizontal_scroll.dart"
+      }
+    },
+    "Icon": {
+      "name": "Icon",
+      "category": "media",
+      "purpose": "A single icon from the project icon set. Decorative unless label is given. For a pressable icon use IconButton.",
+      "props": {
+        "name": {
+          "kind": "string",
+          "description": "icon name from the project set, e.g. \"cart\", \"star\""
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "color": {
+          "kind": "enum",
+          "values": [
+            "inherit",
+            "primary",
+            "muted",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "inherit"
+        },
+        "label": {
+          "kind": "string",
+          "optional": true,
+          "description": "when present the icon carries meaning and this is its accessible name",
+          "text": true
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/icon.dart"
+      }
+    },
+    "IconButton": {
+      "name": "IconButton",
+      "category": "action",
+      "purpose": "Compact button showing only an icon. Requires an accessible label.",
+      "props": {
+        "icon": {
+          "kind": "string"
+        },
+        "label": {
+          "kind": "string",
+          "description": "accessible name, not shown visually",
+          "text": true
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "ghost",
+            "secondary"
+          ],
+          "optional": true,
+          "default": "ghost"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "badge": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted count shown on the icon, e.g. \"3\"; \"\" shows a dot; omitted = no badge"
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/icon_button.dart"
+      }
+    },
+    "Image": {
+      "name": "Image",
+      "category": "media",
+      "purpose": "Displays an image with a fixed aspect ratio and a placeholder while loading.",
+      "props": {
+        "src": {
+          "kind": "string"
+        },
+        "alt": {
+          "kind": "string",
+          "description": "empty string for decorative images",
+          "text": true
+        },
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "1:1",
+            "4:3",
+            "3:4",
+            "16:9",
+            "5:7"
+          ],
+          "optional": true,
+          "default": "5:7",
+          "description": "5:7 is a trading card"
+        },
+        "fit": {
+          "kind": "enum",
+          "values": [
+            "cover",
+            "contain"
+          ],
+          "optional": true,
+          "default": "contain"
+        },
+        "radius": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/image.dart"
+      }
+    },
+    "ImageViewer": {
+      "name": "ImageViewer",
+      "category": "media",
+      "purpose": "Full-screen view of one or more images with zoom and swipe (product photos, a card scan). Opened from an Image the user pressed.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "label": {
+          "kind": "string",
+          "description": "accessible name, e.g. \"Card photos\"",
+          "text": true
+        },
+        "images": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "src": {
+                "kind": "string"
+              },
+              "alt": {
+                "kind": "string",
+                "text": true
+              }
+            }
+          }
+        },
+        "index": {
+          "kind": "number",
+          "optional": true,
+          "default": 0,
+          "description": "image shown, 0-based",
+          "integer": true
+        }
+      },
+      "events": {
+        "close": {
+          "kind": "void",
+          "description": "close control, Escape, or swipe down"
+        },
+        "change": {
+          "kind": "number",
+          "description": "new index",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/image_viewer.dart"
+      }
+    },
+    "InfiniteScroll": {
+      "name": "InfiniteScroll",
+      "category": "layout",
+      "purpose": "Loads the next page when the user scrolls near the end of a long list or grid. Children are the list content. For numbered pages use Pagination.",
+      "props": {
+        "loading": {
+          "kind": "boolean"
+        },
+        "hasMore": {
+          "kind": "boolean"
+        },
+        "loadMoreLabel": {
+          "kind": "string",
+          "description": "text of the fallback button, e.g. \"Load more cards\"",
+          "text": true
+        },
+        "endText": {
+          "kind": "string",
+          "optional": true,
+          "description": "shown when hasMore is false, e.g. \"You have seen everything\"",
+          "text": true
+        }
+      },
+      "events": {
+        "loadMore": {
+          "kind": "void"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/infinite_scroll.dart"
+      }
+    },
+    "Inline": {
+      "name": "Inline",
+      "category": "layout",
+      "purpose": "Horizontal arrangement of children with a consistent gap. Wraps onto new lines when out of room unless wrap is false.",
+      "props": {
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "2",
+          "description": "index into tokens.spacing"
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end",
+            "baseline"
+          ],
+          "optional": true,
+          "default": "center"
+        },
+        "justify": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end",
+            "between"
+          ],
+          "optional": true,
+          "default": "start"
+        },
+        "wrap": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/inline.dart"
+      }
+    },
+    "Input": {
+      "name": "Input",
+      "category": "input",
+      "purpose": "Single-line text entry with label, optional hint and error.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "type": {
+          "kind": "enum",
+          "values": [
+            "text",
+            "email",
+            "password",
+            "number",
+            "tel"
+          ],
+          "optional": true,
+          "default": "text"
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "description": "when present the field is in error state and this text is shown",
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "required": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "revealLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "type=password: accessible name of the show / hide control, e.g. \"Show password\"",
+          "text": true
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "new value on every keystroke"
+        },
+        "submit": {
+          "kind": "void",
+          "description": "Enter / keyboard done"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/input.dart"
+      }
+    },
+    "LineChart": {
+      "name": "LineChart",
+      "category": "chart",
+      "purpose": "Trend of one or more series over an ordered axis (sales per day).",
+      "props": {
+        "summary": {
+          "kind": "string",
+          "description": "one sentence stating what the chart shows, for screen readers and as a fallback",
+          "text": true
+        },
+        "series": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "name": {
+                "kind": "string",
+                "text": true
+              },
+              "points": {
+                "kind": "array",
+                "of": {
+                  "kind": "object",
+                  "fields": {
+                    "x": {
+                      "kind": "string",
+                      "description": "pre-formatted axis label"
+                    },
+                    "y": {
+                      "kind": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "yLabel": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "xLabel": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "height": {
+          "kind": "number",
+          "optional": true,
+          "default": 240
+        },
+        "showLegend": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "only shown with more than one series"
+        }
+      },
+      "events": {
+        "pointPress": {
+          "kind": "object",
+          "fields": {
+            "series": {
+              "kind": "number",
+              "integer": true
+            },
+            "index": {
+              "kind": "number",
+              "integer": true
+            }
+          }
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/line_chart.dart"
+      }
+    },
+    "Link": {
+      "name": "Link",
+      "category": "action",
+      "purpose": "Navigates to another screen. Not for actions that change data — use Button.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "inline",
+            "standalone"
+          ],
+          "optional": true,
+          "default": "inline",
+          "description": "inline sits in running text; standalone is a block-level nav item"
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void",
+          "description": "the flow decides where it goes; the component never knows a route"
+        }
+      },
+      "children": false,
+      "composition": {
+        "cannotBeInside": [
+          "Button",
+          "Link"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/link.dart"
+      }
+    },
+    "List": {
+      "name": "List",
+      "category": "data",
+      "purpose": "Vertical list of ListItem rows (optionally wrapped in SwipeActions) separated by dividers. For free-form children use Stack.",
+      "props": {
+        "dense": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {
+        "canContain": [
+          "ListItem",
+          "SwipeActions"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/list.dart"
+      }
+    },
+    "ListItem": {
+      "name": "ListItem",
+      "category": "data",
+      "purpose": "One row in a List: title, optional subtitle and trailing text, optionally pressable.",
+      "props": {
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "subtitle": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "trailing": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted, e.g. a price",
+          "text": true
+        },
+        "pressable": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/list_item.dart"
+      }
+    },
+    "Menu": {
+      "name": "Menu",
+      "category": "overlay",
+      "purpose": "A short list of actions opened from a button (\"⋯\" more actions). For choosing a value use Select.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the menu, e.g. \"Card actions\"",
+          "text": true
+        },
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              },
+              "danger": {
+                "kind": "boolean",
+                "optional": true
+              },
+              "disabled": {
+                "kind": "boolean",
+                "optional": true
+              }
+            }
+          }
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "end"
+          ],
+          "optional": true,
+          "default": "start",
+          "description": "which edge of the trigger the menu lines up with"
+        }
+      },
+      "events": {
+        "select": {
+          "kind": "string",
+          "description": "value of the chosen item"
+        }
+      },
+      "children": true,
+      "composition": {
+        "canContain": [
+          "Button",
+          "IconButton"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/menu.dart"
+      }
+    },
+    "Modal": {
+      "name": "Modal",
+      "category": "overlay",
+      "purpose": "Blocking dialog over the current screen. For confirming one action use ConfirmDialog; for a side panel or sheet use Drawer; for non-blocking messages use Alert or Toast.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        }
+      },
+      "events": {
+        "close": {
+          "kind": "void",
+          "description": "emitted by the close control, Escape, and backdrop press"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/modal.dart"
+      }
+    },
+    "NumberInput": {
+      "name": "NumberInput",
+      "category": "input",
+      "purpose": "Exact whole or decimal number with minus and plus controls: quantity, guests, age.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "number"
+        },
+        "min": {
+          "kind": "number",
+          "optional": true
+        },
+        "max": {
+          "kind": "number",
+          "optional": true
+        },
+        "step": {
+          "kind": "number",
+          "optional": true,
+          "default": 1
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "number"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/number_input.dart"
+      }
+    },
+    "Pagination": {
+      "name": "Pagination",
+      "category": "navigation",
+      "purpose": "Move between pages of a long list.",
+      "props": {
+        "page": {
+          "kind": "number",
+          "description": "1-based current page",
+          "integer": true
+        },
+        "pageCount": {
+          "kind": "number",
+          "integer": true
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "number",
+          "description": "requested page, 1-based",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/pagination.dart"
+      }
+    },
+    "PieChart": {
+      "name": "PieChart",
+      "category": "chart",
+      "purpose": "Share of a whole across a few (2–6) parts. For more parts or comparisons use BarChart.",
+      "props": {
+        "summary": {
+          "kind": "string",
+          "description": "one sentence stating what the chart shows",
+          "text": true
+        },
+        "slices": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "label": {
+                "kind": "string",
+                "description": "pre-formatted"
+              },
+              "value": {
+                "kind": "number"
+              }
+            }
+          }
+        },
+        "donut": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        },
+        "centerLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "text in the donut hole, e.g. a total",
+          "text": true
+        },
+        "height": {
+          "kind": "number",
+          "optional": true,
+          "default": 200
+        }
+      },
+      "events": {
+        "slicePress": {
+          "kind": "number",
+          "description": "index of the pressed slice",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/pie_chart.dart"
+      }
+    },
+    "PinInput": {
+      "name": "PinInput",
+      "category": "input",
+      "purpose": "One-time code or PIN split into boxes (SMS verification, 2FA).",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string"
+        },
+        "length": {
+          "kind": "number",
+          "optional": true,
+          "default": 6,
+          "integer": true
+        },
+        "type": {
+          "kind": "enum",
+          "values": [
+            "numeric",
+            "alphanumeric"
+          ],
+          "optional": true,
+          "default": "numeric"
+        },
+        "mask": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "hide characters, for PINs"
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        },
+        "complete": {
+          "kind": "string",
+          "description": "all boxes filled"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/pin_input.dart"
+      }
+    },
+    "ProgressBar": {
+      "name": "ProgressBar",
+      "category": "feedback",
+      "purpose": "How far a task has got (upload, profile completion). Omit value when the amount is unknown.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "number",
+          "optional": true,
+          "description": "0–100; omitted = indeterminate"
+        },
+        "valueLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted, e.g. \"3 of 5 files\"",
+          "text": true
+        },
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "primary",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "primary"
+        },
+        "showLabel": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/progress_bar.dart"
+      }
+    },
+    "PullToRefresh": {
+      "name": "PullToRefresh",
+      "category": "layout",
+      "purpose": "Lets the user reload a scrolling list by pulling it down on touch screens. Children are the scrolling content.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the refresh action, e.g. \"Refresh cards\"",
+          "text": true
+        },
+        "refreshing": {
+          "kind": "boolean"
+        }
+      },
+      "events": {
+        "refresh": {
+          "kind": "void"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/pull_to_refresh.dart"
+      }
+    },
+    "RadioGroup": {
+      "name": "RadioGroup",
+      "category": "input",
+      "purpose": "Pick exactly one of 2–6 visible options, e.g. shipping speed. For more options use Select; for switching views use SegmentedControl.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string"
+        },
+        "options": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "description": {
+                "kind": "string",
+                "optional": true,
+                "text": true
+              },
+              "disabled": {
+                "kind": "boolean",
+                "optional": true
+              }
+            }
+          }
+        },
+        "direction": {
+          "kind": "enum",
+          "values": [
+            "vertical",
+            "horizontal"
+          ],
+          "optional": true,
+          "default": "vertical"
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "value of the chosen option"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/radio_group.dart"
+      }
+    },
+    "Rating": {
+      "name": "Rating",
+      "category": "input",
+      "purpose": "Show or choose a score of 1–max stars. readOnly for showing an average.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name, and visible label when not readOnly",
+          "text": true
+        },
+        "value": {
+          "kind": "number",
+          "description": "0 = none; readOnly may show halves"
+        },
+        "max": {
+          "kind": "number",
+          "optional": true,
+          "default": 5,
+          "integer": true
+        },
+        "readOnly": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "number",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/rating.dart"
+      }
+    },
+    "RichText": {
+      "name": "RichText",
+      "category": "typography",
+      "purpose": "A block of formatted text written in a small Markdown subset: product descriptions, terms, help text. For a single plain line use Text.",
+      "props": {
+        "markdown": {
+          "kind": "string",
+          "description": "paragraphs, **bold**, *italic*, [links](url), \"- \" and \"1. \" lists, \"## \" / \"### \" headings",
+          "text": true
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "color": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "muted"
+          ],
+          "optional": true,
+          "default": "default"
+        }
+      },
+      "events": {
+        "link": {
+          "kind": "string",
+          "description": "url of a pressed link; the screen decides what to open"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/rich_text.dart"
+      }
+    },
+    "SearchBox": {
+      "name": "SearchBox",
+      "category": "input",
+      "purpose": "Text search with a search icon and a clear control. Emits search on submit, not on every keystroke.",
+      "props": {
+        "value": {
+          "kind": "string"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "default": "Search",
+          "text": true
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        },
+        "search": {
+          "kind": "string",
+          "description": "committed query"
+        },
+        "clear": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/search_box.dart"
+      }
+    },
+    "SectionHeader": {
+      "name": "SectionHeader",
+      "category": "layout",
+      "purpose": "Title of a section on a screen, with an optional trailing action (\"New arrivals\" · \"See all\").",
+      "props": {
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "description": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "actionLabel": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "level": {
+          "kind": "enum",
+          "values": [
+            "2",
+            "3"
+          ],
+          "optional": true,
+          "default": "2",
+          "description": "heading level inside the screen"
+        }
+      },
+      "events": {
+        "action": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/section_header.dart"
+      }
+    },
+    "SegmentedControl": {
+      "name": "SegmentedControl",
+      "category": "navigation",
+      "purpose": "Switch between 2–5 closely related views or modes in place (Grid / List, Day / Week). For content sections use Tabs; for a form choice use RadioGroup.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name of the group",
+          "text": true
+        },
+        "options": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              }
+            }
+          }
+        },
+        "value": {
+          "kind": "string"
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "fullWidth": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/segmented_control.dart"
+      }
+    },
+    "Select": {
+      "name": "Select",
+      "category": "input",
+      "purpose": "Pick one option from a short list (≤ 15). For longer lists use SearchBox with results.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string"
+        },
+        "options": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              }
+            }
+          }
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "selected option value"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/select.dart"
+      }
+    },
+    "Sidebar": {
+      "name": "Sidebar",
+      "category": "navigation",
+      "purpose": "Vertical list of top-level destinations on wide screens (dashboards, admin). On phones use BottomNav or a Drawer.",
+      "props": {
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              },
+              "badge": {
+                "kind": "string",
+                "optional": true
+              },
+              "section": {
+                "kind": "string",
+                "optional": true,
+                "description": "heading this item is grouped under",
+                "text": true
+              }
+            }
+          }
+        },
+        "value": {
+          "kind": "string"
+        },
+        "title": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "collapsed": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "icons only"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        },
+        "toggle": {
+          "kind": "void",
+          "description": "collapse control pressed"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/sidebar.dart"
+      }
+    },
+    "SiteFooter": {
+      "name": "SiteFooter",
+      "category": "navigation",
+      "purpose": "The footer shared by every page: columns of links, contact or social links, and the legal line. It stacks on narrow screens.",
+      "props": {
+        "brand": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "description": {
+          "kind": "string",
+          "optional": true,
+          "description": "one or two sentences under the brand",
+          "text": true
+        },
+        "columns": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "title": {
+                "kind": "string",
+                "text": true
+              },
+              "links": {
+                "kind": "array",
+                "of": {
+                  "kind": "object",
+                  "fields": {
+                    "value": {
+                      "kind": "string"
+                    },
+                    "label": {
+                      "kind": "string",
+                      "text": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "optional": true,
+          "default": []
+        },
+        "social": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string"
+              }
+            }
+          },
+          "optional": true,
+          "default": [],
+          "description": "icon buttons named by label"
+        },
+        "legal": {
+          "kind": "string",
+          "optional": true,
+          "description": "e.g. \"© 2026 Seaside Stays\"",
+          "text": true
+        }
+      },
+      "events": {
+        "navigate": {
+          "kind": "string",
+          "description": "value of a pressed link or social button"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/site_footer.dart"
+      }
+    },
+    "SiteHeader": {
+      "name": "SiteHeader",
+      "category": "navigation",
+      "purpose": "The header shared by every page of a site or app: brand, main links and account actions. It adapts to narrow screens with a menu. For the title bar of one screen use TopBar.",
+      "props": {
+        "brand": {
+          "kind": "string",
+          "description": "site or app name, also the accessible name of the home link",
+          "text": true
+        },
+        "logo": {
+          "kind": "string",
+          "optional": true,
+          "description": "logo image src; the brand text is still the accessible name"
+        },
+        "links": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "active": {
+                "kind": "boolean",
+                "optional": true
+              }
+            }
+          },
+          "optional": true,
+          "default": []
+        },
+        "actions": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              },
+              "variant": {
+                "kind": "enum",
+                "values": [
+                  "primary",
+                  "secondary",
+                  "ghost"
+                ],
+                "optional": true
+              }
+            }
+          },
+          "optional": true,
+          "default": [],
+          "description": "e.g. \"Sign in\", a primary \"Book now\""
+        },
+        "menuLabel": {
+          "kind": "string",
+          "description": "accessible name of the narrow-screen menu button, e.g. \"Menu\"",
+          "text": true
+        },
+        "sticky": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "stays at the top while the page scrolls"
+        }
+      },
+      "events": {
+        "brandPress": {
+          "kind": "void"
+        },
+        "navigate": {
+          "kind": "string",
+          "description": "value of a pressed link"
+        },
+        "action": {
+          "kind": "string",
+          "description": "value of a pressed action"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/site_header.dart"
+      }
+    },
+    "Skeleton": {
+      "name": "Skeleton",
+      "category": "feedback",
+      "purpose": "Loading placeholder shaped like the content it stands in for.",
+      "props": {
+        "shape": {
+          "kind": "enum",
+          "values": [
+            "text",
+            "rect",
+            "circle",
+            "card"
+          ],
+          "optional": true,
+          "default": "rect"
+        },
+        "lines": {
+          "kind": "number",
+          "optional": true,
+          "default": 1,
+          "description": "for shape=text",
+          "integer": true
+        },
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "1:1",
+            "4:3",
+            "16:9",
+            "5:7"
+          ],
+          "optional": true,
+          "description": "for shape=rect/card"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/skeleton.dart"
+      }
+    },
+    "Slider": {
+      "name": "Slider",
+      "category": "input",
+      "purpose": "Choose a number in a range by dragging, where the exact value matters less than the position (price filter, volume). For exact numbers use NumberInput.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "number"
+        },
+        "min": {
+          "kind": "number"
+        },
+        "max": {
+          "kind": "number"
+        },
+        "step": {
+          "kind": "number",
+          "optional": true,
+          "default": 1
+        },
+        "valueLabel": {
+          "kind": "string",
+          "optional": true,
+          "description": "pre-formatted value shown next to the label, e.g. \"$40\"",
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "number",
+          "description": "while dragging"
+        },
+        "commit": {
+          "kind": "number",
+          "description": "on release"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/slider.dart"
+      }
+    },
+    "Spacer": {
+      "name": "Spacer",
+      "category": "layout",
+      "purpose": "Empty space. Inside Inline with justify=start it pushes following siblings to the far end when grow is true.",
+      "props": {
+        "size": {
+          "kind": "enum",
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "3"
+        },
+        "grow": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/spacer.dart"
+      }
+    },
+    "Spinner": {
+      "name": "Spinner",
+      "category": "feedback",
+      "purpose": "Indeterminate activity indicator for waits under a few seconds. For content that is loading use Skeleton; for known progress use ProgressBar.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "description": "accessible name, e.g. \"Loading cards\"",
+          "text": true
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "showLabel": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/spinner.dart"
+      }
+    },
+    "Stack": {
+      "name": "Stack",
+      "category": "layout",
+      "purpose": "Vertical arrangement of children with a consistent gap. Use for page sections and form fields. Not for horizontal rows — use Inline.",
+      "props": {
+        "gap": {
+          "kind": "enum",
+          "values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "optional": true,
+          "default": "3",
+          "description": "index into tokens.spacing"
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end",
+            "stretch"
+          ],
+          "optional": true,
+          "default": "stretch"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/stack.dart"
+      }
+    },
+    "Stat": {
+      "name": "Stat",
+      "category": "data",
+      "purpose": "One labelled figure, e.g. \"Total · $124.00\". Use in a Grid or Inline for KPI rows.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string",
+          "description": "pre-formatted; the component never formats numbers or currency",
+          "text": true
+        },
+        "trend": {
+          "kind": "enum",
+          "values": [
+            "up",
+            "down",
+            "flat"
+          ],
+          "optional": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/stat.dart"
+      }
+    },
+    "Stepper": {
+      "name": "Stepper",
+      "category": "navigation",
+      "purpose": "Progress through a fixed sequence of steps (checkout, onboarding). Shows the steps; each step's content is the rest of the screen.",
+      "props": {
+        "steps": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "description": {
+                "kind": "string",
+                "optional": true,
+                "text": true
+              }
+            }
+          }
+        },
+        "current": {
+          "kind": "number",
+          "description": "0-based index of the current step",
+          "integer": true
+        },
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "optional": true,
+          "default": "horizontal"
+        },
+        "allowBack": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true,
+          "description": "completed steps are pressable"
+        }
+      },
+      "events": {
+        "press": {
+          "kind": "number",
+          "description": "index of a pressed completed step",
+          "integer": true
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/stepper.dart"
+      }
+    },
+    "SwipeActions": {
+      "name": "SwipeActions",
+      "category": "data",
+      "purpose": "Reveals one or two actions when a row is swiped sideways (delete, archive). Wraps one ListItem or Card.",
+      "props": {
+        "actions": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "icon": {
+                "kind": "string",
+                "optional": true
+              },
+              "tone": {
+                "kind": "enum",
+                "values": [
+                  "neutral",
+                  "primary",
+                  "danger"
+                ],
+                "optional": true
+              }
+            }
+          },
+          "description": "1–2 actions, shown on the trailing side"
+        },
+        "fullSwipe": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "swiping all the way runs the first action"
+        }
+      },
+      "events": {
+        "action": {
+          "kind": "string",
+          "description": "value of the chosen action"
+        }
+      },
+      "children": true,
+      "composition": {
+        "canContain": [
+          "ListItem",
+          "Card"
+        ]
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/swipe_actions.dart"
+      }
+    },
+    "Switch": {
+      "name": "Switch",
+      "category": "input",
+      "purpose": "On/off setting that takes effect immediately (notifications, dark mode). For a choice confirmed later with a submit, use Checkbox.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "checked": {
+          "kind": "boolean"
+        },
+        "description": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "boolean"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/switch.dart"
+      }
+    },
+    "Table": {
+      "name": "Table",
+      "category": "data",
+      "purpose": "Rows and columns of comparable records (orders, users). For a simple list of things use List.",
+      "props": {
+        "columns": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "key": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "align": {
+                "kind": "enum",
+                "values": [
+                  "start",
+                  "center",
+                  "end"
+                ],
+                "optional": true
+              },
+              "sortable": {
+                "kind": "boolean",
+                "optional": true
+              }
+            }
+          }
+        },
+        "rows": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "id": {
+                "kind": "string"
+              },
+              "cells": {
+                "kind": "array",
+                "of": {
+                  "kind": "string"
+                },
+                "description": "pre-formatted, one per column, in column order"
+              }
+            }
+          }
+        },
+        "sortKey": {
+          "kind": "string",
+          "optional": true
+        },
+        "sortDirection": {
+          "kind": "enum",
+          "values": [
+            "asc",
+            "desc"
+          ],
+          "optional": true,
+          "default": "asc"
+        },
+        "emptyText": {
+          "kind": "string",
+          "optional": true,
+          "description": "shown in place of the rows when there are none",
+          "text": true
+        },
+        "dense": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "pressableRows": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "loading": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "rows are being fetched"
+        }
+      },
+      "events": {
+        "sort": {
+          "kind": "string",
+          "description": "key of the column pressed; the screen decides the new order"
+        },
+        "rowPress": {
+          "kind": "string",
+          "description": "id of the row"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/table.dart"
+      }
+    },
+    "Tabs": {
+      "name": "Tabs",
+      "category": "navigation",
+      "purpose": "Switch between views within the same screen. For moving between screens use the flow and TopBar/BottomNav.",
+      "props": {
+        "tabs": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "value": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              }
+            }
+          }
+        },
+        "value": {
+          "kind": "string"
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string"
+        }
+      },
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/tabs.dart"
+      }
+    },
+    "Tag": {
+      "name": "Tag",
+      "category": "data",
+      "purpose": "Removable chip, e.g. an active filter. For non-interactive labels use Badge.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "removable": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        }
+      },
+      "events": {
+        "remove": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/tag.dart"
+      }
+    },
+    "Text": {
+      "name": "Text",
+      "category": "typography",
+      "purpose": "Body text. Not for headings — use Heading.",
+      "props": {
+        "value": {
+          "kind": "string",
+          "text": true
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "optional": true,
+          "default": "md"
+        },
+        "weight": {
+          "kind": "enum",
+          "values": [
+            "regular",
+            "medium",
+            "bold"
+          ],
+          "optional": true,
+          "default": "regular"
+        },
+        "color": {
+          "kind": "enum",
+          "values": [
+            "text",
+            "muted",
+            "primary",
+            "danger"
+          ],
+          "optional": true,
+          "default": "text",
+          "description": "token name"
+        },
+        "truncate": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "single line with ellipsis"
+        },
+        "align": {
+          "kind": "enum",
+          "values": [
+            "start",
+            "center",
+            "end"
+          ],
+          "optional": true,
+          "default": "start"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/text.dart"
+      }
+    },
+    "Textarea": {
+      "name": "Textarea",
+      "category": "input",
+      "purpose": "Multi-line text entry: notes, messages, addresses. For one line use Input.",
+      "props": {
+        "label": {
+          "kind": "string",
+          "text": true
+        },
+        "value": {
+          "kind": "string"
+        },
+        "placeholder": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "rows": {
+          "kind": "number",
+          "optional": true,
+          "default": 3,
+          "description": "visible lines before it scrolls or grows",
+          "integer": true
+        },
+        "autoGrow": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "grow with the content up to 10 lines"
+        },
+        "maxLength": {
+          "kind": "number",
+          "optional": true,
+          "integer": true
+        },
+        "hint": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "error": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "disabled": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "required": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "change": {
+          "kind": "string",
+          "description": "new value on every keystroke"
+        }
+      },
+      "children": false,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/textarea.dart"
+      }
+    },
+    "Timeline": {
+      "name": "Timeline",
+      "category": "data",
+      "purpose": "Events in time order: order tracking, activity history.",
+      "props": {
+        "items": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "title": {
+                "kind": "string",
+                "text": true
+              },
+              "time": {
+                "kind": "string",
+                "optional": true,
+                "description": "pre-formatted"
+              },
+              "description": {
+                "kind": "string",
+                "optional": true,
+                "text": true
+              },
+              "tone": {
+                "kind": "enum",
+                "values": [
+                  "neutral",
+                  "primary",
+                  "success",
+                  "warning",
+                  "danger"
+                ],
+                "optional": true
+              }
+            }
+          }
+        },
+        "order": {
+          "kind": "enum",
+          "values": [
+            "oldest-first",
+            "newest-first"
+          ],
+          "optional": true,
+          "default": "oldest-first"
+        }
+      },
+      "events": {},
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/timeline.dart"
+      }
+    },
+    "Toast": {
+      "name": "Toast",
+      "category": "feedback",
+      "purpose": "Short, non-blocking confirmation that something happened (\"Added to cart\"), optionally with one undo-style action. For messages that must stay on screen use Alert.",
+      "props": {
+        "open": {
+          "kind": "boolean"
+        },
+        "message": {
+          "kind": "string",
+          "text": true
+        },
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "optional": true,
+          "default": "info"
+        },
+        "actionLabel": {
+          "kind": "string",
+          "optional": true,
+          "text": true
+        },
+        "duration": {
+          "kind": "number",
+          "optional": true,
+          "default": 4000,
+          "description": "milliseconds before it closes by itself; 0 = stays until closed",
+          "integer": true
+        }
+      },
+      "events": {
+        "close": {
+          "kind": "void",
+          "description": "timeout, swipe or close control"
+        },
+        "action": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/toast.dart"
+      }
+    },
+    "Tooltip": {
+      "name": "Tooltip",
+      "category": "feedback",
+      "purpose": "Brief extra hint for the one element inside it, typically an IconButton. Never the only place important information lives.",
+      "props": {
+        "text": {
+          "kind": "string",
+          "text": true
+        },
+        "placement": {
+          "kind": "enum",
+          "values": [
+            "top",
+            "bottom",
+            "start",
+            "end"
+          ],
+          "optional": true,
+          "default": "top"
+        }
+      },
+      "events": {},
+      "children": true,
+      "composition": {},
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/tooltip.dart"
+      }
+    },
+    "TopBar": {
+      "name": "TopBar",
+      "category": "navigation",
+      "purpose": "Screen header: title, optional back control, optional actions. One per screen, first child of the Container or root.",
+      "props": {
+        "title": {
+          "kind": "string",
+          "text": true
+        },
+        "showBack": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        },
+        "actions": {
+          "kind": "array",
+          "of": {
+            "kind": "object",
+            "fields": {
+              "icon": {
+                "kind": "string"
+              },
+              "label": {
+                "kind": "string",
+                "text": true
+              },
+              "action": {
+                "kind": "string"
+              }
+            }
+          },
+          "optional": true,
+          "default": [],
+          "description": "each renders as an IconButton; action is the action name emitted through the actionPress event"
+        }
+      },
+      "events": {
+        "back": {
+          "kind": "void"
+        },
+        "actionPress": {
+          "kind": "string",
+          "description": "action name from the actions prop"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/top_bar.dart"
+      }
+    },
+    "Video": {
+      "name": "Video",
+      "category": "media",
+      "purpose": "Plays a video file with the platform controls.",
+      "props": {
+        "src": {
+          "kind": "string"
+        },
+        "label": {
+          "kind": "string",
+          "description": "accessible name, e.g. \"Unboxing video\"",
+          "text": true
+        },
+        "poster": {
+          "kind": "string",
+          "optional": true
+        },
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "9:16"
+          ],
+          "optional": true,
+          "default": "16:9"
+        },
+        "controls": {
+          "kind": "boolean",
+          "optional": true,
+          "default": true
+        },
+        "autoplay": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false,
+          "description": "only ever muted"
+        },
+        "loop": {
+          "kind": "boolean",
+          "optional": true,
+          "default": false
+        }
+      },
+      "events": {
+        "ended": {
+          "kind": "void"
+        }
+      },
+      "children": false,
+      "composition": {
+        "canContain": []
+      },
+      "version": 1,
+      "source": "rules",
+      "impl": {
+        "flutter": "lib/ui/video.dart"
+      }
+    }
+  }
+}

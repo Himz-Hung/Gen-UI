@@ -4,6 +4,7 @@ import type { ScreenSpec } from './define.ts';
 import { Report } from './diagnostics.ts';
 import { DIRS, type Project } from './loader.ts';
 import { didYouMean } from './suggest.ts';
+import { stringGetter } from './flutter.ts';
 import { isI18n, placeholders, type ValueCtx } from './values.ts';
 
 export const stringsFile = (lang: string) => `${DIRS.spec}/strings/${lang}.ts`;
@@ -63,7 +64,9 @@ export function checkStrings(project: Project, specs: ScreenSpec[]): Report[] {
     };
     for (const spec of specs) for (const el of Object.values(spec.elements ?? {})) visit(el.props);
     for (const lit of quotedInSource(join(project.root, 'src'))) used.add(lit);
-    const unused = Object.keys(base.flat).filter((k) => !used.has(k));
+    // Flutter code reads UiStrings.cartEmptyTitle: count the generated getter name as a use of cart.empty.title.
+    const dartWords = wordsInDart(join(project.root, 'lib'));
+    const unused = Object.keys(base.flat).filter((k) => !used.has(k) && !dartWords.has(`UiStrings.${stringGetter(k)}`));
     if (unused.length) reports[0].warn('keys', `not used by any spec or source file: ${unused.join(', ')}`);
   }
   return reports;
@@ -79,6 +82,22 @@ function quotedInSource(dir: string): Set<string> {
       if (statSync(p).isDirectory()) { if (f !== 'node_modules') walk(p); continue; }
       if (!/\.(tsx?|jsx?)$/.test(f)) continue;
       for (const m of readFileSync(p, 'utf8').matchAll(/['"`]([\w.-]+)['"`]/g)) out.add(m[1]);
+    }
+  };
+  walk(dir);
+  return out;
+}
+
+/** Every `UiStrings.x` reference in lib/ (generated files excluded). */
+function wordsInDart(dir: string): Set<string> {
+  const out = new Set<string>();
+  const walk = (d: string) => {
+    if (!existsSync(d)) return;
+    for (const f of readdirSync(d)) {
+      const p = join(d, f);
+      if (statSync(p).isDirectory()) { walk(p); continue; }
+      if (!f.endsWith('.dart') || f.endsWith('.g.dart')) continue;
+      for (const m of readFileSync(p, 'utf8').matchAll(/UiStrings\.(\w+)/g)) out.add(m[0]);
     }
   };
   walk(dir);

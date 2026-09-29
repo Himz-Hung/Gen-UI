@@ -11,4 +11,5 @@ export default defineComponent({
   states: ['default', 'focused', 'loading'],
   rules: ['Clear control is visible only when value is non-empty; pressing it empties the field and emits clear.', 'Enter emits search with the current value.', 'loading shows a spinner in place of the search icon.'],
   a11y: ['Role searchbox; clear control has an accessible name.'],
+  platform: { react: ["<input type=\"search\"> with a clear button"], flutter: ["TextField with a search prefix icon and a clear suffix"] },
 });

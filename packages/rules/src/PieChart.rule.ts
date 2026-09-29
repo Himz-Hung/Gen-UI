@@ -9,7 +9,7 @@ export default defineComponent({
     centerLabel: t.text().opt().desc('text in the donut hole, e.g. a total'),
     height: t.number().def(200),
   },
-  events: { slicePress: t.number().desc('index of the pressed slice') },
+  events: { slicePress: t.number().int().desc('index of the pressed slice') },
   states: ['default', 'empty'],
   rules: [
     'Slices in the given order, clockwise from the top, colored from the tokens in a fixed order.',

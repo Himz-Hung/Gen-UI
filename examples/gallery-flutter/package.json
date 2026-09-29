@@ -1,0 +1,13 @@
+{
+  "name": "gallery-flutter",
+  "private": true,
+  "description": "Every shipped contract materialized in Flutter, checked by fw verify, flutter analyze and a widget test.",
+  "dependencies": {
+    "@himz-genui/core": "1.2.0",
+    "@himz-genui/rules": "1.2.0"
+  },
+  "scripts": {
+    "check": "node ../../packages/core/bin/fw.js check",
+    "test": "node ../../packages/core/bin/fw.js check && flutter analyze --no-pub && flutter test --no-pub"
+  }
+}

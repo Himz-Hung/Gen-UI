@@ -7,4 +7,5 @@ export default defineComponent({
   composition: { canContain: ['ListItem', 'SwipeActions'] },
   rules: ['Rows are separated by a Divider; no divider after the last row.'],
   a11y: ['Role list; each ListItem is a listitem.'],
+  platform: { react: ["<ul> of <li>"], flutter: ["a Column of rows separated by Divider; not a scrolling ListView (the screen scrolls)"] },
 });

@@ -7,7 +7,7 @@ export default defineComponent({
     message: t.text(),
     tone: t.enum(['info', 'success', 'warning', 'danger']).def('info'),
     actionLabel: t.text().opt(),
-    duration: t.number().def(4000).desc('milliseconds before it closes by itself; 0 = stays until closed'),
+    duration: t.number().int().def(4000).desc('milliseconds before it closes by itself; 0 = stays until closed'),
   },
   events: { close: t.void().desc('timeout, swipe or close control'), action: t.void() },
   states: ['hidden', 'visible'],

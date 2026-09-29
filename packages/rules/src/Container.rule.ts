@@ -8,4 +8,5 @@ export default defineComponent({
   },
   children: true,
   rules: ['Content never exceeds maxWidth; below that width it fills the screen minus padding on both sides.', 'Centered horizontally when narrower than the viewport.'],
+  platform: { react: ["<div> with max-width and horizontal padding"], flutter: ["Center + ConstrainedBox(maxWidth) + Padding"] },
 });

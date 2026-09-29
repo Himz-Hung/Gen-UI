@@ -18,9 +18,9 @@ Two packages:
 | package | what |
 |---|---|
 | `@himz-genui/core` | the `fw` CLI, the `t` type system and `define*` helpers |
-| `@himz-genui/rules` | 68 platform-neutral component contracts |
+| `@himz-genui/rules` | 76 platform-neutral component contracts |
 
-> Status: **1.1.0** on npm ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
+> Status: **1.1.0** on npm (1.2.0 with Flutter in progress on main) ([`@himz-genui/core`](https://www.npmjs.com/package/@himz-genui/core), [`@himz-genui/rules`](https://www.npmjs.com/package/@himz-genui/rules)), React. Flutter and behavioural test generation are on the roadmap (see [Limitations](#limitations)).
 
 ---
 
@@ -33,6 +33,7 @@ Two packages:
 - [Project layout](#project-layout)
 - [Describing your app (`ui-spec/`)](#describing-your-app-ui-spec)
 - [Languages](#languages)
+- [Flutter](#flutter)
 - [Contracts](#contracts)
 - [Screen specs](#screen-specs)
 - [Commands](#commands)
@@ -302,6 +303,7 @@ Screens reference these by name: `"Card[]"`, `"Cart"`.
 |---|---|
 | `t.string()` `t.number()` `t.boolean()` | primitives |
 | `t.text()` | a string the user reads (label, title…): translated in multi-language projects |
+| `.int()` | on a number: whole numbers only (page, index, count); `int` in Dart |
 | `t.enum(['a', 'b'])` | one of |
 | `t.ref('Card')` | a domain type |
 | `t.array(x)` `t.object({ … })` | containers |
@@ -412,6 +414,63 @@ Not caught: text that reaches a prop through a variable or `setState('…')`, an
 itself. Copy the new contracts from `node_modules/@himz-genui/rules/src/` into `ui-rules/` (they change no
 props, so implementations stay verified).
 
+## Flutter
+
+`fw init --platform flutter` (in a Flutter project, or `--create flutter` to scaffold one) sets up the same
+`ui-spec/` and screen specs; only the code side differs. Everything is checked the same way.
+
+`fw` itself runs on Node, so a Flutter project also needs a `package.json` with `@himz-genui/core` and
+`@himz-genui/rules` as dev dependencies (`npm i -D @himz-genui/core @himz-genui/rules`); `ui-spec/*.ts` imports them.
+
+| | React | Flutter |
+|---|---|---|
+| component | `ui/ListItem.tsx`, `export function ListItem` | `lib/ui/list_item.dart`, `class UiListItem` |
+| screen | `src/screens/CartScreen.tsx` | `lib/screens/cart_screen.dart`, `class CartScreen` |
+| props / events / children | props type, `onPress`, `children` | named constructor params, `VoidCallback? onPress` / `ValueChanged<T>? onChange`, `List<Widget> children` |
+| tokens | `ui-spec/project.ts` imported directly | `lib/ui/tokens.g.dart` (`UiTokens.colorPrimary`, `UiTokens.space(4)`), generated |
+| strings | the project's i18n function | `lib/l10n/strings.g.dart` (`UiStrings.cartEmptyTitle`, `UiStrings.cartLine(count: 3)`), generated |
+| type check | `tsc` | `flutter analyze` |
+
+**Every Flutter class has the `Ui` prefix.** 19 contract names collide with Flutter widgets (`Text`,
+`Card`, `Switch`, `Table`…) and `List` collides with `dart:core`, so one rule for all names.
+
+**`fw docs <Name>` prints the exact Dart signature** the agent fills in, and `fw verify` checks exactly it:
+
+```dart
+enum UiButtonVariant { primary, secondary, ghost, danger }
+enum UiImageRatio { v1x1, v4x3, v3x4, v16x9, v5x7 }        // '5:7' → v5x7, 'oldest-first' → oldestFirst
+
+class UiSelectOption { const UiSelectOption({required this.value, required this.label}); … }
+
+class UiSelect extends StatelessWidget {
+  const UiSelect({super.key, required this.label, required this.value, required this.options,
+    this.placeholder, this.disabled = false, this.error, this.onChange});
+  final String label; final String value; final List<UiSelectOption> options;
+  final String? placeholder; final bool disabled; final String? error;
+  final ValueChanged<String>? onChange;
+  …
+}
+```
+
+`fw verify` (Flutter) reports a missing class, constructor parameter, field or callback; `required` where the
+contract says optional (and the reverse); a wrong kind (`bool` where the contract says string); an optional
+without default that is not nullable; missing enum values or item-class fields; `children` on a component
+that takes none. It reads Dart by these conventions (no Dart SDK needed); `flutter analyze` stays the real
+type check.
+
+**Screens** import `lib/ui/ui.dart` (generated barrel) and, for the base classes only,
+`package:flutter/widgets.dart show StatelessWidget, StatefulWidget, State, Widget, BuildContext`.
+`fw check lib/screens/…` reports: importing `material.dart` / `cupertino.dart` or other widgets from
+`widgets.dart`; constructing any widget that is not in `lib/ui/` (`Column`, `Text`, a third-party widget);
+a second widget class in the screen file; and, with several languages, string literals with letters on text
+props (`label: 'Checkout'`, `'Cart ($n)'`; `'$a × $b'` passes). Nested item constructors and values that
+reach a prop through a variable are not inspected.
+
+Generated files (`lib/ui/ui.dart`, `lib/ui/tokens.g.dart`, `lib/l10n/strings.g.dart`) are rewritten by every
+`fw` command; do not edit them. They need no pub dependencies.
+
+[`examples/gallery-flutter`](./examples/gallery-flutter) implements every shipped contract in Flutter, with a widget test each (`npm run test:flutter`); its README lists the contract rules those implementations do not fully meet.
+
 ## Contracts
 
 A contract describes one component for every platform. Everything machine-checkable is a type;
@@ -463,19 +522,19 @@ export default defineComponent({
 | `platform.<name>` | advisory hints for one platform — never a shared rule |
 | `version` | bump to force re-verification of existing implementations |
 
-**Shipped contracts** (`@himz-genui/rules`, 68):
+**Shipped contracts** (`@himz-genui/rules`, 76):
 
 | category | components |
 |---|---|
-| layout | Stack, Inline, Grid, Container, Spacer, Divider, SectionHeader, PullToRefresh, InfiniteScroll |
-| typography | Text, Heading |
-| action | Button, IconButton, Link |
-| input | Input, Textarea, Select, SearchBox, Checkbox, RadioGroup, Switch, Slider, NumberInput, DatePicker, FileUpload, Rating, Combobox, ChipGroup, PinInput |
+| layout | Stack, Inline, Grid, Container, Spacer, Divider, SectionHeader, HorizontalScroll, PullToRefresh, InfiniteScroll |
+| typography | Text, Heading, RichText |
+| action | Button, IconButton, Link, FloatingActionButton |
+| input | Input, Textarea, Select, SearchBox, Checkbox, RadioGroup, Switch, Slider, NumberInput, DatePicker, FileUpload, Rating, Combobox, ChipGroup, PinInput, DateRangePicker |
 | form | FormField |
-| data | Card, Badge, Tag, Stat, List, ListItem, Table, Avatar, Accordion, DescriptionList, Timeline, SwipeActions |
-| media | Image, Icon, Carousel, Video |
+| data | Card, Badge, Tag, Stat, List, ListItem, Table, Avatar, Accordion, DescriptionList, Timeline, SwipeActions, AvailabilityCalendar |
+| media | Image, Icon, Carousel, Video, ImageViewer |
 | feedback | EmptyState, Skeleton, Alert, Toast, Spinner, ProgressBar, Tooltip |
-| navigation | Pagination, Tabs, TopBar, BottomNav, SegmentedControl, Sidebar, Breadcrumbs, Stepper |
+| navigation | Pagination, Tabs, TopBar, BottomNav, SegmentedControl, Sidebar, Breadcrumbs, Stepper, SiteHeader, SiteFooter |
 | overlay | Modal, Drawer, Menu, ConfirmDialog |
 | chart | LineChart, BarChart, PieChart |
 
@@ -693,15 +752,15 @@ output.
 
 ## Limitations
 
-- **React only.** Contracts are platform-neutral and a few carry Flutter hints, but `fw verify`, `fw add`
-  and the code lint are React-only.
+- **`fw add` is React-only.** Registering an existing Flutter widget as a contract is not supported yet;
+  write the contract in `ui-spec/components/` and point `impl.flutter` at the file.
 - **`fw verify` is static.** It checks exports, prop names/kinds, enum members, handlers and children with
   the TypeScript compiler — not runtime behaviour. Generated behavioural tests (Testing Library / widget
   tests) are the next milestone.
 - **No shell contracts yet.** `defineShell` (tabs / sidebar layout) and `defineSources` (where data comes
   from, loading/error states) are designed but not implemented. The app shell is hand-written.
-- **`fw init --create`** shells out to `npm create vite` / `create-next-app` / `flutter create` but has not
-  been exercised in tests.
+- **`fw init --create`** shells out to `npm create vite` / `create-next-app` / `flutter create`. The Flutter
+  one is tested (the project name is made a valid package name); the npm ones are not.
 - **Runtime TypeScript.** `fw` runs its own sources through `tsx`, so `ui-spec/` files are plain `.ts`. If
   your `tsconfig` includes `ui-spec/`, add `"allowImportingTsExtensions": true`.
 - **Consistency is per project.** Two projects materializing the same contract will get different code.
@@ -719,7 +778,7 @@ tokens and *your* platform idioms while still passing the same assertions.
 exhaustively (names, types, composition), it is easy to review, and it stays next to the code as the
 screen's documentation.
 
-**What if I need a component that isn't in the 68?** Write a contract in `ui-spec/components/`, composing
+**What if I need a component that isn't in the 76?** Write a contract in `ui-spec/components/`, composing
 from existing primitives where possible. The agent can do this too. The catalog grows with the project.
 
 **Can I change a shipped contract?** Override it: same `name` in `ui-spec/components/`. Don't edit

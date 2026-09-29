@@ -10,4 +10,5 @@ export default defineComponent({
   children: true,
   rules: ['Children are the content of the active tab; the screen swaps children when value changes.', 'Active tab is marked by a tokens.color.primary indicator and text — not color alone.'],
   a11y: ['Roles tablist / tab / tabpanel; arrow keys move between tabs.'],
+  platform: { react: ["role=\"tablist\" with buttons role=\"tab\""], flutter: ["a TabBar-like Row driven by value (not a TabController-owned state)"] },
 });
