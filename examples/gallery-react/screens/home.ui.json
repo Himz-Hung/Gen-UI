@@ -1,0 +1,26 @@
+{
+  "screen": "Home",
+  "root": "page",
+  "elements": {
+    "page":      { "type": "Container", "props": { "maxWidth": "md" }, "children": ["bar", "body"] },
+    "bar":       { "type": "TopBar", "props": { "title": "Component gallery" } },
+    "body":      { "type": "Stack", "props": { "gap": "5" }, "children": ["actionsH", "actions", "inputsH", "name", "notify", "dataH", "row", "feedbackH", "alert", "navH", "tabs"] },
+    "actionsH":  { "type": "SectionHeader", "props": { "title": "Actions" } },
+    "actions":   { "type": "Inline", "props": { "gap": "3", "wrap": true }, "children": ["primary", "danger"] },
+    "primary":   { "type": "Button", "props": { "label": "Primary" }, "on": { "press": "press" } },
+    "danger":    { "type": "Button", "props": { "label": "Delete", "variant": "danger" }, "on": { "press": "press" } },
+    "inputsH":   { "type": "SectionHeader", "props": { "title": "Inputs" } },
+    "name":      { "type": "Input", "props": { "label": "Name", "value": { "path": "/name" }, "hint": "Your full name" }, "on": { "change": "changeName" } },
+    "notify":    { "type": "Switch", "props": { "label": "Email me updates", "checked": { "path": "/notify" } }, "on": { "change": "toggleNotify" } },
+    "dataH":     { "type": "SectionHeader", "props": { "title": "Data" } },
+    "row":       { "type": "Inline", "props": { "gap": "3" }, "children": ["avatar", "badge", "stat"] },
+    "avatar":    { "type": "Avatar", "props": { "name": "Ash Ketchum" } },
+    "badge":     { "type": "Badge", "props": { "label": "New", "tone": "primary" } },
+    "stat":      { "type": "Stat", "props": { "label": "Orders", "value": "128" } },
+    "feedbackH": { "type": "SectionHeader", "props": { "title": "Feedback" } },
+    "alert":     { "type": "Alert", "props": { "tone": "success", "title": "Saved", "description": "Your changes are live." } },
+    "navH":      { "type": "SectionHeader", "props": { "title": "Navigation" } },
+    "tabs":      { "type": "Tabs", "props": { "tabs": [{ "value": "a", "label": "Overview" }, { "value": "b", "label": "Details" }], "value": { "path": "/tab" } }, "on": { "change": "changeTab" }, "children": ["tabText"] },
+    "tabText":   { "type": "Text", "props": { "value": "Tab content" } }
+  }
+}

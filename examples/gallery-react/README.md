@@ -1,0 +1,36 @@
+# gallery-react — example
+
+Every shipped contract (76) materialized in React, from **the same `ui-spec/` and screen spec as
+[`gallery-flutter`](../gallery-flutter)**. `npm run test:parity` (root) fails if the two drift apart.
+
+```sh
+npm test           # fw check (81 passed) + tsc + vitest (92 tests)
+npm run dev        # the gallery Home screen
+```
+
+| | |
+|---|---|
+| `ui/*.tsx` | one component per contract, each passing `fw verify`; `icons.tsx` is the icon set |
+| `ui-spec/`, `screens/home.ui.json` | identical to gallery-flutter (checked by `scripts/parity.mjs`) |
+| `src/screens/HomeScreen.tsx` | the same Home screen as `gallery-flutter/lib/screens/home_screen.dart`, composed from `ui/` only |
+| `test/*.test.tsx` | vitest + Testing Library, a test per component mirroring the Flutter test of the same component |
+
+22 components come from the Pokemon shop, `Link` and `Spacer` from its history; the other 52 were
+written by coding agents from `fw docs` (which prints a React and a Dart signature from the same contract),
+reading the Flutter implementation for behaviour.
+
+## Where React and Flutter still differ
+
+Both satisfy the contract; these are the known differences in how far each goes.
+
+- **React goes further:** charts include a visually hidden data table; Toast's timer pauses on hover and focus
+  (now on Flutter too); RichText uses real `<ul>` / `<ol>`; Table keeps its header in the empty state;
+  AvailabilityCalendar and Combobox have (simplified) arrow-key navigation.
+- **Flutter goes further:** ImageViewer pinch / pan zoom (React: double-click 2×); Drawer swipe to close;
+  DateRangePicker reopens on the previous range (React starts a fresh pick).
+- **Platform-native choices:** DatePicker uses `<input type="date">` on React and the Material dialog on
+  Flutter; HorizontalScroll snaps with CSS on any item width, Flutter only with a fixed `itemWidth`;
+  Video plays natively on React, Flutter renders the frame only (no `video_player`).
+- **Shared gaps:** FloatingActionButton does not lift above a BottomNav; InfiniteScroll does not announce
+  the number of new items; Menu always opens below its trigger; chart marks are not keyboard-focusable;
+  ChipGroup uses toggle semantics even in single-select mode.

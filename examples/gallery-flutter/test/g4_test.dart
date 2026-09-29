@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -274,5 +275,19 @@ void main() {
     await tester.tap(find.byIcon(Icons.check));
     await tester.pump();
     expect(pressed, 0);
+  });
+
+  testWidgets('Toast: the close timer pauses while hovered', (tester) async {
+    var closed = 0;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: UiToast(open: true, message: 'Added to cart', duration: 1000, onClose: () => closed++))));
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    addTearDown(mouse.removePointer);
+    await mouse.moveTo(tester.getCenter(find.text('Added to cart')));
+    await tester.pump(const Duration(milliseconds: 1500));
+    expect(closed, 0, reason: 'paused while hovered');
+    await mouse.moveTo(Offset.zero);
+    await tester.pump(const Duration(milliseconds: 1100));
+    expect(closed, 1);
   });
 }

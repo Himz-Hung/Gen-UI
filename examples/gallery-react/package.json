@@ -1,0 +1,28 @@
+{
+  "name": "gallery-react",
+  "private": true,
+  "type": "module",
+  "description": "Every shipped contract materialized in React, checked by fw verify, tsc and a Testing Library test each. Same ui-spec as gallery-flutter.",
+  "dependencies": {
+    "@himz-genui/core": "1.2.0",
+    "@himz-genui/rules": "1.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.21",
+    "vitest": "^2.1.9"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check": "node ../../packages/core/bin/fw.js check",
+    "test": "node ../../packages/core/bin/fw.js check && tsc -p tsconfig.json --noEmit && vitest run"
+  }
+}

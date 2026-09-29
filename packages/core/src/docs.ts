@@ -15,6 +15,31 @@ function nestedNotes(path: string, node: TypeNode): string[] {
   });
 }
 
+/** TypeScript type for a contract type: 'a' | 'b', string[], { value: string; label: string }[] */
+function tsType(n: TypeNode): string {
+  switch (n.kind) {
+    case 'string': return 'string';
+    case 'number': return 'number';
+    case 'boolean': return 'boolean';
+    case 'enum': return (n.values ?? []).map((v) => `'${v}'`).join(' | ');
+    case 'array': { const t = tsType(n.of!); return /[|{]/.test(t) && n.of!.kind === 'enum' ? `(${t})[]` : `${t}[]`; }
+    case 'object': return `{ ${Object.entries(n.fields ?? {}).map(([k, f]) => `${k}${f.optional ? '?' : ''}: ${tsType(f)}`).join('; ')} }`;
+    case 'node': return 'React.ReactNode';
+    case 'ref': return 'unknown';
+    case 'void': return 'void';
+  }
+}
+
+/** ui/<Name>.tsx: the props interface and the export, as fw verify expects them. */
+export function renderReactSignature(c: ComponentContract): string {
+  const L = [`// ui/${c.name}.tsx`, `export interface ${c.name}Props {`];
+  for (const [k, v] of Object.entries(c.props)) L.push(`  ${k}${v.optional ? '?' : ''}: ${tsType(v)};${v.default !== undefined ? `   // default ${JSON.stringify(v.default)}` : ''}`);
+  for (const [ev, v] of Object.entries(c.events ?? {})) L.push(`  on${ev[0].toUpperCase()}${ev.slice(1)}?: (${v.kind === 'void' ? '' : `value: ${tsType(v)}`}) => void;`);
+  if (c.children) L.push('  children?: React.ReactNode;');
+  L.push('}', `export function ${c.name}(props: ${c.name}Props) { … }   // defaults applied in the destructuring; styles from ./tokens`);
+  return L.join('\n');
+}
+
 /** Markdown the agent reads before materializing a component. */
 export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter' | ('react' | 'flutter')[]): string {
   const L: string[] = [];
@@ -44,6 +69,9 @@ export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter' 
   for (const p of plats) {
     const hints = c.platform?.[p];
     if (hints?.length) L.push('', `## ${p} hints (advisory)`, '', ...hints.map((x) => `- ${x}`));
+  }
+  if (plats.includes('react')) {
+    L.push('', '## React signature (fw verify checks these names and kinds)', '', '```tsx', renderReactSignature(c), '```');
   }
   if (plats.includes('flutter')) {
     L.push('', '## Flutter signature (fw verify checks exactly this)', '', '```dart', renderFlutterSignature(c), '```', '',
