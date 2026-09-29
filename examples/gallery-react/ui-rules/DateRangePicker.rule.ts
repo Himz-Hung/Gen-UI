@@ -28,6 +28,9 @@ export default defineComponent({
   ],
   a11y: ['Keyboard: arrows move by day, Page by month, Enter picks; the chosen start and end are announced.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['a button-like field opening a popover (sheet on narrow screens) with a month grid'], flutter: ['a read-only m.TextField opening m.showDateRangePicker (selectableDayPredicate for disabledDates), validating the range before emitting'] },
   examples: [{ label: 'Stay', start: '2026-10-12', end: '2026-10-15', summary: '3 nights', disabledDates: ['2026-10-20'] }],
 });

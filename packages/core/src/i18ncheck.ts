@@ -66,7 +66,8 @@ export function checkStrings(project: Project, specs: ScreenSpec[]): Report[] {
     for (const lit of quotedInSource(join(project.root, 'src'))) used.add(lit);
     // Flutter code reads UiStrings.cartEmptyTitle: count the generated getter name as a use of cart.empty.title.
     const dartWords = wordsInDart(join(project.root, 'lib'));
-    const unused = Object.keys(base.flat).filter((k) => !used.has(k) && !dartWords.has(`UiStrings.${stringGetter(k)}`));
+    // with ARB (AppLocalizations.of(context)!.cartEmptyTitle, l10n.cartEmptyTitle) any .getter reference counts
+    const unused = Object.keys(base.flat).filter((k) => !used.has(k) && !dartWords.has(`UiStrings.${stringGetter(k)}`) && !dartWords.has(`.${stringGetter(k)}`));
     if (unused.length) reports[0].warn('keys', `not used by any spec or source file: ${unused.join(', ')}`);
   }
   return reports;
@@ -97,7 +98,7 @@ function wordsInDart(dir: string): Set<string> {
       const p = join(d, f);
       if (statSync(p).isDirectory()) { walk(p); continue; }
       if (!f.endsWith('.dart') || f.endsWith('.g.dart')) continue;
-      for (const m of readFileSync(p, 'utf8').matchAll(/UiStrings\.(\w+)/g)) out.add(m[0]);
+      for (const m of readFileSync(p, 'utf8').matchAll(/(UiStrings)?\.([a-z]\w*)/g)) out.add(m[0]);
     }
   };
   walk(dir);

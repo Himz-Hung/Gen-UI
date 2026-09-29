@@ -20,6 +20,9 @@ export default defineComponent({
   ],
   a11y: ['Image named by summary, plus a data table alternative reachable by assistive tech.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'img', name: { fromProp: 'summary' } },
+  ],
   platform: { react: ['SVG, or a chart library the project adds (one for the whole project)'], flutter: ['CustomPaint, or a chart package the project adds (one for the whole project)'] },
   examples: [{ summary: 'Sales rose from 12 to 30 orders over the week', series: [{ name: 'Orders', points: [{ x: 'Mon', y: 12 }, { x: 'Sun', y: 30 }] }] }],
 });

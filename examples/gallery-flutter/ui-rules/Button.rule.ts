@@ -22,6 +22,14 @@ export default defineComponent({
   ],
   a11y: ['Role button.', 'Label is the accessible name; if label is empty an accessible name must still be provided.', 'Visible focus ring.'],
   composition: { canContain: [], cannotBeInside: ['Button', 'Link'] },
+  checks: [
+    { kind: 'size', byProp: 'size', height: { sm: 32, md: 40, lg: 48 } },
+    { kind: 'keepsSize', props: { loading: true }, like: { loading: false } },
+    { kind: 'emits', event: 'press', on: ['press', 'enter', 'space'] },
+    { kind: 'neverEmits', event: 'press', props: { disabled: true }, on: ['press', 'enter'] },
+    { kind: 'neverEmits', event: 'press', props: { loading: true }, on: ['press', 'enter'] },
+    { kind: 'role', role: 'button', name: { fromProp: 'label' } },
+  ],
   platform: { react: ['use <button type="button">, never a div with onClick', 'aria-busy while loading'], flutter: ['FilledButton / OutlinedButton / TextButton by variant', 'onPressed null when disabled or loading'] },
   examples: [{ label: 'Add to cart' }, { label: 'Remove', variant: 'danger', size: 'sm' }, { label: 'Saving…', loading: true }],
 });

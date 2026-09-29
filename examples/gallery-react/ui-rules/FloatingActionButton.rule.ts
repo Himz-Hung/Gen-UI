@@ -20,6 +20,13 @@ export default defineComponent({
   ],
   a11y: ['Role button named by label, also when the label is not shown.', 'Reachable by keyboard after the page content.'],
   composition: { canContain: [], cannotBeInside: ['Button', 'Link', 'Card', 'List'] },
+  checks: [
+    { kind: 'size', byProp: 'size', height: { sm: 40, md: 56 }, width: { sm: 40, md: 56 } },
+    { kind: 'role', role: 'button', name: { fromProp: 'label' } },
+    { kind: 'role', role: 'button', name: { fromProp: 'label' }, props: { extended: true } },
+    { kind: 'emits', event: 'press', on: ['press', 'enter', 'space'] },
+    { kind: 'neverEmits', event: 'press', props: { disabled: true }, on: ['press', 'enter'] },
+  ],
   platform: { react: ['<button> with position: fixed and env(safe-area-inset-*)'], flutter: ['m.FloatingActionButton / .extended lifted into an OverlayPortal so it stays fixed without a Scaffold'] },
   examples: [{ label: 'New order', icon: 'plus' }, { label: 'Add card', icon: 'plus', extended: true }],
 });

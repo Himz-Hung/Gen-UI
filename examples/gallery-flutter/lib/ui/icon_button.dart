@@ -46,8 +46,10 @@ class UiIconButton extends StatelessWidget {
           ? IconButton.styleFrom(
               backgroundColor: UiTokens.colorMuted.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             )
-          : IconButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd))),
+          // shrinkWrap: the laid-out size is the contract size, no invisible 48px tap padding
+          : IconButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)), tapTargetSize: MaterialTapTargetSize.shrinkWrap),
     );
     // The badge is part of the accessible name and never changes the button size.
     final count = badge != null && RegExp(r'^\d+$').hasMatch(badge!) && int.parse(badge!) > 99 ? '99+' : badge;

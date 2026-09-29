@@ -25,7 +25,8 @@ class UiSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     final v = _clamp(value);
     final divisions = step > 0 && max > min ? ((max - min) / step).round().clamp(1, 1 << 20) : null;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+    // MergeSemantics: the visible label becomes the field's accessible name (one node: label + field)
+    return MergeSemantics(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       Row(children: [
         Expanded(child: Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600))),
         if (valueLabel != null) Text(valueLabel!, style: TextStyle(color: UiTokens.colorMuted)),
@@ -43,6 +44,6 @@ class UiSlider extends StatelessWidget {
           semanticFormatterCallback: (_) => valueLabel ?? v.toString(),
         ),
       ),
-    ]);
+    ]));
   }
 }

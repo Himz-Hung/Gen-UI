@@ -5,5 +5,8 @@ export default defineComponent({
   props: { label: t.text(), removable: t.boolean().def(true) },
   events: { remove: t.void() },
   rules: ['removable=true shows a remove control with an accessible name "Remove <label>".', 'Height 28, radius tokens.radius.full.'],
+  checks: [
+    { kind: 'neverEmits', event: 'remove', props: { removable: false } },
+  ],
   platform: { react: ["<span> with a remove <button>"], flutter: ["InputChip / Chip with onDeleted when removable"] },
 });

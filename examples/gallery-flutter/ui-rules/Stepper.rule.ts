@@ -16,6 +16,10 @@ export default defineComponent({
   ],
   a11y: ['An ordered list; the current step is marked current; completed steps say "completed".'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'neverEmits', event: 'press', target: '2', props: {}, note: 'the current step is not completed, so not pressable' },
+    { kind: 'neverEmits', event: 'press', target: '3', props: {}, note: 'future steps are never pressable' },
+  ],
   platform: { react: ['<ol> of steps; pressable ones are buttons'], flutter: ['a custom Row / Column of step markers (m.Stepper owns the content, so it is not a fit)'] },
   examples: [{ current: 1, steps: [{ label: 'Cart' }, { label: 'Shipping' }, { label: 'Payment' }] }],
 });

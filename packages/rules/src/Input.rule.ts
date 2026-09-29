@@ -23,5 +23,9 @@ export default defineComponent({
     'type=password always has a show / hide control at the end of the field: a toggle named by revealLabel (or the field label when absent) whose pressed state says whether the text is visible; it never submits and keeps focus and cursor in the field.',
   ],
   a11y: ['Label is programmatically associated with the field.', 'error is announced (live region / semantics).'],
+  checks: [
+    { kind: 'role', role: 'textbox', name: { fromProp: 'label' } },
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['use <label for> + <input>', 'aria-invalid and aria-describedby for error'], flutter: ['TextField with InputDecoration'] },
 });

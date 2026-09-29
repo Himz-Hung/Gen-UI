@@ -9,5 +9,8 @@ export default defineComponent({
   },
   rules: ['Uses tokens.font.heading, weight bold.', 'level controls semantics only; size controls appearance only.'],
   a11y: ['Exposed as a heading of the given level.'],
+  checks: [
+    { kind: 'role', role: 'heading', name: { fromProp: 'value' } },
+  ],
   platform: { react: ['render h1..h4 by level'], flutter: ['Semantics(header: true)'] },
 });

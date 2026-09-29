@@ -17,6 +17,11 @@ export default defineComponent({
     'Same focus and inert-background rules as Modal.',
   ],
   a11y: ['Role dialog, aria-modal, labelled by title; focus moves in on open and back to the opener on close.'],
+  checks: [
+    { kind: 'role', role: 'dialog', props: { open: true } },
+    { kind: 'key', key: 'Escape', emits: 'close', props: { open: true } },
+    { kind: 'rendersNothing', props: { open: false } },
+  ],
   platform: { react: ['portal + focus trap; start/end follow the text direction'], flutter: ['side bottom: m.showModalBottomSheet; start/end: m.Scaffold drawer / endDrawer or a sliding overlay'] },
   examples: [{ open: true, title: 'Filters', side: 'end' }],
 });

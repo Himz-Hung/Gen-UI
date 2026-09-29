@@ -11,5 +11,9 @@ export default defineComponent({
   rules: ['inline variant is underlined or clearly distinct from surrounding text by more than color alone.', 'Color tokens.color.primary.'],
   a11y: ['Role link.', 'Visible focus ring.'],
   composition: { cannotBeInside: ['Button', 'Link'] },
+  checks: [
+    { kind: 'role', role: 'link', name: { fromProp: 'label' } },
+    { kind: 'emits', event: 'press', on: ['press', 'enter'] },
+  ],
   platform: { react: ['use <a> (router Link) so middle-click and open-in-new-tab work'], flutter: ["TextButton styled as a link; Semantics(link: true)"] },
 });

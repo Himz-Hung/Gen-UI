@@ -6,11 +6,12 @@ import type { TypeNode } from './types.ts';
 import { typeText } from './types.ts';
 import { Report } from './diagnostics.ts';
 import { DIRS } from './loader.ts';
+import { resolveProps } from './propsof.ts';
 
 /**
- * v0 static verify for React: does ui/<Name>.tsx export a component whose
- * props type honours the contract? Checks surface (names, kinds, enum
- * members, event handlers), not behaviour. Behavioural test generation is deferred.
+ * Static verify for React: does ui/<Name>.tsx export a component whose props type honours the contract?
+ * Checks surface (names, kinds, enum members, event handlers). Behaviour is tested separately:
+ * `fw verify` runs the contract's checks as generated tests (behaviour.ts).
  */
 export function verifyReact(root: string, c: ComponentContract): { report: Report; implPath: string | null } {
   const candidates = [`${c.name}.tsx`, `${c.name}/index.tsx`, `${c.name}/${c.name}.tsx`].map((p) => join(root, DIRS.ui, p));
@@ -29,11 +30,23 @@ export function verifyReact(root: string, c: ComponentContract): { report: Repor
   if (!exported) { r.error('export', `no export named ${c.name}. Use "export function ${c.name}(props: ${c.name}Props)" or "export const ${c.name} = ..."`); return { report: r, implPath: null }; }
 
   // 2. props type: first parameter's type, resolved if it is a type reference
+  // Not visible in the file's AST (forwardRef<El, Props>((p, ref) => …) with an untyped parameter): ask the type checker.
   const propsType = propsTypeOf(sf, exported);
-  if (!propsType) { r.error('props', 'could not find a props type on the first parameter (use an interface/type literal, e.g. ButtonProps)'); return { report: r, implPath: null }; }
-  const members = membersOf(sf, propsType);
+  let members = propsType ? membersOf(sf, propsType) : null;
+  if (!members) {
+    const resolved = resolveProps(root, file, c.name);
+    if (resolved) members = new Map([...resolved].map(([k, p]) => [k, { optional: p.optional, typeText: p.typeText, inherited: !!p.library }]));
+  }
+  if (!propsType && !members) { r.error('props', 'could not find a props type on the first parameter (use an interface/type literal, e.g. ButtonProps)'); return { report: r, implPath: null }; }
   if (!members) { r.error('props', 'props type is not an object type'); return { report: r, implPath: null }; }
 
+  // A registered component (fw add) may take props from a library type (extends MUI's ButtonProps…) that the
+  // file's own AST cannot see: resolve those with the type checker, only when something is missing.
+  const wanted = [...Object.keys(c.props), ...Object.keys(c.events ?? {}).map((ev) => 'on' + ev[0].toUpperCase() + ev.slice(1)), ...(c.children ? ['children'] : [])];
+  if (c.impl?.react && wanted.some((k) => !members.has(k))) {
+    const resolved = resolveProps(root, file, c.name);
+    if (resolved) for (const [k, p] of resolved) if (!members.has(k)) members.set(k, { optional: p.optional, typeText: p.typeText, inherited: true });
+  }
   // 3. each contract prop
   for (const [name, ty] of Object.entries(c.props)) {
     const m = members.get(name);
@@ -48,14 +61,15 @@ export function verifyReact(root: string, c: ComponentContract): { report: Repor
     const handler = 'on' + ev[0].toUpperCase() + ev.slice(1);
     const m = members.get(handler);
     if (!m) { r.error(`events.${ev}`, `missing handler prop "${handler}"`); continue; }
-    if (!/=>|\bFunction\b|\(\)/.test(m.typeText)) r.error(`events.${ev}`, `"${handler}" should be a function type, got ${m.typeText}`);
+    if (!/=>|\bFunction\b|\(\)|Handler\b|Callback\b/.test(m.typeText)) r.error(`events.${ev}`, `"${handler}" should be a function type, got ${m.typeText}`);
     void payload;
   }
   // 5. children
   if (c.children && !members.has('children')) r.error('children', 'contract accepts children but props have no "children"');
-  if (!c.children && members.has('children')) r.error('children', 'contract does not accept children but props declare "children"');
+  if (!c.children && members.has('children') && !members.get('children')!.inherited) r.error('children', 'contract does not accept children but props declare "children"');
   // 6. unknown props → warning (implementation may add internals like className)
-  for (const k of members.keys()) {
+  for (const [k, mem] of members) {
+    if (mem.inherited) continue;
     const isHandler = [...Object.keys(c.events ?? {})].some((ev) => k === 'on' + ev[0].toUpperCase() + ev.slice(1));
     if (!c.props[k] && !isHandler && k !== 'children') r.warn(`props.${k}`, 'prop not in contract (allowed, but the agent must not rely on it in specs)');
   }
@@ -104,7 +118,7 @@ function propsTypeOf(sf: ts.SourceFile, node: ts.Node): ts.TypeNode | null {
   return p?.type ?? null;
 }
 
-interface Member { optional: boolean; typeText: string }
+interface Member { optional: boolean; typeText: string; inherited?: boolean }
 
 function membersOf(sf: ts.SourceFile, tn: ts.TypeNode): Map<string, Member> | null {
   if (ts.isTypeLiteralNode(tn)) return collect(sf, tn.members);

@@ -1,0 +1,13 @@
+name: compat_flutter_l10n
+description: Compatibility fixture for fw check with Flutter's own i18n (ARB + AppLocalizations).
+publish_to: 'none'
+environment:
+  sdk: ^3.12.0
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+flutter:
+  generate: true

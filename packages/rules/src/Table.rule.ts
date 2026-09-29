@@ -23,6 +23,11 @@ export default defineComponent({
   ],
   a11y: ['Real table semantics: header cells, aria-sort on the sorted column; pressable rows are focusable and activate with Enter.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'sort', target: 'Total' },
+    { kind: 'emits', event: 'rowPress', props: { pressableRows: true }, target: '$42.00' },
+    { kind: 'neverEmits', event: 'rowPress', props: { pressableRows: false }, target: '$42.00' },
+  ],
   platform: { react: ['<table> with <thead>/<tbody>; overflow-x auto wrapper'], flutter: ['m.DataTable inside a horizontal m.SingleChildScrollView'] },
   examples: [{ columns: [{ key: 'id', label: 'Order' }, { key: 'total', label: 'Total', align: 'end', sortable: true }], rows: [{ id: 'A-1001', cells: ['A-1001', '$42.00'] }] }],
 });

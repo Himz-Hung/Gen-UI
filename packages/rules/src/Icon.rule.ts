@@ -15,6 +15,10 @@ export default defineComponent({
   ],
   a11y: ['Without label: hidden from assistive tech. With label: an image named by label.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'size', byProp: 'size', height: { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 }, width: { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 } },
+    { kind: 'role', role: 'img', name: { fromProp: 'label' }, props: { name: 'star', label: 'Favourite' } },
+  ],
   platform: { react: ['inline SVG from one icon module; aria-hidden when no label'], flutter: ['m.Icon from one IconData map keyed by name; semanticLabel = label'] },
   examples: [{ name: 'cart' }, { name: 'star', color: 'warning', label: 'Favourite' }],
 });

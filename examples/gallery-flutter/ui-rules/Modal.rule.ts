@@ -12,5 +12,10 @@ export default defineComponent({
   states: ['closed', 'open'],
   rules: ['Focus moves into the dialog on open and returns to the opener on close.', 'Background content is inert while open.', 'Always has a visible close control.'],
   a11y: ['Role dialog, aria-modal, labelled by title.'],
+  checks: [
+    { kind: 'role', role: 'dialog', props: { open: true } },
+    { kind: 'key', key: 'Escape', emits: 'close', props: { open: true } },
+    { kind: 'rendersNothing', props: { open: false } },
+  ],
   platform: { react: ["portal + focus trap; <div role=\"dialog\" aria-modal>"], flutter: ["rendered by the widget itself while open (barrier + panel), not showDialog in build"] },
 });

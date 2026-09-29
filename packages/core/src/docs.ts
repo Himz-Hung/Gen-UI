@@ -60,6 +60,7 @@ export function renderDocs(c: ComponentContract, platform?: 'react' | 'flutter' 
   if (c.states?.length) L.push('', '## States', '', c.states.map((s) => `\`${s}\``).join(', '));
   if (c.rules?.length) L.push('', '## Rules (every platform)', '', ...c.rules.map((x) => `- ${x}`));
   if (c.a11y?.length) L.push('', '## Accessibility', '', ...c.a11y.map((x) => `- ${x}`));
+  if (c.checks?.length) L.push('', '## Checks (fw verify generates and runs a test for each)', '', ...c.checks.map((x, i) => `- \`checks[${i}]\` ${JSON.stringify(x)}`));
   if (c.composition) {
     L.push('', '## Composition', '');
     if (c.composition.canContain) L.push(`- May only contain: ${c.composition.canContain.join(', ')}`);

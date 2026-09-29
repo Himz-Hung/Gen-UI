@@ -10,6 +10,9 @@ export default defineComponent({
   rules: ['Sizes sm 16, md 24, lg 40 logical pixels; color tokens.color.primary.', 'Respects reduced-motion settings with a slower or static indicator.'],
   a11y: ['Role status (or progressbar without value) named by label.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'status', name: { fromProp: 'label' } },
+  ],
   platform: { react: ['CSS animation on an element with role="status"'], flutter: ['m.CircularProgressIndicator inside Semantics(label: label)'] },
   examples: [{ label: 'Loading cards' }],
 });

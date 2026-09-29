@@ -47,10 +47,10 @@ class _UiFloatingActionButtonState extends State<UiFloatingActionButton> {
     // Never emits press while disabled.
     final onPressed = enabled ? widget.onPress : null;
     final Widget fab = widget.extended
-        ? FloatingActionButton.extended(heroTag: null, onPressed: onPressed, backgroundColor: bg, shape: shape, icon: icon, label: Text(widget.label, style: const TextStyle(color: UiTokens.colorSurface, fontWeight: FontWeight.w600)))
+        ? FloatingActionButton.extended(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, icon: icon, label: Text(widget.label, style: const TextStyle(color: UiTokens.colorSurface, fontWeight: FontWeight.w600)))
         : widget.size == UiFloatingActionButtonSize.sm
-            ? FloatingActionButton.small(heroTag: null, onPressed: onPressed, backgroundColor: bg, shape: shape, tooltip: widget.label, child: icon)
-            : FloatingActionButton(heroTag: null, onPressed: onPressed, backgroundColor: bg, shape: shape, tooltip: widget.label, child: icon);
+            ? FloatingActionButton.small(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, tooltip: widget.label, child: icon)
+            : FloatingActionButton(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, tooltip: widget.label, child: icon);
     // Role button named by label, also when the label is not shown.
     return Semantics(button: true, enabled: enabled, label: widget.label, excludeSemantics: true, child: fab);
   }

@@ -17,6 +17,10 @@ export default defineComponent({
     'A load-more button with loadMoreLabel is always present at the end as a fallback (keyboard, assistive tech, failed loads).',
   ],
   a11y: ['New items are announced politely ("20 more cards loaded"); focus stays where it was.'],
+  checks: [
+    { kind: 'emits', event: 'loadMore', props: { hasMore: true, loading: false }, target: 'Load more cards' },
+    { kind: 'neverEmits', event: 'loadMore', props: { loading: true, hasMore: true }, on: ['press'] },
+  ],
   platform: { react: ['IntersectionObserver on a sentinel after the last child'], flutter: ['a ScrollController listener near maxScrollExtent, or a trailing item in the ListView builder'] },
   examples: [{ loading: false, hasMore: true, loadMoreLabel: 'Load more cards' }],
 });

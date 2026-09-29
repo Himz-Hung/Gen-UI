@@ -66,9 +66,10 @@ class UiSegmentedControl extends StatelessWidget {
         ),
       ],
     );
+    // radio-group semantics (contract a11y): each option is a checked / unchecked radio in one exclusive group
     final button = Semantics(
-      button: true,
-      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      checked: selected,
       label: o.label,
       child: Material(
         color: selected ? UiTokens.colorSurface : Colors.transparent,

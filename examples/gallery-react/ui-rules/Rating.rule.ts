@@ -17,6 +17,10 @@ export default defineComponent({
     'Each star is at least a 32×32 target when interactive.',
   ],
   a11y: ['Interactive: role radiogroup of max options named "<n> of <max>". readOnly: an image named "<value> of <max>".'],
+  checks: [
+    { kind: 'neverEmits', event: 'change', props: { readOnly: true } },
+    { kind: 'role', role: 'img', props: { readOnly: true, value: 4.5 }, name: '4.5 of 5' },
+  ],
   platform: { react: ['radio inputs styled as stars'], flutter: ['a Row of m.IconButton / m.Icon (star, star_half, star_border)'] },
   examples: [{ label: 'Your rating', value: 4 }, { label: 'Average rating', value: 4.5, readOnly: true, size: 'sm' }],
 });

@@ -19,6 +19,12 @@ export default defineComponent({
   ],
   a11y: ['Announced through a polite live region (assertive for danger); the action is keyboard reachable.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'status', props: { open: true, tone: 'info' } },
+    { kind: 'role', role: 'alert', props: { open: true, tone: 'danger' } },
+    { kind: 'rendersNothing', props: { open: false } },
+    { kind: 'emits', event: 'action', props: { open: true, actionLabel: 'Undo' }, target: 'Undo' },
+  ],
   platform: { react: ['render in a portal; role="status"'], flutter: ['m.ScaffoldMessenger.of(context).showSnackBar driven by open, or an Overlay entry'] },
   examples: [{ open: true, message: 'Added to cart', tone: 'success', actionLabel: 'Undo' }],
 });

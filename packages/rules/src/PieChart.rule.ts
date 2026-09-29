@@ -18,6 +18,9 @@ export default defineComponent({
   ],
   a11y: ['Image named by summary, plus a data table alternative.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'img', name: { fromProp: 'summary' } },
+  ],
   platform: { react: ['SVG arcs, or the project chart library'], flutter: ['CustomPaint, or the project chart package'] },
   examples: [{ summary: 'Most orders are near-mint cards', slices: [{ label: 'Near mint', value: 60 }, { label: 'Played', value: 40 }] }],
 });

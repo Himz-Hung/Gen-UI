@@ -13,6 +13,9 @@ export default defineComponent({
   rules: ['Track height 8, radius tokens.radius.full; fill uses the tone color.', 'value is clamped to 0–100.', 'valueLabel, when given, replaces the percentage text.'],
   a11y: ['Role progressbar with min 0, max 100 and the value (none when indeterminate); named by label.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'progressbar', name: { fromProp: 'label' } },
+  ],
   platform: { react: ['<progress> or role="progressbar" with aria-valuenow'], flutter: ['m.LinearProgressIndicator(value: value == null ? null : value / 100)'] },
   examples: [{ label: 'Uploading photos', value: 60, valueLabel: '3 of 5 files' }],
 });

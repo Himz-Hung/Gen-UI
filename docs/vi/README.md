@@ -21,7 +21,11 @@ Node ≥ 20, project React TypeScript hoặc folder trống. Package đã có tr
 npm i -D @himz-genui/core @himz-genui/rules
 npx fw init --agent claude --platform react --name "My Shop"
 #            --agent cursor | codex | copilot      --create vite (scaffold Vite trước, chưa thử)
+npm i -D vitest jsdom @testing-library/react @testing-library/user-event   # React: để fw verify chạy check hành vi
 ```
+
+`fw init` còn thêm `test/fw/` vào `.gitignore` (test sinh ra, không commit) và, nếu project chưa có script test,
+đặt `"test": "fw verify"`.
 
 Sinh ra:
 
@@ -177,7 +181,11 @@ FAIL  ui/Button.tsx  (2 errors, 0 warnings)
 ```
 
 Quy ước: `ui/<Name>.tsx`, `export function <Name>(props: <Name>Props)`, event `x` → prop `onX`.
-`fw verify` v1 kiểm bề mặt (export, props, enum, handler, children), chưa kiểm hành vi.
+`fw verify` kiểm bề mặt (export, props, enum, handler, children), rồi **chạy check hành vi**: mỗi mục trong
+`checks` của hợp đồng thành một test (`test/fw/`, vitest + Testing Library trên React, `flutter test` trên Flutter).
+8 loại: `size`, `keepsSize`, `emits`, `neverEmits`, `role`, `key`, `rendersNothing`, `minTarget`. Lỗi báo ở `checks[i]`
+kèm giá trị mong đợi và thực tế. React chạy jsdom (không có layout) nên check kích thước chỉ đo trên Flutter.
+`level: 'warn'` chỉ cảnh báo. File trong `test/fw/` sinh lại mỗi lần chạy, đừng sửa tay.
 
 ## 5. Pha B — agent ráp màn
 
@@ -304,11 +312,14 @@ Chạy lần lượt: outline, mọi component trong `ui/`, mọi spec, mô tả
 `ui/`) và sơ đồ điều hướng,
 dòng cuối `N failed, M passed`. Exit `0` sạch, `1` có lỗi, `2` dùng sai. Dùng thẳng trong CI.
 
+`fw check` chỉ kiểm tĩnh, không chạy test. Check hành vi chạy bằng `npx fw verify` (thêm vào CI; Flutter cần
+Flutter SDK trên máy CI).
+
 ## 7. Tình huống thường gặp
 
 | Tình huống | Làm gì |
 |---|---|
-| Team đã có component | `npx fw add src/legacy/PriceTag.tsx` — sinh hợp đồng trỏ về file gốc, không copy |
+| Team đã có component / design system | `npx fw add src/legacy/PriceTag.tsx` (hoặc `lib/widgets/price_tag.dart`) — sinh hợp đồng trỏ về file gốc, không copy |
 | Thêm màn / component mới | thêm tên vào `ui-spec/app.ts` trước, rồi mới làm chi tiết |
 | Cần component chưa có hợp đồng | viết `ui-spec/components/<Name>.rule.ts`, rồi Pha A |
 | Muốn đổi hợp đồng ship sẵn | tạo file cùng `name` trong `ui-spec/components/`, không sửa `ui-rules/` |
@@ -321,7 +332,7 @@ dòng cuối `N failed, M passed`. Exit `0` sạch, `1` có lỗi, `2` dùng sai
 | Lệnh | Ai | Làm gì |
 |---|---|---|
 | `fw init --agent … --platform … [--name] [--create]` | bạn | khởi tạo |
-| `fw add <file.tsx> [--name]` | bạn | đăng ký component sẵn có |
+| `fw add <file.tsx / file.dart> [--name]` | bạn | đăng ký component React / widget Flutter sẵn có |
 | `fw check` | bạn / CI | kiểm hết |
 | `fw check <path…>` | agent | kiểm spec, file màn, folder, `ui-spec/screens` hoặc `ui-spec/app.ts` theo đường dẫn |
 | `fw docs <Name>` | agent | in hợp đồng |
@@ -350,11 +361,15 @@ Mọi lệnh tự làm mới `ui.catalog.json` và file chỉ dẫn trước khi
 | `imported from "…", which is not ui/ or a registered impl` | `fw add` nó, hoặc viết hợp đồng và vật chất hoá |
 | `guard "x" is not declared` | thêm vào `guards` trong `project.ts` |
 | `nothing to check in: …` | đường dẫn không phải `.ui.json`, `.tsx`, folder, `ui-spec/screens`, `ui-spec/flows` hay `ui-spec/app.ts` |
-| tsc `TS5097 allowImportingTsExtensions` | thêm `"allowImportingTsExtensions": true` vào tsconfig |
+| tsc `TS5097 allowImportingTsExtensions` | từ 1.3 không cần nữa: nâng `@himz-genui/core` lên 1.3 |
+| `behavioural checks need …` | cài `vitest jsdom @testing-library/react @testing-library/user-event` |
 
-## 10. Giới hạn 1.2
+## 10. Giới hạn 1.3
 
-React và Flutter. `fw verify` kiểm bề mặt (không chạy hành vi). `fw add` chỉ cho React. Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Bản 1.2.0 (React và Flutter, 76 contract) phát hành 29/09/2026.
+React và Flutter. `fw verify` chạy check hành vi, nhưng 8 loại check chưa diễn đạt được: gõ chữ, mở danh sách
+rồi chọn, kéo, bấm nút chỉ có icon, trạng thái aria (expanded, selected), role list / menu / combobox. Những cam
+kết đó vẫn là chữ trong `rules` / `a11y`. React không có trình duyệt nên check kích thước chỉ chạy trên Flutter.
+`fw add` đọc được component React (kể cả bọc MUI, shadcn `forwardRef`) và widget Flutter; prop kế thừa từ thư viện chỉ được liệt kê, bạn chọn cái nào đưa vào contract. `screenDirs` / `freeformDirs` trong `project.ts` quyết định thư mục nào áp luật màn (landing page để ở `freeformDirs`). Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Bản 1.3.0 (check hành vi, core build sẵn ra JS) sau 1.2.0 (React và Flutter, 76 contract).
 Hứa nhất quán **trong một project**, không hứa hai project ra code giống nhau.
 
 ## 11. Ví dụ

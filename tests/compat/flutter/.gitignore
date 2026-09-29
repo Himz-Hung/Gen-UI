@@ -1,0 +1,7 @@
+.dart_tool/
+build/
+.flutter-plugins*
+lib/ui/ui.dart
+lib/ui/tokens.g.dart
+lib/l10n/
+lib/ui/theme.g.dart

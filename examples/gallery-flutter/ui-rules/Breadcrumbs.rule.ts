@@ -12,6 +12,10 @@ export default defineComponent({
   ],
   a11y: ['Navigation landmark named "Breadcrumb"; the last item is marked current page.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'press', target: 'Home', note: 'every item but the last is pressable' },
+    { kind: 'neverEmits', event: 'press', target: 'Base Set', props: {}, note: 'the last item is plain text' },
+  ],
   platform: { react: ['<nav aria-label="Breadcrumb"><ol>'], flutter: ['a Wrap of m.TextButton and separator Icons'] },
   examples: [{ items: [{ value: 'home', label: 'Home' }, { value: 'sets', label: 'Sets' }, { value: 'base', label: 'Base Set' }] }],
 });

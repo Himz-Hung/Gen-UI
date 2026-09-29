@@ -18,6 +18,10 @@ export default defineComponent({
   ],
   a11y: ['Navigation landmark named by title; the active item is marked current; the collapse control states its expanded state.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'change', target: 'Cards' },
+    { kind: 'role', role: 'button', name: 'Orders', props: {} },
+  ],
   platform: { react: ['<nav> with a list of links or buttons'], flutter: ['m.NavigationRail (collapsed) / m.NavigationDrawer (expanded)'] },
   examples: [{ value: 'orders', title: 'Admin', items: [{ value: 'orders', label: 'Orders', icon: 'box', badge: '12' }, { value: 'cards', label: 'Cards', icon: 'grid', section: 'Catalog' }] }],
 });

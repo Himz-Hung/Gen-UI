@@ -12,12 +12,13 @@ import { checkStrings, i18nContext } from './i18ncheck.ts';
 import type { CodeI18n } from './codecheck.ts';
 import { verifyReact } from './verify.ts';
 import { verifyFlutter } from './dart.ts';
+import { runChecks, validateChecks, type Target } from './behaviour.ts';
 import { checkDartScreens } from './dartcheck.ts';
 import { screenWrappers } from './wrappers.ts';
-import { FLUTTER, writeFlutterFiles, dartFile } from './flutter.ts';
+import { FLUTTER, writeFlutterFiles, dartFile, usesArb } from './flutter.ts';
 import { renderDocs, renderScreen } from './docs.ts';
 import { didYouMean } from './suggest.ts';
-import { addReactComponent } from './add.ts';
+import { addFlutterWidget, addReactComponent } from './add.ts';
 import { init } from './init.ts';
 import type { Catalog } from './define.ts';
 import type { Report } from './diagnostics.ts';
@@ -35,7 +36,7 @@ for (let i = 0; i < rest.length; i++) {
 const HELP = `fw — contract-driven UI for coding agents
 
   fw init --agent <claude|cursor|codex|copilot> --platform <react|flutter> [--name "App"] [--create vite|next|flutter]
-  fw add <file.tsx> [--name X]     register an existing component as a contract
+  fw add <file.tsx|file.dart> [--name X]  register an existing React component or Flutter widget as a contract
   fw check                          check everything: outline, components, screens, specs, navigation, screen code
   fw check <path...>                check just these: *.ui.json specs, *.tsx screens, folders, ui-spec/screens, ui-spec/strings, ui-spec/app.ts
 
@@ -65,11 +66,12 @@ async function main() {
     }
 
     case 'add': {
-      const file = args[0]; if (!file || !existsSync(file)) fail('fw add <file.tsx>');
+      const file = args[0]; if (!file || !existsSync(file)) fail('fw add <file.tsx | file.dart>');
       const root = findRoot();
       const { project: pre } = await sync(root);
-      if (!pre.config.platforms.includes('react')) fail('fw add registers React components only. For Flutter, write the contract in ui-spec/components/<Name>.rule.ts and point impl.flutter at the file.');
-      const { contractFile, name, todo } = addReactComponent(root, resolve(file), flags.get('name'));
+      const dart = file.endsWith('.dart');
+      if (!pre.config.platforms.includes(dart ? 'flutter' : 'react')) fail(`${file} is a ${dart ? 'Flutter' : 'React'} file, but ui-spec/project.ts platforms does not include '${dart ? 'flutter' : 'react'}'`);
+      const { contractFile, name, todo } = (dart ? addFlutterWidget : addReactComponent)(root, resolve(file), flags.get('name'));
       console.log(`created  ${contractFile}  (component ${name})`);
       for (const t of todo) console.log(`todo     ${t}`);
       const { project, catalog } = await sync(root);
@@ -105,6 +107,15 @@ async function main() {
       const { project, catalog } = await sync(findRoot());
       const reports = verifyMany(project, catalog, args.length ? args : undefined);
       writeCatalog(project.root, catalog);
+      // Behavioural checks run here only (fw check stays static): generated tests for every component whose surface passed.
+      for (const p of platformsOf(project)) {
+        const targets: Target[] = [];
+        for (const n of args.length ? args : [...project.contracts.keys()]) {
+          const impl = catalog.components[n]?.impl[p];
+          if (impl) targets.push({ contract: project.contracts.get(n)!.contract, implFile: impl });
+        }
+        reports.push(...runChecks(project.root, p, project.config, targets, !args.length));
+      }
       finish(reports);
     }
 
@@ -121,10 +132,14 @@ async function main() {
         reports.push(...checkSpecs(project, catalog, specs));
         reports.push(...checkFlows(project, specs.map((f) => ({ file: f, spec: readSpec(f) }))));
         reports.push(...checkStrings(project, specs.map(readSpec)));
-        reports.push(...screenCode(project, catalog, [...(platformsOf(project).includes('react') ? ['src/screens', 'screens'] : []), ...(platformsOf(project).includes('flutter') ? [FLUTTER.screens] : [])]));
-        const notes = project.app
-          ? progress(project, catalog, specs.map(readSpec), platformsOf(project))
-          : [`hint  no ${APP_FILE}: outline checks skipped. Add one (defineApp) to list every screen and component up front.`];
+        const { dirs, free, unchecked } = screenScope(project);
+        reports.push(...screenCode(project, catalog, dirs).filter((r) => !free.some((f) => r.file === f || r.file.startsWith(`${f}/`))));
+        const notes = [
+          ...(project.app
+            ? progress(project, catalog, specs.map(readSpec), platformsOf(project))
+            : [`hint  no ${APP_FILE}: outline checks skipped. Add one (defineApp) to list every screen and component up front.`]),
+          ...unchecked.map((d) => `hint  ${d}/ has UI code that fw check does not look at: add it to screenDirs (composed from ${platformsOf(project).includes('react') ? 'ui/' : 'lib/ui/'} only) or freeformDirs (free, e.g. a landing page) in ui-spec/project.ts`),
+        ];
         finish(reports, notes);
       } else {
         const targets = collect(args.map((a) => resolve(a)), project.root);
@@ -174,19 +189,26 @@ function platformsOf(project: Project): Platform[] {
 function verifyOne(project: Project, catalog: Catalog, name: string): Report[] {
   const c = project.contracts.get(name); if (!c) fail(`no contract named ${name}`);
   const entry = catalog.components[name];
-  return platformsOf(project).map((p) => {
+  const results = platformsOf(project).map((p) => {
     const { report, implPath } = p === 'react' ? verifyReact(project.root, c.contract) : verifyFlutter(project.root, c.contract);
     if (entry) { if (implPath) entry.impl[p] = implPath; else delete entry.impl[p]; }
-    return report;
+    return { report, implPath };
   });
+  // checks are part of the contract: validate once, on the first platform that has an implementation
+  const first = results.find((x) => x.implPath) ?? results.find((x) => !fileOnly(x.report));
+  if (first) validateChecks(c.contract, project.config, first.report);
+  return results.map((x) => x.report);
 }
+
+/** The component has no file on that platform (the report says only "not found"). */
+const fileOnly = (r: Report) => r.items.length === 1 && r.items[0].where === 'file';
 
 /** With names: those. Without: every contract that has a file (unmaterialized ones are skipped silently). */
 function verifyMany(project: Project, catalog: Catalog, names?: string[]): Report[] {
   const out: Report[] = [];
   for (const n of names ?? [...project.contracts.keys()]) {
     for (const r of verifyOne(project, catalog, n)) {
-      if (!names && r.items.length === 1 && r.items[0].where === 'file') continue;
+      if (!names && fileOnly(r)) continue;
       out.push(r);
     }
   }
@@ -206,13 +228,29 @@ function screenCode(project: Project, catalog: Catalog, paths: string[]): Report
   const langs = project.config.languages ?? [];
   const out: Report[] = [];
   const wrappers = screenWrappers(project.config);
-  if (web.length) out.push(...checkCode(project.root, web, allowedImpl(catalog), outline, codeI18n(project, catalog), wrappers));
+  if (web.length) out.push(...checkCode(project.root, web, allowedImpl(catalog), outline, codeI18n(project, catalog), wrappers, (n) => catalog.components[n]));
   if (dart.length) out.push(...checkDartScreens(project.root, dart, {
     outline,
     wrappers,
-    text: langs.length > 1 ? { props: (n) => catalog.components[n]?.props, languages: langs } : undefined,
+    registered: Object.entries(catalog.components).filter(([, e]) => e.impl.flutter && !e.impl.flutter.startsWith(`${FLUTTER.ui}/`)).flatMap(([n]) => [n, `Ui${n}`]),
+    text: langs.length > 1 ? { props: (n) => catalog.components[n]?.props, languages: langs, arb: usesArb(project.config) } : undefined,
   }));
   return out;
+}
+
+/**
+ * Where screen rules apply: project.screenDirs, or the conventional folders. `unchecked` lists common UI folders
+ * (pages/, app/, views/…) that exist but are neither checked nor declared free, so nothing is skipped silently.
+ */
+function screenScope(project: Project): { dirs: string[]; free: string[]; unchecked: string[] } {
+  const ps = platformsOf(project);
+  const strip = (d: string) => d.replace(/^\.\//, '').replace(/\/+$/, '');
+  const dirs = (project.config.screenDirs ?? [...(ps.includes('react') ? ['src/screens', 'screens'] : []), ...(ps.includes('flutter') ? [FLUTTER.screens] : [])]).map(strip);
+  const free = (project.config.freeformDirs ?? []).map(strip);
+  const covered = (d: string) => [...dirs, ...free].some((x) => d === x || d.startsWith(`${x}/`) || x.startsWith(`${d}/`));
+  const common = [...(ps.includes('react') ? ['src/pages', 'pages', 'src/app', 'app', 'src/views', 'src/routes'] : []), ...(ps.includes('flutter') ? ['lib/pages', 'lib/views'] : [])];
+  const hasCode = (d: string) => { try { return readdirSync(join(project.root, d), { recursive: true }).some((f) => /\.(tsx|jsx|dart)$/.test(String(f))); } catch { return false; } };
+  return { dirs, free, unchecked: common.filter((d) => !covered(d) && hasCode(d)) };
 }
 
 /** Hard-coded text is only an error in code when the project has several languages. */

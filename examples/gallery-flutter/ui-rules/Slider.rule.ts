@@ -19,6 +19,10 @@ export default defineComponent({
     'Filled part of the track uses tokens.color.primary.',
   ],
   a11y: ['Role slider with min, max and current value; the value text is valueLabel when given; arrow keys change by step, Page keys by 10 steps.'],
+  checks: [
+    { kind: 'role', role: 'slider', name: { fromProp: 'label' } },
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['<input type="range">'], flutter: ['m.Slider with divisions = (max - min) / step'] },
   examples: [{ label: 'Max price', value: 40, min: 0, max: 200, step: 5, valueLabel: '$40' }],
 });

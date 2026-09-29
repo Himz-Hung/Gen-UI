@@ -4,8 +4,8 @@
   "type": "module",
   "description": "Every shipped contract materialized in React, checked by fw verify, tsc and a Testing Library test each. Same ui-spec as gallery-flutter.",
   "dependencies": {
-    "@himz-genui/core": "1.2.1",
-    "@himz-genui/rules": "1.2.0"
+    "@himz-genui/core": "1.3.0",
+    "@himz-genui/rules": "1.3.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
@@ -23,6 +23,6 @@
     "dev": "vite",
     "build": "vite build",
     "check": "node ../../packages/core/bin/fw.js check",
-    "test": "node ../../packages/core/bin/fw.js check && tsc -p tsconfig.json --noEmit && vitest run"
+    "test": "node ../../packages/core/bin/fw.js check && node ../../packages/core/bin/fw.js verify && tsc -p tsconfig.json --noEmit && vitest run"
   }
 }

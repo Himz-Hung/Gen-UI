@@ -12,5 +12,8 @@ export default defineComponent({
   states: ['loading', 'loaded', 'error'],
   rules: ['The box keeps its ratio before, during and after load — no layout shift.', 'loading shows a neutral placeholder; error shows a neutral placeholder with an icon.', 'Never upscales beyond natural size when fit=contain.'],
   a11y: ['alt is the accessible description; alt="" hides it from assistive tech.'],
+  checks: [
+    { kind: 'role', role: 'img', name: { fromProp: 'alt' }, props: { src: 'https://example.com/front.jpg', alt: 'Front of the card' } },
+  ],
   platform: { react: ['use <img loading="lazy">'], flutter: ["Image.network inside AspectRatio + ClipRRect, loadingBuilder / errorBuilder placeholders"] },
 });

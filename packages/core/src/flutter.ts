@@ -155,7 +155,41 @@ export function tokensDart(config: ProjectConfig): string {
   L.push('  /** spacing step, e.g. UiTokens.space(4) */', '  static double space(int step) => step < spacing.length ? spacing[step] : spacing.last;');
   for (const [k, v] of Object.entries(t.radius)) L.push(`  static const double radius${pascal(k)} = ${v};`);
   for (const [k, v] of Object.entries(t.font)) L.push(`  static const String font${pascal(k)} = ${dartString(v)};`);
+  for (const [k, v] of Object.entries(t.size ?? {})) L.push(`  static const double size${pascal(k)} = ${v};`);
   L.push('}', '');
+  return L.join('\n');
+}
+
+/**
+ * lib/ui/theme.g.dart: a Material ThemeData built from the tokens, for the shell (MaterialApp(theme: uiTheme())),
+ * so Material widgets inside lib/ui and third-party Material packages read the same colors, radius and font.
+ */
+export function themeDart(config: ProjectConfig): string {
+  const c = config.tokens.color;
+  const has = (k: string) => c[k] !== undefined;
+  const L = [HEADER('ui-spec/project.ts'), "import 'package:flutter/material.dart';", "import 'tokens.g.dart';", '',
+    '/// MaterialApp(theme: uiTheme()) in the shell; uiTheme(brightness: Brightness.dark) for a dark variant.',
+    'ThemeData uiTheme({Brightness brightness = Brightness.light}) {',
+    `  final scheme = ColorScheme.fromSeed(seedColor: ${has('primary') ? 'UiTokens.colorPrimary' : 'const Color(0xFF2563EB)'}, brightness: brightness).copyWith(`,
+    ...(has('primary') ? ['    primary: UiTokens.colorPrimary,'] : []),
+    ...(has('secondary') ? ['    secondary: UiTokens.colorSecondary,'] : []),
+    ...(has('danger') ? ['    error: UiTokens.colorDanger,'] : []),
+    ...(has('surface') ? ['    surface: brightness == Brightness.light ? UiTokens.colorSurface : null,'] : []),
+    ...(has('text') ? ['    onSurface: brightness == Brightness.light ? UiTokens.colorText : null,'] : []),
+    '  );',
+    `  final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(${config.tokens.radius.md !== undefined ? 'UiTokens.radiusMd' : '8'}));`,
+    '  return ThemeData(',
+    '    colorScheme: scheme,',
+    ...(config.tokens.font.body ? ['    fontFamily: UiTokens.fontBody,'] : []),
+    '    // tokens own the sizes: no invisible 48px tap padding (see MaterialTapTargetSize.shrinkWrap in the contracts)',
+    '    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,',
+    '    filledButtonTheme: FilledButtonThemeData(style: FilledButton.styleFrom(shape: shape)),',
+    '    outlinedButtonTheme: OutlinedButtonThemeData(style: OutlinedButton.styleFrom(shape: shape)),',
+    '    textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(shape: shape)),',
+    '    cardTheme: CardThemeData(shape: shape),',
+    `    inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder(borderRadius: BorderRadius.circular(${config.tokens.radius.md !== undefined ? 'UiTokens.radiusMd' : '8'}))),`,
+    '  );',
+    '}', ''];
   return L.join('\n');
 }
 
@@ -195,7 +229,29 @@ export function barrelDart(uiFiles: string[], hasStrings: boolean): string {
 
 export function writeFlutterFiles(root: string, config: ProjectConfig, uiFiles: string[], strings: Map<string, Record<string, string>>) {
   writeIfChanged(join(root, FLUTTER.ui, 'tokens.g.dart'), tokensDart(config));
+  writeIfChanged(join(root, FLUTTER.ui, 'theme.g.dart'), themeDart(config));
   const langs = config.languages ?? [];
-  if (langs.length) writeIfChanged(join(root, FLUTTER.l10n, 'strings.g.dart'), stringsDart(langs, strings));
-  writeIfChanged(join(root, FLUTTER.ui, 'ui.dart'), barrelDart(uiFiles, langs.length > 0));
+  const arb = usesArb(config);
+  if (langs.length && arb) {
+    // Flutter's own i18n (gen-l10n): one ARB per language from ui-spec/strings, read through AppLocalizations
+    for (const lang of langs) writeIfChanged(join(root, FLUTTER.l10n, `app_${lang}.arb`), arbFile(lang, strings.get(lang) ?? {}, lang === langs[0]));
+    const l10nYaml = join(root, 'l10n.yaml');
+    if (!existsSync(l10nYaml)) writeFileSync(l10nYaml, `# written by fw (i18nLibrary: ${config.i18nLibrary}); the ARB files are generated from ui-spec/strings/\narb-dir: ${FLUTTER.l10n}\ntemplate-arb-file: app_${langs[0]}.arb\noutput-localization-file: app_localizations.dart\n`);
+  } else if (langs.length) writeIfChanged(join(root, FLUTTER.l10n, 'strings.g.dart'), stringsDart(langs, strings));
+  writeIfChanged(join(root, FLUTTER.ui, 'ui.dart'), barrelDart(uiFiles, langs.length > 0 && !arb));
+}
+
+/** i18nLibrary naming Flutter's own localization: strings go to ARB files and code reads AppLocalizations. */
+export const usesArb = (config: ProjectConfig) => /\b(flutter_localizations|gen_l10n|intl|arb)\b/i.test(config.i18nLibrary ?? '') && !/\b(easy_localization|slang|i18next)\b/i.test(config.i18nLibrary ?? '');
+
+/** An ARB file: keys are the Dart getter names (cart.empty.title → cartEmptyTitle); the template declares placeholders. */
+export function arbFile(lang: string, strings: Record<string, string>, template: boolean): string {
+  const out: Record<string, unknown> = { '@@locale': lang };
+  for (const [key, text] of Object.entries(strings)) {
+    const id = stringGetter(key);
+    out[id] = text;
+    const ps = [...new Set([...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))];
+    if (template) out[`@${id}`] = { description: `ui-spec/strings key ${key}`, ...(ps.length ? { placeholders: Object.fromEntries(ps.map((p) => [p, {}])) } : {}) };
+  }
+  return JSON.stringify(out, null, 2) + '\n';
 }

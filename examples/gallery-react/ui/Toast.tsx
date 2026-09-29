@@ -83,7 +83,7 @@ export function Toast({ open, message, tone = 'info', actionLabel, duration = 40
       style={{ position: 'fixed', left: 0, right: 0, bottom: sp(4), display: 'flex', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none' }}
     >
       <div
-        role="status"
+        role={tone === 'danger' ? 'alert' : 'status'}
         aria-live={tone === 'danger' ? 'assertive' : 'polite'}
         onMouseEnter={pause}
         onMouseLeave={resume}

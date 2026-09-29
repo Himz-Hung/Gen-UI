@@ -18,6 +18,9 @@ export default defineComponent({
   ],
   a11y: ['Image named by summary, plus a data table alternative.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'img', name: { fromProp: 'summary' } },
+  ],
   platform: { react: ['SVG, or the project chart library'], flutter: ['CustomPaint, or the project chart package'] },
   examples: [{ summary: 'Base Set sells the most', bars: [{ label: 'Base Set', value: 42 }, { label: 'Jungle', value: 18 }] }],
 });

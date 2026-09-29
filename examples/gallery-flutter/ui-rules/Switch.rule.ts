@@ -16,6 +16,12 @@ export default defineComponent({
     'Track 44×24, thumb 20 logical pixels.',
   ],
   a11y: ['Role switch with checked state; label is the accessible name.'],
+  checks: [
+    { kind: 'role', role: 'switch', name: { fromProp: 'label' } },
+    { kind: 'emits', event: 'change', on: ['press', 'space'] },
+    { kind: 'emits', event: 'change', target: 'Notify me', props: { label: 'Notify me' } },
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['<button role="switch" aria-checked>'], flutter: ['m.SwitchListTile, or m.Switch with a tappable label'] },
   examples: [{ label: 'Email me when an order ships', checked: true }],
 });

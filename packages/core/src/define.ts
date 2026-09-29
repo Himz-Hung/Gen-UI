@@ -26,11 +26,58 @@ export interface ComponentContract {
   /** Hints per platform. Advisory, never a shared commitment. */
   platform?: Partial<Record<'react' | 'flutter', string[]>>;
   examples?: Record<string, unknown>[];
+  /** Machine-checked commitments: \`fw verify\` generates a test per check for every platform and runs it. */
+  checks?: Check[];
   /** Bump when the contract changes in a way that requires re-verify. */
   version?: number;
   /** Where the implementation lives when it is NOT ui/<Name>. Set by `fw add` for pre-existing components. */
   impl?: Partial<Record<'react' | 'flutter', string>>;
 }
+
+// ---------- Behavioural checks ----------
+
+/** Prop values for one render. Merged over the contract's first example; missing required props get a placeholder; null leaves an optional prop out. */
+export type CheckProps = Record<string, unknown>;
+/** A size in logical pixels, or a number from ui-spec/project.ts tokens by path ('size.controlMd'). */
+export type CheckSize = number | { token: string };
+/** How the user acts on the component: pointer tap/click, or Enter / Space after Tab focuses it. */
+export type CheckActivation = 'press' | 'enter' | 'space';
+export type CheckRole = 'button' | 'link' | 'checkbox' | 'switch' | 'radio' | 'textbox' | 'searchbox' | 'slider' | 'heading' | 'img' | 'dialog' | 'alertdialog' | 'tab' | 'status' | 'alert' | 'progressbar';
+export type CheckKey = 'Escape' | 'Enter' | 'Space' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End';
+
+interface CheckBase {
+  /** Props for the render (merged over examples[0]). */
+  props?: CheckProps;
+  /** error (default for most kinds) fails fw verify; warn only reports. */
+  level?: 'error' | 'warn';
+  /** Why, in one line. Shown when the check fails. */
+  note?: string;
+  /** Press this visible text instead of the component itself (the action lives on an inner element). */
+  target?: string;
+}
+/**
+ * One commitment a machine can test, the same on every platform.
+ * Layout kinds (size, keepsSize, minTarget) need real layout: Flutter measures them, React (jsdom) reports them skipped.
+ */
+export type Check = CheckBase & (
+  /** Rendered height / width for each value of an enum prop. */
+  | { kind: 'size'; byProp: string; height?: Record<string, CheckSize>; width?: Record<string, CheckSize> }
+  /** Rendered with \`props\`, the component has the same size as rendered with \`like\`. */
+  | { kind: 'keepsSize'; props: CheckProps; like: CheckProps }
+  /** Acting on it emits the event (each activation listed; default press). */
+  | { kind: 'emits'; event: string; on?: CheckActivation[] }
+  /** With \`props\`, acting on it never emits the event. */
+  | { kind: 'neverEmits'; event: string; props: CheckProps; on?: CheckActivation[] }
+  /** Exposes this role, with this accessible name (a literal, or the value of a prop). */
+  | { kind: 'role'; role: CheckRole; name?: string | { fromProp: string } }
+  /** Pressing a key (after Tab moves focus into it) emits the event. */
+  | { kind: 'key'; key: CheckKey; emits: string }
+  /** With \`props\`, nothing is drawn (closed overlay, hidden element). */
+  | { kind: 'rendersNothing'; props: CheckProps }
+  /** Pointer target at least this many logical pixels in both directions. Default level: warn. */
+  | { kind: 'minTarget'; size: number }
+);
+export type CheckKind = Check['kind'];
 
 export function defineComponent(c: ComponentContract): ComponentContract {
   if (!/^[A-Z][A-Za-z0-9]*$/.test(c.name)) throw new Error(`Component name must be PascalCase: ${c.name}`);
@@ -53,15 +100,23 @@ export interface ProjectConfig {
     spacing: number[];
     radius: Record<string, number>;
     font: Record<string, string>;
+    /** Named sizes (control heights…) that checks can reference: { token: 'size.controlMd' }. */
+    size?: Record<string, number>;
   };
   /** Named guards the flows may reference. Bodies are hand-written. */
   guards?: string[];
-  /** The project's state (and form) libraries, e.g. 'bloc' or 'zustand, react-hook-form'. Known ones allow their
+  /** The project's state, form, data and router libraries, e.g. 'bloc' or 'zustand, react-hook-form, @apollo/client, react-router'. Known ones allow their
    *  non-visual wrappers in screens (BlocBuilder, Obx, <FormProvider>…); see WRAPPER_PRESETS. */
   stateLibrary?: string;
   /** Extra components / widgets screens may use although they are not in ui/: wrappers that pass state and draw
    *  nothing. What they render is still checked. */
   screenWrappers?: string[];
+  /** Folders whose code must be composed from ui/ (lib/ui/) only: \`fw check\` applies the screen rules there.
+   *  Default: src/screens and screens (React), lib/screens (Flutter). */
+  screenDirs?: string[];
+  /** Folders deliberately left free (a marketing landing page, a hand-styled layout): never checked, and fw check stops
+   *  suggesting them. Takes precedence over screenDirs for anything inside. */
+  freeformDirs?: string[];
   /** Languages the UI is shown in; the first is the default. Omit for a single-language app. */
   languages?: string[];
   /** Convention only: how code looks up a translated string (a library such as 'i18next', or a file such as 'src/i18n.ts'). */

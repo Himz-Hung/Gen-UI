@@ -20,6 +20,12 @@ export default defineComponent({
   ],
   a11y: ['A banner landmark with a navigation landmark for the links; the active link is marked current; the menu button states whether the menu is open.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'navigate', target: 'Offers' },
+    { kind: 'emits', event: 'action', target: 'Book now' },
+    { kind: 'emits', event: 'brandPress', target: 'Seaside Stays' },
+    { kind: 'role', role: 'link', name: { fromProp: 'brand' }, note: 'the brand is the accessible name of the home link' },
+  ],
   platform: { react: ['<header> with <nav>; position: sticky; the menu opens a Drawer'], flutter: ['a LayoutBuilder switching wide / narrow; narrow uses UiDrawer for the menu; sticky is achieved by the shell placing it above the scroll view'] },
   examples: [{ brand: 'Seaside Stays', menuLabel: 'Menu', links: [{ value: 'rooms', label: 'Rooms', active: true }, { value: 'offers', label: 'Offers' }], actions: [{ value: 'signin', label: 'Sign in', variant: 'ghost' }, { value: 'book', label: 'Book now', variant: 'primary' }] }],
 });

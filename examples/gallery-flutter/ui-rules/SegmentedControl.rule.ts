@@ -16,6 +16,12 @@ export default defineComponent({
   ],
   a11y: ['Radio group semantics (one selected) named by label; arrow keys move the selection.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'size', byProp: 'size', height: { sm: 32, md: 40 } },
+    { kind: 'emits', event: 'change', target: 'List' },
+    { kind: 'role', role: 'radio' },
+    { kind: 'key', key: 'ArrowRight', emits: 'change', level: 'warn', note: 'arrow keys move the selection' },
+  ],
   platform: { react: ['role="radiogroup" with buttons role="radio"'], flutter: ['m.SegmentedButton with a single selection'] },
   examples: [{ label: 'View', value: 'grid', options: [{ value: 'grid', label: 'Grid', icon: 'grid' }, { value: 'list', label: 'List', icon: 'list' }] }],
 });

@@ -15,6 +15,9 @@ export default defineComponent({
   ],
   a11y: ['Headings keep their levels, lists keep list semantics, links are focusable in reading order.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'link', target: 'Grading guide' },
+  ],
   platform: { react: ['parse the subset into React elements; never dangerouslySetInnerHTML'], flutter: ['parse the subset into a Column of Text.rich / TextSpan with TapGestureRecognizer for links'] },
   examples: [{ markdown: '**Near mint.** Shipped in a toploader.\n\n- Base Set, 1999\n- [Grading guide](https://example.com/grading)' }],
 });

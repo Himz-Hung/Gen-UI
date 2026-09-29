@@ -45,7 +45,8 @@ class _UiTextareaState extends State<UiTextarea> {
   Widget build(BuildContext context) {
     final rows = widget.rows;
     final maxLength = widget.maxLength;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+    // MergeSemantics: the visible label becomes the field's accessible name (one node: label + field)
+    return MergeSemantics(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       Text.rich(TextSpan(text: widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600), children: [
         if (widget.required) TextSpan(text: ' *', style: TextStyle(color: UiTokens.colorDanger)),
       ])),
@@ -78,6 +79,6 @@ class _UiTextareaState extends State<UiTextarea> {
           ),
         ),
       ),
-    ]);
+    ]));
   }
 }

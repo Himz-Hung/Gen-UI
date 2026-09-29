@@ -20,6 +20,9 @@ export default defineComponent({
     'Minus and plus are 40×40 targets with accessible names "Decrease <label>" / "Increase <label>".',
   ],
   a11y: ['Role spinbutton with min, max and value; arrow up / down change by step.'],
+  checks: [
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['<input inputMode="decimal"> between two <button>s'], flutter: ['m.TextField(keyboardType: number) between two m.IconButtons'] },
   examples: [{ label: 'Quantity', value: 1, min: 1, max: 10 }],
 });

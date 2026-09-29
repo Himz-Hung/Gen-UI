@@ -18,5 +18,10 @@ export default defineComponent({
   ],
   a11y: ['When pressable, role button (or link when it navigates) and visible focus ring.'],
   composition: { cannotBeInside: ['Button', 'Link'] },
+  checks: [
+    { kind: 'emits', event: 'press', props: { pressable: true }, on: ['press', 'enter'] },
+    { kind: 'neverEmits', event: 'press', props: { pressable: false }, on: ['press', 'enter'] },
+    { kind: 'role', role: 'button', props: { pressable: true } },
+  ],
   platform: { react: ["<div> surface; <button> semantics when pressable, nested buttons stop propagation"], flutter: ["Material + InkWell when pressable; children in a Column"] },
 });

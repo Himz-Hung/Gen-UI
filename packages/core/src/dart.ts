@@ -176,7 +176,14 @@ export function verifyFlutter(root: string, c: ComponentContract): { report: Rep
   const classes = dartClasses(m);
   const enums = dartEnums(m);
 
-  const cls = classes.find((x) => x.name === sig.className);
+  // A widget registered with fw add keeps its own names: class <Name> (or Ui<Name>), enums matched by their values.
+  const registered = !!c.impl?.flutter;
+  const cls = classes.find((x) => x.name === sig.className) ?? (registered ? classes.find((x) => x.name === c.name) : undefined);
+  const alias = new Map<string, string>();
+  if (registered) for (const d of sig.decls) if (d.kind === 'enum' && !enums.has(d.name)) {
+    const same = [...enums].find(([, vs]) => vs.length === d.values!.length && d.values!.every((v) => vs.includes(v)));
+    if (same) alias.set(d.name, same[0]);
+  }
   if (!cls) { r.error('class', `no class ${sig.className}. The widget for contract ${c.name} is named ${sig.className} (Ui prefix, see fw docs ${c.name})`); return { report: r, implPath: null }; }
   if (!/extends\s+(?:\w+\.)?(StatelessWidget|StatefulWidget)\b/.test(cls.header)) r.error('class', `${sig.className} must extend StatelessWidget or StatefulWidget`);
   const params = dartConstructor(m, cls);
@@ -194,7 +201,7 @@ export function verifyFlutter(root: string, c: ComponentContract): { report: Rep
     if (p.def && !got.hasDefault && !got.required) r.warn(w, `contract default is ${p.def}; give the parameter that default`);
     const t = typeOf(p.name);
     if (!t) { r.error(w, `no field "final ${p.type} ${p.name};"`); continue; }
-    const e = kindMismatch(p.node, p.type, t);
+    const e = kindMismatch(p.node, alias.size ? p.type.replace(/\bUi\w+/g, (n) => alias.get(n) ?? n) : p.type, t);
     if (e) r.error(w, e);
     if (!p.required && p.def === undefined && !t.trim().endsWith('?')) r.error(w, `optional without default: the type must be nullable (${p.type})`);
   }
@@ -204,7 +211,7 @@ export function verifyFlutter(root: string, c: ComponentContract): { report: Rep
     const t = typeOf(cb.name) ?? '';
     if (!/^(VoidCallback|ValueChanged<.+>|ValueSetter<.+>|void Function\(.*\)|Function)\??$/.test(t.trim())) { r.error(w, `"${cb.name}" should be ${cb.type}, got ${t || 'no field'}`); continue; }
     // The payload type must match too: ValueChanged<int> is not ValueChanged<double>.
-    const want = payloadOf(cb.type), got = payloadOf(t);
+    const want = payloadOf(alias.size ? cb.type.replace(/\bUi\w+/g, (n) => alias.get(n) ?? n) : cb.type), got = payloadOf(t);
     if (want !== got && !(want === null && got === '')) r.error(w, `"${cb.name}" should be ${cb.type}, got ${t}`);
   }
   if (sig.child && !byName.has('children')) r.error('children', 'contract accepts children: add "this.children = const []" (List<Widget>)');
@@ -212,7 +219,7 @@ export function verifyFlutter(root: string, c: ComponentContract): { report: Rep
 
   // Enums and item classes the signature needs.
   const allEnums = new Map(enums);
-  for (const d of sig.decls) checkDecl(d, allEnums, classes, m, r);
+  for (const d of sig.decls) if (!alias.has(d.name)) checkDecl(d, allEnums, classes, m, r);
 
   const known = new Set([...sig.params.map((p) => p.name), ...sig.callbacks.map((cb) => cb.name), 'children', 'super.key', 'key']);
   for (const p of params) if (!known.has(p.name)) r.warn(`props.${p.name}`, 'parameter not in the contract (allowed, but specs cannot use it)');

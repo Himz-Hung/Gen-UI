@@ -20,6 +20,9 @@ export default defineComponent({
     'Same label, hint and error behaviour as Input; typing a date is allowed where the platform supports it.',
   ],
   a11y: ['The calendar is keyboard operable: arrows move by day, Page by month, Enter picks, Escape closes.'],
+  checks: [
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['<input type="date"> is acceptable'], flutter: ['a read-only m.TextField that opens m.showDatePicker'] },
   examples: [{ label: 'Delivery date', value: '', min: '2026-10-01' }],
 });

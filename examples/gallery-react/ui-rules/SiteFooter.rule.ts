@@ -18,6 +18,11 @@ export default defineComponent({
   ],
   a11y: ['A contentinfo landmark; each column is a navigation list named by its title; social buttons are named by label.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'navigate', target: 'About', note: 'pressing a link emits its value' },
+    { kind: 'role', role: 'link', name: 'About' },
+    { kind: 'role', role: 'button', name: 'Instagram', props: { social: [{ value: 'instagram', label: 'Instagram', icon: 'instagram' }] }, note: 'social buttons are named by label' },
+  ],
   platform: { react: ['<footer> with <nav aria-label> per column; <details> for collapsed columns'], flutter: ['a LayoutBuilder switching a Row of columns / a Column with ExpansionTiles'] },
   examples: [{ brand: 'Seaside Stays', columns: [{ title: 'Company', links: [{ value: 'about', label: 'About' }] }, { title: 'Help', links: [{ value: 'faq', label: 'FAQ' }] }], legal: '© 2026 Seaside Stays' }],
 });

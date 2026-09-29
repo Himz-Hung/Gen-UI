@@ -18,6 +18,11 @@ export default defineComponent({
     'Radio mark is 20 logical pixels; selected fill tokens.color.primary.',
   ],
   a11y: ['Role radiogroup labelled by label; arrow keys move and select; only the selected option is in the tab order.'],
+  checks: [
+    { kind: 'emits', event: 'change', target: 'Express' },
+    { kind: 'emits', event: 'change', target: 'Next day' },
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['native <input type="radio"> sharing one name'], flutter: ['m.RadioListTile per option, or m.RadioGroup where available'] },
   examples: [{ label: 'Shipping', value: 'standard', options: [{ value: 'standard', label: 'Standard', description: '3–5 days' }, { value: 'express', label: 'Express', description: 'Next day' }] }],
 });

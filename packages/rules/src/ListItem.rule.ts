@@ -12,5 +12,9 @@ export default defineComponent({
   states: ['default', 'hover', 'pressed', 'focused'],
   rules: ['Min height 48 (56 with subtitle) unless the parent List is dense.', 'pressable=false never emits press and has no hover feedback.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'press', props: { title: 'Base Set', pressable: true }, target: 'Base Set' },
+    { kind: 'neverEmits', event: 'press', props: { title: 'Base Set', pressable: false }, target: 'Base Set' },
+  ],
   platform: { react: ["<li> containing a <button> when pressable"], flutter: ["ListTile (onTap only when pressable)"] },
 });

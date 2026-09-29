@@ -21,6 +21,7 @@ class UiSpinner extends StatelessWidget {
     );
     return Semantics(
       label: label,
+      liveRegion: true,
       child: showLabel
           ? Row(mainAxisSize: MainAxisSize.min, children: [
               indicator,

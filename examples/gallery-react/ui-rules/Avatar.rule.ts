@@ -17,6 +17,10 @@ export default defineComponent({
   ],
   a11y: ['Image named by name; decorative (hidden) when a visible name is right next to it.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'size', byProp: 'size', height: { xs: 24, sm: 32, md: 40, lg: 56, xl: 80 }, width: { xs: 24, sm: 32, md: 40, lg: 56, xl: 80 } },
+    { kind: 'role', role: 'img', name: { fromProp: 'name' } },
+  ],
   platform: { react: ['<img> with an initials fallback <span>'], flutter: ['m.CircleAvatar (or ClipRRect for square) with foregroundImage and initials child'] },
   examples: [{ name: 'Ash Ketchum', size: 'lg', status: 'online' }],
 });

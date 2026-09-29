@@ -6,6 +6,7 @@ import { Report } from './diagnostics.ts';
 import { closing, dartClasses, maskDart, splitTop } from './dart.ts';
 import { FLUTTER } from './flutter.ts';
 import { didYouMean } from './suggest.ts';
+import { DartIndex } from './dartindex.ts';
 import type { TypeNode } from './types.ts';
 
 /** Only these may come from package:flutter/widgets.dart in a screen (with `show`). */
@@ -17,15 +18,19 @@ const WIDGET_BASES = /extends\s+(?:\w+\.)?(StatelessWidget|StatefulWidget|Widget
 export interface DartScreenCtx {
   outline?: { app: AppOutline; hasContract: (n: string) => boolean };
   /** Ui<Name> → props of the contract, for hard-coded text; undefined when the project has one language */
-  text?: { props: (component: string) => Record<string, TypeNode> | undefined; languages: string[] };
+  text?: { props: (component: string) => Record<string, TypeNode> | undefined; languages: string[]; arb?: boolean };
   /** state-library wrappers a screen may construct (BlocBuilder, Obx…); what they build is still checked */
   wrappers?: string[];
+  /** widgets registered with fw add (they live outside lib/ui/ and keep their own class names) */
+  registered?: string[];
 }
 
 export function checkDartScreens(root: string, paths: string[], ctx: DartScreenCtx = {}): Report[] {
   const files = paths.flatMap((p) => { const abs = join(root, p); return existsSync(abs) && statSync(abs).isFile() ? [abs] : walk(abs); }).filter((f) => f.endsWith('.dart') && !f.endsWith('.g.dart'));
   const { uiClasses, appClasses } = libClasses(root);
   const appName = pubspecName(root);
+  // Classes the screens import from packages (Flutter SDK included): which are widgets, which calls construct them.
+  const index = new DartIndex(root);
   return files.map((file) => {
     const rel = relative(root, file);
     const r = new Report(rel);
@@ -33,24 +38,27 @@ export function checkDartScreens(root: string, paths: string[], ctx: DartScreenC
     const m = maskDart(src);
     const line = (at: number) => m.slice(0, at).split('\n').length;
 
-    // Imports: never the Material / Cupertino libraries; widgets.dart only with `show` of the base classes.
+    // Imports: Flutter libraries only with `show` (a screen names what it uses: StatelessWidget, BuildContext,
+    // MediaQuery, Navigator…); which of those it may construct is decided below, per call. Without the index
+    // (no .dart_tool/package_config.json yet), fall back to the strict rule: base classes only.
     for (const x of m.matchAll(/\bimport\s+(['"])/g)) {
       const q = x.index! + x[0].length - 1;
       const end = src.indexOf(x[1], q + 1);
       const uri = src.slice(q + 1, end);
       const tail = m.slice(end + 1, m.indexOf(';', end));
       const at = `line ${line(x.index!)}`;
-      if (/^package:flutter\/(material|cupertino)\.dart$/.test(uri)) r.error(at, `imports ${uri}: screens compose from lib/ui/ only — import ${appName ? `package:${appName}/ui/ui.dart` : '../ui/ui.dart'} and, for the base classes, package:flutter/widgets.dart show ${SCREEN_BASE.slice(0, 5).join(', ')}`);
-      else if (uri === 'package:flutter/widgets.dart') {
+      const target = index.resolveUri(uri, file);
+      if (target && !(appName && uri.startsWith(`package:${appName}/`)) && !uri.startsWith('.')) index.addLibrary(target);
+      if (/^package:flutter\//.test(uri)) {
         const show = tail.match(/\bshow\s+([\w\s,]+)/);
-        if (!show) r.error(at, `import package:flutter/widgets.dart with "show" and only the base classes: ${SCREEN_BASE.join(', ')}`);
-        else for (const n of show[1].split(',').map((s) => s.trim()).filter(Boolean)) if (!SCREEN_BASE.includes(n)) r.error(at, `${n} from widgets.dart is a raw Flutter widget or helper: use a lib/ui component instead`);
-      } else if (/^package:flutter\//.test(uri)) r.error(at, `imports ${uri}: screens only use lib/ui/ and the base classes of widgets.dart`);
+        if (!show) r.error(at, `import ${uri} with "show" and the names the screen uses (${SCREEN_BASE.slice(0, 5).join(', ')}…): widgets come from ${appName ? `package:${appName}/ui/ui.dart` : 'lib/ui/ui.dart'}`);
+        else if (!index.ready) for (const n of show[1].split(',').map((s) => s.trim()).filter(Boolean)) if (!SCREEN_BASE.includes(n)) r.error(at, `${n} from ${uri}: only base classes (${SCREEN_BASE.join(', ')}) until .dart_tool/package_config.json exists (run flutter pub get)`);
+      }
     }
 
     // Classes in the screen file: one screen widget (plus its State); any other widget is a local component.
     const own = dartClasses(m);
-    const widgets = own.filter((c) => WIDGET_BASES.test(c.header));
+    const widgets = own.filter((c) => WIDGET_BASES.test(c.header) || (index.ready && index.isWidget(c.header.match(/\bextends\s+([A-Za-z_]\w*)/)?.[1] ?? '')));
     for (const w of widgets.slice(1)) r.error(`line ${line(w.bodyStart)} class ${w.name}`, `locally defined widget: move it to lib/ui/ with a contract (fw docs / ui-spec/components/) and verify it`);
     const ownNames = new Set(own.map((c) => c.name));
 
@@ -60,6 +68,7 @@ export function checkDartScreens(root: string, paths: string[], ctx: DartScreenC
       const before = m.slice(Math.max(0, x.index! - 12), x.index!);
       if (/\b(class|extends|with|implements|enum|typedef)\s+$/.test(before)) continue;
       if (ctx.wrappers?.includes(name)) continue;
+      if (ctx.registered?.includes(name)) continue;
       if (uiClasses.has(name) || appClasses.has(name) || ownNames.has(name) || CORE.has(name)) {
         if (uiClasses.has(name) && ctx.outline && name.startsWith('Ui')) {
           const comp = name.slice(2);
@@ -68,6 +77,14 @@ export function checkDartScreens(root: string, paths: string[], ctx: DartScreenC
         }
         if (ctx.text && name.startsWith('Ui')) hardCodedText(src, m, x.index! + x[0].length - 1, name, ctx.text, r, line);
         continue;
+      }
+      // Like a JSX tag on the web, only constructing a widget counts. Static calls (MediaQuery.of, Navigator.pushNamed,
+      // GoRouter.of, AppLocalizations.of, Get.toNamed) and non-widget classes (routes, repositories, EdgeInsets) are free.
+      if (index.ready) {
+        const sym = index.get(name);
+        if (sym && !sym.isWidget) continue;
+        if (sym && x[2] && !sym.ctors.has(x[2])) continue;
+        if (!sym && x[2]) continue;
       }
       const hint = uiClasses.has(`Ui${name}`) ? ` Use Ui${name} from lib/ui instead.` : didYouMean(`Ui${name}`, [...uiClasses.keys()]) || didYouMean(name, ctx.wrappers ?? []);
       r.error(`line ${line(x.index!)} ${name}(…)`, `${name} is not a lib/ui component or one of the app's own classes: raw Flutter and third-party widgets belong inside lib/ui/ behind a contract. A state-library wrapper that draws nothing (BlocBuilder, Obx…) is allowed when listed by stateLibrary or screenWrappers in ui-spec/project.ts.${hint}`);
@@ -87,7 +104,7 @@ function hardCodedText(src: string, m: string, open: number, cls: string, ctx: N
     if (!arg || !props[arg[1]]?.text) continue;
     const valueStart = a + arg[0].length;
     for (const lit of literalsAtTop(src, m, valueStart, b))
-      r.error(`line ${line(a)} ${cls} ${arg[1]}`, `hard-coded text "${lit}" in a project with languages ${ctx.languages.join(', ')}: use UiStrings.<key> generated from ui-spec/strings/`);
+      r.error(`line ${line(a)} ${cls} ${arg[1]}`, `hard-coded text "${lit}" in a project with languages ${ctx.languages.join(', ')}: use ${ctx.arb ? 'AppLocalizations.of(context)!.<key> (ARB files generated from ui-spec/strings/)' : 'UiStrings.<key> generated from ui-spec/strings/'}`);
   }
 }
 

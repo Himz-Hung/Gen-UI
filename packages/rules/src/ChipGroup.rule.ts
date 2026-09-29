@@ -17,6 +17,10 @@ export default defineComponent({
   ],
   a11y: ['Group named by label; each chip is a toggle button with aria-pressed (checkbox semantics when multiple, radio when not).'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'size', byProp: 'size', height: { sm: 28, md: 32 } },
+    { kind: 'emits', event: 'change', target: 'Rare' },
+  ],
   platform: { react: ['<button aria-pressed> per chip'], flutter: ['m.FilterChip (multiple) / m.ChoiceChip (single) in a Wrap or horizontal ListView'] },
   examples: [{ label: 'Rarity', value: ['holo'], options: [{ value: 'holo', label: 'Holo' }, { value: 'rare', label: 'Rare' }] }],
 });

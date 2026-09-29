@@ -18,6 +18,11 @@ export default defineComponent({
   ],
   a11y: ['Role dialog named by label; each image announces its alt and position ("2 of 5").'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'dialog', name: { fromProp: 'label' } },
+    { kind: 'key', key: 'Escape', emits: 'close' },
+    { kind: 'rendersNothing', props: { open: false } },
+  ],
   platform: { react: ['portal + focus trap; CSS transform for zoom and pan'], flutter: ['OverlayPortal with a PageView of m.InteractiveViewer'] },
   examples: [{ open: true, label: 'Card photos', images: [{ src: 'https://example.com/front.jpg', alt: 'Front' }, { src: 'https://example.com/back.jpg', alt: 'Back' }] }],
 });

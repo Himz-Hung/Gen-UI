@@ -17,7 +17,7 @@ export interface CodeI18n { props: (component: string) => Record<string, TypeNod
  * Lowercase (raw) markup is an error outside ui/.
  */
 /** `dirs` may be folders or single .tsx/.jsx files, relative to root. With `outline`, tags must also be listed in ui-spec/app.ts. */
-export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }, i18n?: CodeI18n, wrappers: string[] = []): Report[] {
+export function checkCode(root: string, dirs = ['src/screens', 'screens'], allowedImpl: string[] = [], outline?: { app: AppOutline; hasContract: (n: string) => boolean }, i18n?: CodeI18n, wrappers: string[] = [], contracts?: (name: string) => ContractShape | undefined): Report[] {
   const reports: Report[] = [];
   const uiDir = resolve(root, DIRS.ui);
   const allowed = allowedImpl.map((p) => resolve(root, p).replace(/\.(tsx|ts|jsx|js)$/, ''));
@@ -45,14 +45,19 @@ export function checkCode(root: string, dirs = ['src/screens', 'screens'], allow
         const tag = n.tagName.getText(sf);
         const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
         const where = `line ${line + 1} <${tag}>`;
-        if (/^[a-z]/.test(tag)) r.error(where, 'raw markup outside ui/ — compose from ui/ components instead');
+        const member = tag.includes('.') ? `.${tag.split('.').pop()}` : '';
+        // form.Field (TanStack Form): a member of a local object, allowed when the wrapper list has "form.Field" or ".Field"
+        if (member && (wrappers.includes(tag) || (/^[a-z]/.test(tag) && wrappers.includes(member)))) { /* allowed */ }
+        else if (/^[a-z]/.test(tag)) r.error(where, `raw markup outside ui/ — compose from ui/ components instead${member ? ` (a form library's ${member} render-prop is allowed when stateLibrary lists the library, or screenWrappers has "${member}")` : ''}`);
         // Wrappers of the project's state / form libraries pass state and draw nothing; what they render is still checked.
         else if (wrappers.includes(tag.split('.')[0]) && !fromUi.has(tag.split('.')[0])) { /* allowed */ }
         else if (!fromUi.has(tag.split('.')[0])) {
           const from = fromElsewhere.get(tag.split('.')[0]);
           r.error(where, from ? `imported from "${from}", which is not ui/ or a registered impl (a state / form wrapper that draws nothing, like <FormProvider>, is allowed when listed by stateLibrary or screenWrappers in ui-spec/project.ts)${didYouMean(tag.split('.')[0], wrappers)}` : `not imported from ui/ (locally defined component?) — move it to ui/ and verify it.${didYouMean(tag.split('.')[0], [...fromUi, ...wrappers])}`);
-        } else if (outline && !outline.app.components.includes(tag.split('.')[0])) {
-          r.error(where, notInOutline(tag.split('.')[0], outline.app, outline.hasContract));
+        } else {
+          if (outline && !outline.app.components.includes(tag.split('.')[0])) r.error(where, notInOutline(tag.split('.')[0], outline.app, outline.hasContract));
+          const shape = contracts?.(tag.split('.')[0]);
+          if (shape) extraProps(n, tag, shape, sf, r, where);
         }
         if (i18n) hardCodedText(n, tag, i18n, sf, r);
       }
@@ -66,6 +71,21 @@ export function checkCode(root: string, dirs = ['src/screens', 'screens'], allow
     reports.push(r);
   }
   return reports;
+}
+
+/** What a screen may pass to a component: its contract props, onX for its events, children when it accepts them. */
+export interface ContractShape { props: Record<string, unknown>; events?: Record<string, unknown>; children?: boolean }
+
+/** className / style / sx and any other prop outside the contract: styling and extras belong inside ui/<Name>. */
+function extraProps(n: ts.JsxOpeningElement | ts.JsxSelfClosingElement, tag: string, c: ContractShape, sf: ts.SourceFile, r: Report, where: string) {
+  const handlers = new Set(Object.keys(c.events ?? {}).map((ev) => 'on' + ev[0].toUpperCase() + ev.slice(1)));
+  for (const a of n.attributes.properties) {
+    if (!ts.isJsxAttribute(a)) continue;
+    const name = a.name.getText(sf);
+    if (name in c.props || handlers.has(name) || name === 'key' || (name === 'children' && c.children)) continue;
+    const styling = /^(className|style|sx|css|tw|class)$/.test(name);
+    r.error(where, `prop "${name}" is not in the ${tag} contract: screens pass contract props only${styling ? ` (styling belongs inside ui/${tag}, or use a layout component: Stack, Inline, Grid, Container, Spacer)` : `. Props: ${Object.keys(c.props).join(', ') || 'none'}`}`);
+  }
 }
 
 const LETTERS = /\p{L}/u;

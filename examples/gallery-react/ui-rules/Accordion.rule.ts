@@ -16,6 +16,9 @@ export default defineComponent({
     'Sections are separated by 1px lines.',
   ],
   a11y: ['Each title is a button with aria-expanded controlling its region.'],
+  checks: [
+    { kind: 'emits', event: 'change', target: 'How long does shipping take?' },
+  ],
   platform: { react: ['<button aria-expanded> + region; <details> is acceptable when multiple=true'], flutter: ['m.ExpansionPanelList, or m.ExpansionTile per item'] },
   examples: [{ items: [{ value: 'ship', title: 'How long does shipping take?' }, { value: 'return', title: 'Can I return a card?' }], open: ['ship'] }],
 });

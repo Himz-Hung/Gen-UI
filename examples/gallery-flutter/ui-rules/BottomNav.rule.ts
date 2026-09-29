@@ -14,6 +14,10 @@ export default defineComponent({
   ],
   a11y: ['Navigation landmark; the active item is marked current; badges are part of the item name ("Cart, 3 items").'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'change', target: 'Cart', note: 'pressing an item emits its value' },
+    { kind: 'emits', event: 'change', target: 'Home', note: 'pressing the active item again emits change too' },
+  ],
   platform: { react: ['<nav> with buttons or links; position fixed with env(safe-area-inset-bottom)'], flutter: ['m.NavigationBar with NavigationDestinations'] },
   examples: [{ value: 'home', items: [{ value: 'home', label: 'Home', icon: 'home' }, { value: 'cart', label: 'Cart', icon: 'cart', badge: '3' }, { value: 'me', label: 'Account', icon: 'user' }] }],
 });

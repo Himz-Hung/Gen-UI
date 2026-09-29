@@ -1,0 +1,20 @@
+name: compat_flutter
+description: Compatibility fixture for fw check (screens written against popular Flutter packages).
+publish_to: 'none'
+environment:
+  sdk: ^3.12.0
+dependencies:
+  flutter:
+    sdk: flutter
+  go_router: any
+  auto_route: any
+  flutter_bloc: any
+  get: any
+  flutter_riverpod: any
+  hooks_riverpod: any
+  flutter_hooks: any
+  provider: any
+  reactive_forms: any
+  flutter_form_builder: any
+  easy_localization: any
+  get_it: any

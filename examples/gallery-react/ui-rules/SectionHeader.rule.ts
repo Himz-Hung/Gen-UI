@@ -16,6 +16,10 @@ export default defineComponent({
   ],
   a11y: ['Title is a real heading of the given level; the action name includes the section ("See all new arrivals").'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'heading', name: { fromProp: 'title' } },
+    { kind: 'emits', event: 'action', props: { actionLabel: 'See all' }, target: 'See all' },
+  ],
   platform: { react: ['<h2>/<h3> + a <button> styled as a link'], flutter: ['a Row with the heading Text (Semantics header: true) and m.TextButton'] },
   examples: [{ title: 'New arrivals', actionLabel: 'See all' }],
 });

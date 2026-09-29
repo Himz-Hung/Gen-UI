@@ -34,7 +34,7 @@ Two packages:
 - [Describing your app (`ui-spec/`)](#describing-your-app-ui-spec)
 - [Languages](#languages)
 - [Flutter](#flutter)
-- [State and form libraries](#state-and-form-libraries)
+- [Integrations](#integrations-state-data-forms-router-i18n-ui-kits)
 - [Contracts](#contracts)
 - [Screen specs](#screen-specs)
 - [Commands](#commands)
@@ -91,7 +91,8 @@ npx fw init --agent claude --platform react --name "My App"
 ```
 
 `--agent` is one of `claude`, `cursor`, `codex`, `copilot`. Add `--create vite` to scaffold a Vite React TS
-app first.
+app first. For the behavioural checks run by `fw verify`, a React project also needs
+`npm i -D vitest jsdom @testing-library/react @testing-library/user-event`.
 
 ---
 
@@ -281,10 +282,17 @@ export default defineProject({
   },
   guards: ['requireCartNotEmpty'],       // names screens may use as guard; bodies are hand-written
   stateLibrary: 'zustand',               // convention: one store library for the project
+  screenDirs: ['src/screens', 'app/(shop)'],   // code here is composed from ui/ only (default: src/screens, screens)
+  freeformDirs: ['app/(marketing)'],           // deliberately free: never checked (a landing page, a hand-styled layout)
 });
 ```
 
 Implementations read tokens through `ui/tokens.ts`; change a color here, not in twenty files.
+
+`screenDirs` / `freeformDirs` decide where the screen rules (compose from `ui/`, no raw markup, no hard-coded
+text) apply. The defaults are `src/screens` and `screens` (React) and `lib/screens` (Flutter). When a common UI
+folder (`src/pages`, `app`, `src/app`, `src/views`, `src/routes`, `lib/pages`, `lib/views`) has code but is in
+neither list, `fw check` says so instead of skipping it silently.
 
 ### `domain.ts`
 
@@ -428,8 +436,8 @@ props, so implementations stay verified).
 | component | `ui/ListItem.tsx`, `export function ListItem` | `lib/ui/list_item.dart`, `class UiListItem` |
 | screen | `src/screens/CartScreen.tsx` | `lib/screens/cart_screen.dart`, `class CartScreen` |
 | props / events / children | props type, `onPress`, `children` | named constructor params, `VoidCallback? onPress` / `ValueChanged<T>? onChange`, `List<Widget> children` |
-| tokens | `ui-spec/project.ts` imported directly | `lib/ui/tokens.g.dart` (`UiTokens.colorPrimary`, `UiTokens.space(4)`), generated |
-| strings | the project's i18n function | `lib/l10n/strings.g.dart` (`UiStrings.cartEmptyTitle`, `UiStrings.cartLine(count: 3)`), generated |
+| tokens | `ui-spec/project.ts` imported directly (`tailwindPreset` / `muiTheme` / `cssVariables` for styling libraries) | `lib/ui/tokens.g.dart` (`UiTokens.colorPrimary`, `UiTokens.space(4)`) and `lib/ui/theme.g.dart` (`MaterialApp(theme: uiTheme())`), generated |
+| strings | the project's i18n function | `lib/l10n/strings.g.dart` (`UiStrings.cartEmptyTitle`), generated; or, with `i18nLibrary: 'flutter_localizations'`, ARB files `lib/l10n/app_<lang>.arb` read through `AppLocalizations` |
 | type check | `tsc` | `flutter analyze` |
 
 **Every Flutter class has the `Ui` prefix.** 19 contract names collide with Flutter widgets (`Text`,
@@ -459,20 +467,38 @@ without default that is not nullable; missing enum values or item-class fields; 
 that takes none. It reads Dart by these conventions (no Dart SDK needed); `flutter analyze` stays the real
 type check.
 
-**Screens** import `lib/ui/ui.dart` (generated barrel) and, for the base classes only,
-`package:flutter/widgets.dart show StatelessWidget, StatefulWidget, State, Widget, BuildContext`.
-`fw check lib/screens/…` reports: importing `material.dart` / `cupertino.dart` or other widgets from
-`widgets.dart`; constructing any widget that is not in `lib/ui/` (`Column`, `Text`, a third-party widget);
-a second widget class in the screen file; and, with several languages, string literals with letters on text
-props (`label: 'Checkout'`, `'Cart ($n)'`; `'$a × $b'` passes). Nested item constructors and values that
-reach a prop through a variable are not inspected.
+**Screens** import `lib/ui/ui.dart` (generated barrel), their packages, and Flutter libraries with `show`
+(`package:flutter/widgets.dart show StatelessWidget, Widget, BuildContext, MediaQuery, Navigator`). As on the web,
+only **constructing a widget** from outside `lib/ui/` is an error: `fw check` reads the imported libraries (the
+Flutter SDK and pub packages, through `.dart_tool/package_config.json`) to know which classes are widgets and
+which calls construct them. So `Text('…')`, `Padding(…)`, `Navigator(…)` or a package's `ReactiveTextField(…)` fail,
+while `MediaQuery.sizeOf(context)`, `Theme.of(context)`, `Navigator.of(context).pushNamed(…)`,
+`GoRouter.of(context)`, `Get.toNamed(…)`, `AppLocalizations.of(context)!`, `GetIt.I<Repo>()`, route classes and
+`EdgeInsets` pass. A Flutter import without `show`, a second widget class in the screen file and, with several
+languages, string literals with letters on text props (`label: 'Checkout'`; `'$a × $b'` passes) are errors too.
+Before `flutter pub get` has run, the check falls back to base classes only.
 
-Generated files (`lib/ui/ui.dart`, `lib/ui/tokens.g.dart`, `lib/l10n/strings.g.dart`) are rewritten by every
-`fw` command; do not edit them. They need no pub dependencies.
+Generated files (`lib/ui/ui.dart`, `lib/ui/tokens.g.dart`, `lib/ui/theme.g.dart`, `lib/l10n/strings.g.dart` or the
+ARB files) are rewritten by every `fw` command; do not edit them.
+
+**Flutter recipes:**
+
+| package | do |
+|---|---|
+| go_router / auto_route / Navigator | routes and `Scaffold` in the shell (`ShellRoute`, `AutoTabsScaffold`); screens call `context.go(…)`, `context.router.push(CartRoute())`, `Navigator.of(context)` |
+| flutter_bloc · provider · riverpod · GetX · MobX · signals | `stateLibrary` lists it; `BlocBuilder`, `Consumer`, `Obx`, `Observer`, `Watch` wrap `Ui…` widgets; `context.read`, `ref.watch`, `Get.find` are free; screens may extend `ConsumerWidget` / `HookConsumerWidget` |
+| flutter_hooks | `useState`, `useTextEditingController` in the screen; `HookBuilder` is a wrapper |
+| reactive_forms | `ReactiveForm` + `ReactiveValueListenableBuilder(builder: (_, control, _) => UiInput(value: control.value ?? '', onChange: (v) => control.value = v))`; not `ReactiveTextField` (draws its own input) |
+| flutter_form_builder | `FormBuilder` + `FormBuilderField(builder: (field) => UiInput(…, error: field.errorText, onChange: field.didChange))` |
+| flutter_localizations / intl | `i18nLibrary: 'flutter_localizations'`, `flutter: generate: true` in pubspec; fw writes the ARB files and `l10n.yaml`; screens read `AppLocalizations.of(context)!.cartTitle` |
+| easy_localization | `'cart.title'.tr()`; keys from `ui-spec/strings` |
+| Material / Cupertino / UI packages | inside `lib/ui/`, or `fw add` a widget you already have; the shell uses `uiTheme()` |
+
+`tests/compat/flutter*` hold a screen per pattern against the real packages; `npm run test:flutter` runs them.
 
 [`examples/gallery-flutter`](./examples/gallery-flutter) and [`examples/gallery-react`](./examples/gallery-react) implement every shipped contract on both platforms from the same `ui-spec/`, with a test per component on each side. `npm run test:parity` fails if they drift apart; the gallery READMEs list where the two still differ.
 
-## State and form libraries
+## Integrations: state, data, forms, router, i18n, UI kits
 
 `fw` owns the UI layer only. Components are controlled (values in through props, changes out through `onX`),
 so any state or validation library works: the screen reads state with the library's hooks or calls and
@@ -496,17 +522,63 @@ are allowed in screens when `stateLibrary` in `project.ts` names the library, or
 | `provider` | `Consumer`, `Selector`, `ChangeNotifierProvider`, `MultiProvider` |
 | `signals` | `Watch` |
 | `react-hook-form` | `FormProvider`, `Controller` |
-| `react-redux` / `redux`, `jotai` | `Provider` |
+| `react-redux` / `redux` / `@reduxjs/toolkit`, `jotai` | `Provider` |
+| `recoil` | `RecoilRoot` |
 | `@tanstack/react-query` | `QueryClientProvider` |
+| `@apollo/client` · `urql` · `swr` · `react-relay` | `ApolloProvider` · `Provider` · `SWRConfig` · `RelayEnvironmentProvider` |
+| `@tanstack/react-form` | `form.Field`, `form.Subscribe` (any `x.Field` / `x.Subscribe`) |
+| `formik` · `react-final-form` | `Formik`, `FieldArray` · `Form`, `FormSpy` |
+| `react-router` / `react-router-dom` | `Navigate` |
+
+`i18nLibrary` adds its provider the same way: `i18next` / `react-i18next` → `I18nextProvider`, `react-intl` →
+`IntlProvider`, `next-intl` → `NextIntlClientProvider`, `lingui` → `I18nProvider`.
 
 ```ts
-stateLibrary: 'bloc',                 // or 'zustand, react-hook-form'
+stateLibrary: 'bloc',                 // or 'zustand, react-hook-form, @apollo/client, react-router'
 screenWrappers: ['MyStoreScope'],     // your own non-visual wrappers
 ```
 
 What a wrapper renders is still screen code: `BlocBuilder(builder: (_, s) => Text('…'))` still fails on `Text`.
 Components that draw inputs themselves (Formik's `Field`) are not wrappers; put them behind a contract or use
 the library's hooks (`useField`).
+
+**Recipes (React):**
+
+| library | do | don't |
+|---|---|---|
+| react-hook-form | `<Controller render={({ field, fieldState }) => <Input value={field.value} onChange={field.onChange} error={fieldState.error?.message} />} />` | `<Input {...register('email')} />`: it spreads DOM props (`name`, `onBlur`, `ref`), not the contract's `value` / `onChange(value)` |
+| TanStack Form | `<form.Field name="email" children={(f) => <Input value={f.state.value} onChange={f.handleChange} />} />` | |
+| Formik | `<Formik>{({ values, setFieldValue }) => <Input … />}</Formik>` or `useFormik` | `<Field>` (draws its own input) |
+| React Router / TanStack Router | routes and `<Outlet>` in the shell; screens call `useNavigate()` or render `<Navigate>` | `<Link>` from the router in a screen: wrap it in `ui/Link.tsx` (the Link contract says so) |
+| Next.js App Router | `app/**/page.tsx` renders `<CartScreen />` from `src/screens`, or add `app` to `screenDirs`; `layout.tsx` (with `<html>` / `<body>`) goes in `freeformDirs` | `next/link` in a screen: wrap it in `ui/Link.tsx` |
+| MUI, Ant Design, Chakra, Mantine, shadcn | components inside `ui/`, or `fw add` your existing ones; theme from the tokens (below) | importing the kit in a screen |
+| Tailwind, CSS Modules, styled-components | inside `ui/`; Tailwind theme from the tokens (below) | `className` / `style` on a component in a screen |
+
+**Screens pass contract props only.** `fw check` rejects any prop that is not in the component's contract (or an
+`onX` handler of its events): `className`, `style`, `sx` included. Styling lives inside `ui/<Name>`; spacing
+between components comes from layout components (`Stack`, `Inline`, `Grid`, `Container`, `Spacer`).
+
+**One source for design tokens.** `@himz-genui/core` turns the `tokens` of `ui-spec/project.ts` into what your
+styling library reads:
+
+```ts
+// tailwind.config.ts
+import project from './ui-spec/project';
+import { tailwindPreset } from '@himz-genui/core';
+export default { content: ['./src/**/*.tsx', './ui/**/*.tsx'], presets: [tailwindPreset(project)] };
+// bg-primary, text-muted, rounded-md from the tokens; spacing as p-ui-4 = tokens.spacing[4]
+
+// ui/theme.ts (MUI)
+import { createTheme } from '@mui/material/styles';
+import { muiTheme } from '@himz-genui/core';
+export const theme = createTheme(muiTheme(project));   // palette, spacing(n), shape, typography
+
+// anywhere: CSS custom properties
+import { cssVariables } from '@himz-genui/core';
+cssVariables(project);   // ":root { --ui-color-primary: #2563EB; --ui-space-4: 16px; --ui-radius-md: 8px; … }"
+```
+
+`tests/compat/react` holds a screen per library pattern with the answer `fw check` must give; `npm test` runs them.
 
 ## Contracts
 
@@ -543,6 +615,13 @@ export default defineComponent({
     flutter: ['FilledButton / OutlinedButton / TextButton by variant', 'onPressed null when disabled or loading'],
   },
   examples: [{ label: 'Add to cart' }, { label: 'Saving…', loading: true }],
+  checks: [
+    { kind: 'size', byProp: 'size', height: { sm: 32, md: 40, lg: 48 } },
+    { kind: 'keepsSize', props: { loading: true }, like: { loading: false } },
+    { kind: 'emits', event: 'press', on: ['press', 'enter', 'space'] },
+    { kind: 'neverEmits', event: 'press', props: { disabled: true }, on: ['press', 'enter'] },
+    { kind: 'role', role: 'button', name: { fromProp: 'label' } },
+  ],
 });
 ```
 
@@ -557,7 +636,32 @@ export default defineComponent({
 | `composition.canContain` | allowed direct children (`[]` = none) |
 | `composition.cannotBeInside` | forbidden ancestors, any depth |
 | `platform.<name>` | advisory hints for one platform — never a shared rule |
+| `checks` | the machine-tested part of `rules` / `a11y`: `fw verify` generates a test per check for every platform and runs it (see below) |
 | `version` | bump to force re-verification of existing implementations |
+
+### Checks
+
+`rules` and `a11y` are prose for the agent; `checks` are the commitments a machine can test, written once and
+run on every platform. `fw verify` turns each check into a test (`test/fw/<Name>.contract.test.tsx` with vitest +
+Testing Library, `test/fw/<snake>_contract_test.dart` with `flutter_test`) and runs it.
+
+| kind | what the generated test does |
+|---|---|
+| `size` | renders each value of an enum prop and measures height / width (a number, or `{ token: 'size.x' }` from `project.ts`) |
+| `keepsSize` | renders with `props` and with `like`; the size must not change |
+| `emits` | presses the component (or the visible `target` text), or Tabs to it and presses Enter / Space; the event fires once per activation |
+| `neverEmits` | same actions with `props` (e.g. `disabled: true`); the event never fires |
+| `role` | the role exists, with the accessible name given or taken from a prop |
+| `key` | Tab, then a key (Escape, arrows…); the event fires |
+| `rendersNothing` | with `props` (e.g. `open: false`) nothing is drawn |
+| `minTarget` | the pointer target is at least N in both directions (warning by default) |
+
+Render props are the first example merged with the check's `props` (`null` leaves an optional prop out).
+`level: 'warn'` reports without failing; warnings run only under `fw verify`, so a plain `vitest` / `flutter test`
+stays green on them. React runs in jsdom, which has no layout: `size`, `keepsSize` and `minTarget` are reported
+as skipped there and measured on Flutter. `fw check` validates checks statically (unknown kinds, props, events,
+enum values, wrong value types) but never runs tests. 53 of the 76 shipped contracts carry checks (124 in total);
+the rest have nothing a current kind can measure.
 
 **Shipped contracts** (`@himz-genui/rules`, 76):
 
@@ -662,7 +766,7 @@ agent rules first**, so there is nothing to keep in sync by hand.
 
 ```
 fw init --agent <claude|cursor|codex|copilot> --platform <react|flutter> [--name "App"] [--create vite|next|flutter]
-fw add <file.tsx> [--name X]
+fw add <file.tsx | file.dart> [--name X]
 fw check [<path>...]
 fw docs <Name>
 fw verify [<Name>...]
@@ -673,11 +777,20 @@ fw verify [<Name>...]
 Copies shipped contracts to `ui-rules/`, creates the `ui-spec/` skeleton (never overwrites existing
 files), generates the rules file for your agent. `--create` scaffolds the app first.
 
-### `fw add <file.tsx>`
+### `fw add <file.tsx | file.dart>`
 
-Registers a component you already have. Reads its `Props` type with the TypeScript compiler, writes a
-minimal contract to `ui-spec/added/<Name>.rule.ts` whose `impl` points at the original file, and verifies
-it. The original file is not touched. Fill in `purpose` and `rules` afterwards.
+Registers a component you already have and writes a minimal contract to `ui-spec/added/<Name>.rule.ts` whose
+`impl` points at the original file, then verifies it. The original file is not touched. Fill in `purpose`,
+`rules` and `checks` afterwards.
+
+- **React:** props come from the TypeScript type checker, so function components, `forwardRef`, `memo`, and props
+  that `extends` / intersect library types (MUI's `ButtonProps`, `React.ButtonHTMLAttributes`, cva's
+  `VariantProps`) all resolve. Props declared in your code go into the contract; props inherited from a library
+  are listed, not copied: add the few screens may use, and `fw verify` resolves them through the library type.
+- **Flutter:** the first public widget in the file (or `--name`), from its named constructor: `String`, `int`,
+  `double`, `bool`, `Widget`, enums declared in the file, `List<…>`, `onX` callbacks (`VoidCallback`,
+  `ValueChanged<T>`) and `List<Widget> children`, with literal defaults as `.def()`. The widget keeps its own class
+  and enum names (`PriceTag`, `PriceTone`); `fw verify`, the generated tests and `fw check` on screens accept them.
 
 ### `fw check`
 
@@ -720,6 +833,20 @@ Checks implementations against contracts with the TypeScript compiler API:
 On pass, the catalog records the implementation path; on fail it is removed, so `fw check` will flag every
 spec that uses the component. Without names, verifies every contract that has an implementation.
 
+Then the **behavioural checks**: for every component whose surface passed and whose contract has `checks`,
+`fw verify` writes the tests to `test/fw/` and runs them with the platform's runner (`vitest run` on React,
+`flutter test` on Flutter). Each failing check is reported at `checks[i]` with the expected and actual values:
+
+```
+error  test/fw/button_contract_test.dart  checks[1]
+       keepsSize failed: Expected: 187.1 (±0.5) / Actual: <50.0> / width
+```
+
+React projects need `vitest jsdom @testing-library/react @testing-library/user-event` (fw says so when one is
+missing; a project without its own vite / vitest config gets a minimal one in `test/fw/`); Flutter projects
+need the Flutter SDK on `PATH`. The files in `test/fw/` are regenerated on every run:
+never edit them, change the contract's `checks`.
+
 ---
 
 ## Agent rules
@@ -755,7 +882,7 @@ The rules, in short:
 Most teams already have components. Don't rewrite them:
 
 ```sh
-npx fw add src/components/PriceTag.tsx
+npx fw add src/components/PriceTag.tsx     # or lib/widgets/price_tag.dart
 ```
 
 ```ts
@@ -772,7 +899,16 @@ export default defineComponent({
 
 From here the agent uses `PriceTag` like any shipped component, and `fw check` accepts imports from the
 registered path. Type mappings `fw add` cannot infer are left as `t.string() /* TODO */` and listed in the
-output.
+output, together with the props inherited from a library:
+
+```
+created  ui-spec/added/MuiBtn.rule.ts  (component MuiBtn)
+todo     32 prop(s) inherited from @mui/material are not in the contract: children, color, disabled, variant, size, …
+todo     267 HTML / React attribute(s) inherited (id, className, aria-*, DOM events…) are not in the contract.
+```
+
+**Projects with a design system (MUI, shadcn…)** register their components with `fw add` instead of writing
+`ui/` from the shipped contracts, and keep marketing pages or hand-styled layouts in `freeformDirs`.
 
 ---
 
@@ -781,25 +917,36 @@ output.
 ```yaml
 - run: npm ci
 - run: npx fw check
+- run: npx fw verify   # behavioural checks; Flutter projects need the Flutter SDK on the runner
 ```
 
-`fw check` exits non-zero on any finding. Pair it with `tsc --noEmit` and your build.
+`fw check` is static and fast: specs, screen code, component surfaces. `fw verify` also generates a test per contract
+check into `test/fw/` and runs it (vitest + Testing Library on React, `flutter test` on Flutter). The generated files
+are rebuilt on every run and git-ignored (`fw init` adds `test/fw/` to `.gitignore`), so a fresh clone only needs
+`npx fw verify`. On React, `fw init` sets `"test": "fw verify"` when the project has no test script; otherwise chain
+it yourself: `"test": "fw verify && vitest run"`. Both exit non-zero on any finding. Pair them with `tsc --noEmit`
+and your build.
 
 ---
 
 ## Limitations
 
-- **`fw add` is React-only.** Registering an existing Flutter widget as a contract is not supported yet;
-  write the contract in `ui-spec/components/` and point `impl.flutter` at the file.
-- **`fw verify` is static.** It checks exports, prop names/kinds, enum members, handlers and children with
-  the TypeScript compiler — not runtime behaviour. Generated behavioural tests (Testing Library / widget
-  tests) are the next milestone.
+- **`fw add` reads one file.** Flutter props whose types are classes from other files, and item classes, come out
+  as `TODO`; generated tests for a registered Flutter widget cover its own enums, not item classes. No adapter
+  maps the shipped contracts onto MUI / shadcn yet: register your own components instead.
+- **Behavioural checks cover what eight kinds can express.** Typing into a field, opening a list and picking
+  an option, dragging, pressing an icon-only control (no visible text to target), ARIA states (expanded,
+  selected, sort), list / menu / combobox roles and sizes keyed by a boolean prop are not expressible yet; those
+  commitments stay in `rules` / `a11y` as prose. React has no browser in the loop, so layout checks run on
+  Flutter only. Where a contract only has a `neverEmits` check (Select, DatePicker, Combobox, Input…), it
+  proves little: pressing the component would not emit even when enabled, until typing / picking kinds exist.
 - **No shell contracts yet.** `defineShell` (tabs / sidebar layout) and `defineSources` (where data comes
   from, loading/error states) are designed but not implemented. The app shell is hand-written.
 - **`fw init --create`** shells out to `npm create vite` / `create-next-app` / `flutter create`. The Flutter
   one is tested (the project name is made a valid package name); the npm ones are not.
-- **Runtime TypeScript.** `fw` runs its own sources through `tsx`, so `ui-spec/` files are plain `.ts`. If
-  your `tsconfig` includes `ui-spec/`, add `"allowImportingTsExtensions": true`.
+- **Your spec files are TypeScript.** `fw` is prebuilt JavaScript; it registers `tsx` in-process only to load
+  `ui-spec/` and `ui-rules/`, so `tsx` stays a dependency. No special `tsconfig` flag is needed to include
+  those folders in your own type check.
 - **Consistency is per project.** Two projects materializing the same contract will get different code.
   That is by design.
 

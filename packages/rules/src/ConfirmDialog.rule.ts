@@ -21,6 +21,13 @@ export default defineComponent({
   ],
   a11y: ['Role alertdialog labelled by title and described by message.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'rendersNothing', props: { open: false } },
+    { kind: 'key', key: 'Escape', emits: 'cancel', props: { open: true } },
+    { kind: 'emits', event: 'confirm', target: 'Delete order', props: { open: true, confirmLabel: 'Delete order' } },
+    { kind: 'emits', event: 'cancel', target: 'Keep it', props: { open: true, cancelLabel: 'Keep it' } },
+    { kind: 'neverEmits', event: 'cancel', target: 'Keep it', props: { open: true, loading: true, cancelLabel: 'Keep it' } },
+  ],
   platform: { react: ['portal + focus trap'], flutter: ['m.showDialog with an m.AlertDialog driven by open'] },
   examples: [{ open: true, title: 'Delete this order?', message: 'This cannot be undone.', confirmLabel: 'Delete order', cancelLabel: 'Keep it', tone: 'danger' }],
 });

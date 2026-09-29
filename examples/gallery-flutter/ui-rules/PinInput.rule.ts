@@ -21,6 +21,10 @@ export default defineComponent({
   ],
   a11y: ['Exposed as one field named by label that accepts the whole code (not length separate fields); error is announced.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'role', role: 'textbox', name: { fromProp: 'label' } },
+    { kind: 'neverEmits', event: 'change', props: { disabled: true } },
+  ],
   platform: { react: ['one <input autocomplete="one-time-code" inputMode="numeric"> drawn as boxes'], flutter: ['one m.TextField (autofillHints: oneTimeCode) drawn as boxes'] },
   examples: [{ label: 'Verification code', value: '', length: 6 }],
 });

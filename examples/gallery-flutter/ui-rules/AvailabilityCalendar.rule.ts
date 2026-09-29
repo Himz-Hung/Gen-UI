@@ -27,6 +27,11 @@ export default defineComponent({
   ],
   a11y: ['A grid; each day is named with its full date, status and price ("Monday 12 October, available, $120").', 'Arrow keys move between days.'],
   composition: { canContain: [] },
+  checks: [
+    { kind: 'emits', event: 'dayPress', target: '12', props: { days: [{ date: '2026-10-12', status: 'available' }] } },
+    { kind: 'neverEmits', event: 'dayPress', target: '13', props: { days: [{ date: '2026-10-13', status: 'booked' }] } },
+    { kind: 'neverEmits', event: 'dayPress', target: '14', props: { days: [{ date: '2026-10-14', status: 'closed' }] } },
+  ],
   platform: { react: ['role="grid" of buttons; aria-disabled for booked and closed'], flutter: ['a custom grid (GridView with 7 columns or rows of Expanded cells) with Semantics per day'] },
   examples: [{ month: '2026-10', days: [{ date: '2026-10-12', status: 'available', priceLabel: '$120' }, { date: '2026-10-13', status: 'booked' }], legend: { available: 'Available', limited: 'Few left', booked: 'Booked', closed: 'Closed' } }],
 });
