@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 — 2026-09-29
+
+- **`@himz-genui/rules` ships a built entry.** `exports` point at `dist/index.js` + `dist/index.d.ts` instead of `src/index.ts`, so `import { SHIPPED } from '@himz-genui/rules'` works in plain Node (it failed with `ERR_UNKNOWN_FILE_EXTENSION`); the contracts stay in `src/` for `fw init` to copy. `./package.json` is exported too: `fw init` found the contracts only through a fallback path that happened to match npm's layout (pnpm could miss it).
+- **`fw init` (React) prepares `fw verify`:** it adds the test runner to `devDependencies` when missing (`vitest ^3.2`, `jsdom ^26.1`, `@testing-library/react`, `@testing-library/dom`, `@testing-library/user-event`: majors that still run on Node 20) and asks for `npm install`. `@himz-genui/core` lists them as optional peer dependencies. `fw check` still needs none of them.
+- Checked end to end: packed packages in an empty project, `fw init`, `npm install`, `npm test` → `fw verify` passes on vitest 3.2.7 / jsdom 26.1.0.
+
 ## 1.3.0 — 2026-09-29
 
 Behavioural checks, and a prebuilt CLI. Both packages move to 1.3.0; `@himz-genui/rules` 1.3.0 requires

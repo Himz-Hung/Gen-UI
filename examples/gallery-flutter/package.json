@@ -3,8 +3,8 @@
   "private": true,
   "description": "Every shipped contract materialized in Flutter, checked by fw verify, flutter analyze and a widget test.",
   "dependencies": {
-    "@himz-genui/core": "1.3.0",
-    "@himz-genui/rules": "1.3.0"
+    "@himz-genui/core": "1.3.1",
+    "@himz-genui/rules": "1.3.1"
   },
   "scripts": {
     "check": "node ../../packages/core/bin/fw.js check",

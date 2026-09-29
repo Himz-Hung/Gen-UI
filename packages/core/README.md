@@ -92,8 +92,8 @@ npx fw init --agent claude --platform react --name "My App"
 ```
 
 `--agent` is one of `claude`, `cursor`, `codex`, `copilot`. Add `--create vite` to scaffold a Vite React TS
-app first. For the behavioural checks run by `fw verify`, a React project also needs
-`npm i -D vitest jsdom @testing-library/react @testing-library/user-event`.
+app first. On React, `fw init` also adds what `fw verify` runs behavioural checks with (vitest, jsdom, Testing
+Library) to `devDependencies`: run `npm install` once afterwards. `fw check` needs none of them.
 
 ---
 

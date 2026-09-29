@@ -1,6 +1,6 @@
 {
   "name": "@himz-genui/core",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Contract-driven UI for coding agents. Ship component contracts, let the agent materialize them once, compose screens from them, and gate every step with a deterministic check.",
   "keywords": [
     "ui",
@@ -54,5 +54,25 @@
   "dependencies": {
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
+  },
+  "peerDependencies": {
+    "vitest": ">=2",
+    "jsdom": ">=24",
+    "@testing-library/react": ">=14",
+    "@testing-library/user-event": ">=14"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    },
+    "jsdom": {
+      "optional": true
+    },
+    "@testing-library/react": {
+      "optional": true
+    },
+    "@testing-library/user-event": {
+      "optional": true
+    }
   }
 }
