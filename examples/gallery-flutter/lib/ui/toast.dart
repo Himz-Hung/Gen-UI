@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiToastTone { info, success, warning, danger }
@@ -91,10 +92,10 @@ class _UiToastState extends State<UiToast> {
   }
 
   Color get _color => switch (widget.tone) {
-    UiToastTone.info => UiTokens.colorPrimary,
-    UiToastTone.success => UiTokens.colorSuccess,
-    UiToastTone.warning => UiTokens.colorWarning,
-    UiToastTone.danger => UiTokens.colorDanger,
+    UiToastTone.info => context.ui.color.primary,
+    UiToastTone.success => context.ui.color.success,
+    UiToastTone.warning => context.ui.color.warning,
+    UiToastTone.danger => context.ui.color.danger,
   };
 
   IconData get _icon => switch (widget.tone) {
@@ -124,7 +125,7 @@ class _UiToastState extends State<UiToast> {
                 onFocusChange: (f) => _setHold(focused: f),
                 skipTraversal: true,
                 child: Material(
-                  color: UiTokens.colorText,
+                  color: context.ui.color.text,
                   borderRadius: BorderRadius.circular(UiTokens.radiusMd),
                   elevation: 4,
                   child: Padding(
@@ -140,8 +141,8 @@ class _UiToastState extends State<UiToast> {
                         Flexible(
                           child: Text(
                             widget.message,
-                            style: const TextStyle(
-                              color: UiTokens.colorSurface,
+                            style: TextStyle(
+                              color: context.ui.color.surface,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -151,7 +152,7 @@ class _UiToastState extends State<UiToast> {
                           TextButton(
                             onPressed: widget.onAction,
                             style: TextButton.styleFrom(
-                              foregroundColor: UiTokens.colorPrimary,
+                              foregroundColor: context.ui.color.primary,
                             ),
                             child: Text(widget.actionLabel!),
                           ),
@@ -160,7 +161,7 @@ class _UiToastState extends State<UiToast> {
                           icon: Icon(
                             uiIconData('close'),
                             size: 16,
-                            color: UiTokens.colorSurface,
+                            color: context.ui.color.surface,
                           ),
                           tooltip: 'Close',
                           onPressed: widget.onClose,

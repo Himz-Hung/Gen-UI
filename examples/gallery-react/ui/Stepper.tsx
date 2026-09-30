@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface StepperProps {
   steps: { label: string; description?: string }[];
@@ -32,7 +32,7 @@ function useMediaQuery(query: string, defaultValue = true) {
 function Marker({ index, currentIndex, label, pressable, onPress }: { index: number; currentIndex: number; label: string; pressable: boolean; onPress?: (i: number) => void }) {
   const completed = index < currentIndex;
   const isCurrent = index === currentIndex;
-  const color = completed || isCurrent ? tokens.color.primary : `${tokens.color.muted}66`;
+  const color = completed || isCurrent ? tokens.color.primary : alpha(tokens.color.muted, 0.4);
   const name = completed ? `${label}, completed` : isCurrent ? `${label}, current step` : label;
   const content = (
     <span
@@ -70,7 +70,7 @@ export function Stepper({ steps, current, orientation = 'horizontal', allowBack 
             <li key={i} aria-current={isCurrent ? 'step' : undefined} style={{ display: 'flex', gap: sp(3) }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Marker index={i} currentIndex={currentIndex} label={step.label} pressable={pressable} onPress={onPress} />
-                {i < steps.length - 1 && <div aria-hidden style={{ width: 2, height: 24, background: completed ? tokens.color.primary : `${tokens.color.muted}4d` }} />}
+                {i < steps.length - 1 && <div aria-hidden style={{ width: 2, height: 24, background: completed ? tokens.color.primary : alpha(tokens.color.muted, 0.3) }} />}
               </div>
               <div style={{ paddingBottom: sp(4) }}>
                 <div style={{ color: isCurrent ? tokens.color.primary : tokens.color.text, fontWeight: isCurrent ? 700 : 400 }}>{step.label}</div>
@@ -113,7 +113,7 @@ export function Stepper({ steps, current, orientation = 'horizontal', allowBack 
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div aria-hidden style={{ flex: 1, height: 2, marginTop: 13, background: i < currentIndex ? tokens.color.primary : `${tokens.color.muted}4d` }} />
+              <div aria-hidden style={{ flex: 1, height: 2, marginTop: 13, background: i < currentIndex ? tokens.color.primary : alpha(tokens.color.muted, 0.3) }} />
             )}
           </li>
         );

@@ -1,4 +1,4 @@
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 import { Tooltip } from './Tooltip';
 
 export interface SidebarProps {
@@ -64,7 +64,7 @@ export function Sidebar({ items, value, title, collapsed = false, onChange, onTo
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start', gap: sp(3),
                   height: 40, width: '100%', border: 'none', cursor: 'pointer', textAlign: 'left',
-                  padding: `0 ${collapsed ? sp(3) : sp(4)}`, background: selected ? `${tokens.color.primary}14` : 'transparent',
+                  padding: `0 ${collapsed ? sp(3) : sp(4)}`, background: selected ? alpha(tokens.color.primary, 0.08) : 'transparent',
                   color: selected ? tokens.color.primary : tokens.color.text, fontWeight: selected ? 700 : 400,
                 }}
               >
@@ -78,7 +78,7 @@ export function Sidebar({ items, value, title, collapsed = false, onChange, onTo
                   <>
                     <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
                     {item.badge && (
-                      <span style={{ padding: `0 ${sp(2)}`, borderRadius: tokens.radius.full, background: `${tokens.color.muted}26`, color: tokens.color.muted, fontSize: 12 }}>{item.badge}</span>
+                      <span style={{ padding: `0 ${sp(2)}`, borderRadius: tokens.radius.full, background: alpha(tokens.color.muted, 0.15), color: tokens.color.muted, fontSize: 12 }}>{item.badge}</span>
                     )}
                   </>
                 )}

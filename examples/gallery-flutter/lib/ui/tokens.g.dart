@@ -5,13 +5,23 @@ import 'dart:ui' show Color;
 
 abstract final class UiTokens {
   static const Color colorPrimary = Color(0xFF2563EB);
+  static const Color colorOnPrimary = Color(0xFFFFFFFF);
   static const Color colorSecondary = Color(0xFF64748B);
+  static const Color colorOnSecondary = Color(0xFFFFFFFF);
   static const Color colorDanger = Color(0xFFDC2626);
+  static const Color colorOnDanger = Color(0xFFFFFFFF);
   static const Color colorSuccess = Color(0xFF15803D);
+  static const Color colorOnSuccess = Color(0xFFFFFFFF);
   static const Color colorWarning = Color(0xFFB45309);
+  static const Color colorOnWarning = Color(0xFFFFFFFF);
   static const Color colorSurface = Color(0xFFFFFFFF);
+  static const Color colorSurfaceAlt = Color(0xFFF1F5F9);
   static const Color colorText = Color(0xFF0F172A);
   static const Color colorMuted = Color(0xFF64748B);
+  static const Color colorBorder = Color(0xFFE2E8F0);
+  static const Color colorScrim = Color(0xFF0F172A);
+  static const Color colorOnScrim = Color(0xFFFFFFFF);
+  static const Color colorShadow = Color(0xFF0F172A);
   static const List<double> spacing = [0, 4, 8, 12, 16, 24, 32, 48];
   /** spacing step, e.g. UiTokens.space(4) */
   static double space(int step) => step < spacing.length ? spacing[step] : spacing.last;
@@ -21,4 +31,7 @@ abstract final class UiTokens {
   static const double radiusFull = 9999;
   static const String fontBody = 'Inter';
   static const String fontHeading = 'Inter';
+  static const double sizeControlSm = 32;
+  static const double sizeControlMd = 40;
+  static const double sizeControlLg = 48;
 }

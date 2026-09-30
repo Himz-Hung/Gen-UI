@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiPinInputType { numeric, alphanumeric }
@@ -62,7 +63,7 @@ class _UiPinInputState extends State<UiPinInput> {
   Widget build(BuildContext context) {
     final text = _controller.text;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text(widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(widget.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       Semantics(
         label: widget.label,
@@ -113,7 +114,7 @@ class _UiPinInputState extends State<UiPinInput> {
       ),
       if (widget.error != null) ...[
         SizedBox(height: UiTokens.space(1)),
-        Text(widget.error!, style: TextStyle(color: UiTokens.colorDanger, fontSize: 12)),
+        Text(widget.error!, style: TextStyle(color: context.ui.color.danger, fontSize: 12)),
       ],
     ]);
   }
@@ -129,7 +130,7 @@ class _PinBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = error ? UiTokens.colorDanger : (focused ? UiTokens.colorPrimary : UiTokens.colorMuted.withValues(alpha: 0.4));
+    final borderColor = error ? context.ui.color.danger : (focused ? context.ui.color.primary : context.ui.color.muted.withValues(alpha: 0.4));
     return Container(
       width: 44,
       height: 52,
@@ -140,7 +141,7 @@ class _PinBox extends StatelessWidget {
       ),
       child: Text(
         char.isEmpty ? '' : (mask ? '•' : char),
-        style: const TextStyle(color: UiTokens.colorText, fontSize: 20, fontWeight: FontWeight.w600),
+        style: TextStyle(color: context.ui.color.text, fontSize: 20, fontWeight: FontWeight.w600),
       ),
     );
   }

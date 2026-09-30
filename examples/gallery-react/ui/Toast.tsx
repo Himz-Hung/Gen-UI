@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface ToastProps {
   open: boolean;
@@ -92,7 +92,7 @@ export function Toast({ open, message, tone = 'info', actionLabel, duration = 40
         style={{
           pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: sp(3), maxWidth: 480,
           background: tokens.color.text, color: tokens.color.surface, borderRadius: tokens.radius.md,
-          padding: `${sp(3)} ${sp(4)}`, fontFamily: font('body'), boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+          padding: `${sp(3)} ${sp(4)}`, fontFamily: font('body'), boxShadow: `0 4px 12px ${alpha(tokens.color.shadow, 0.2)}`,
         }}
       >
         <span aria-hidden data-icon={TONE_ICON[tone]} style={{ color: TONE_COLOR[tone] }} />

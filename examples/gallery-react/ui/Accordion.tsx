@@ -27,7 +27,7 @@ export function Accordion({ items, open, multiple = false, onChange, children }:
         const isOpen = open.includes(item.value);
         const regionId = `accordion-${item.value}`;
         return (
-          <div key={item.value} style={{ borderBottom: i < items.length - 1 ? '1px solid #E5E7EB' : undefined }}>
+          <div key={item.value} style={{ borderBottom: i < items.length - 1 ? `1px solid ${tokens.color.border}` : undefined }}>
             <button
               type="button"
               aria-expanded={isOpen}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiTimelineItem {
@@ -19,12 +20,12 @@ class UiTimeline extends StatelessWidget {
   final List<UiTimelineItem> items;
   final UiTimelineOrder order;
 
-  Color _toneColor(UiTimelineTone? tone) => switch (tone) {
-        null || UiTimelineTone.neutral => UiTokens.colorMuted,
-        UiTimelineTone.primary => UiTokens.colorPrimary,
-        UiTimelineTone.success => UiTokens.colorSuccess,
-        UiTimelineTone.warning => UiTokens.colorWarning,
-        UiTimelineTone.danger => UiTokens.colorDanger,
+  Color _toneColor(BuildContext context, UiTimelineTone? tone) => switch (tone) {
+        null || UiTimelineTone.neutral => context.ui.color.muted,
+        UiTimelineTone.primary => context.ui.color.primary,
+        UiTimelineTone.success => context.ui.color.success,
+        UiTimelineTone.warning => context.ui.color.warning,
+        UiTimelineTone.danger => context.ui.color.danger,
       };
 
   @override
@@ -36,14 +37,14 @@ class UiTimeline extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < ordered.length; i++)
-            _row(ordered[i], isLast: i == ordered.length - 1),
+            _row(context, ordered[i], isLast: i == ordered.length - 1),
         ],
       ),
     );
   }
 
-  Widget _row(UiTimelineItem item, {required bool isLast}) {
-    final color = _toneColor(item.tone);
+  Widget _row(BuildContext context, UiTimelineItem item, {required bool isLast}) {
+    final color = _toneColor(context, item.tone);
     return MergeSemantics(
       child: IntrinsicHeight(
         child: Row(
@@ -59,7 +60,7 @@ class UiTimeline extends StatelessWidget {
                     margin: EdgeInsets.only(top: UiTokens.space(1)),
                     decoration: BoxDecoration(shape: BoxShape.circle, color: color),
                   ),
-                  if (!isLast) Expanded(child: Container(width: 1.5, color: UiTokens.colorMuted.withValues(alpha: 0.25))),
+                  if (!isLast) Expanded(child: Container(width: 1.5, color: context.ui.color.muted.withValues(alpha: 0.25))),
                 ],
               ),
             ),
@@ -72,15 +73,15 @@ class UiTimeline extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(children: [
-                      Flexible(child: Text(item.title, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600))),
+                      Flexible(child: Text(item.title, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600))),
                       if (item.time != null) ...[
                         SizedBox(width: UiTokens.space(2)),
-                        Text(item.time!, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+                        Text(item.time!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
                       ],
                     ]),
                     if (item.description != null) ...[
                       SizedBox(height: UiTokens.space(1)),
-                      Text(item.description!, style: const TextStyle(color: UiTokens.colorText, fontSize: 13)),
+                      Text(item.description!, style: TextStyle(color: context.ui.color.text, fontSize: 13)),
                     ],
                   ],
                 ),

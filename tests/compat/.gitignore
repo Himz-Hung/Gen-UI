@@ -2,3 +2,5 @@ ui-rules/
 ui.catalog.json
 CLAUDE.md
 .claude/
+**/ui/tokens.css
+**/ui/tokens.g.ts

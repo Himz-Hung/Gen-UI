@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 class UiTabsTab {
   const UiTabsTab({required this.value, required this.label});
@@ -29,17 +29,17 @@ class UiTabs extends StatelessWidget {
           child: SizedBox(
             height: 44,
             child: Row(
-              children: [for (final t in tabs) Expanded(child: _tab(t))],
+              children: [for (final t in tabs) Expanded(child: _tab(context, t))],
             ),
           ),
         ),
-        const Divider(height: 1, thickness: 1, color: UiTokens.colorMuted),
+        Divider(height: 1, thickness: 1, color: context.ui.color.muted),
         ...children,
       ],
     );
   }
 
-  Widget _tab(UiTabsTab t) {
+  Widget _tab(BuildContext context, UiTabsTab t) {
     final selected = t.value == value;
     return Semantics(
       selected: selected,
@@ -52,14 +52,14 @@ class UiTabs extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(
               // Active tab is marked by a primary-colored indicator and bold text — not color alone.
-              bottom: BorderSide(color: selected ? UiTokens.colorPrimary : Colors.transparent, width: 2),
+              bottom: BorderSide(color: selected ? context.ui.color.primary : Colors.transparent, width: 2),
             ),
           ),
           child: Text(
             t.label,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: selected ? UiTokens.colorPrimary : UiTokens.colorMuted,
+              color: selected ? context.ui.color.primary : context.ui.color.muted,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
             ),
           ),

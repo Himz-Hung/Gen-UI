@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 enum UiIconSize { xs, sm, md, lg, xl }
 
@@ -22,13 +22,13 @@ class UiIcon extends StatelessWidget {
         UiIconSize.xl => 32,
       };
 
-  Color? get _color => switch (color) {
+  Color? _color(BuildContext context) => switch (color) {
         UiIconColor.inherit => null,
-        UiIconColor.primary => UiTokens.colorPrimary,
-        UiIconColor.muted => UiTokens.colorMuted,
-        UiIconColor.success => UiTokens.colorSuccess,
-        UiIconColor.warning => UiTokens.colorWarning,
-        UiIconColor.danger => UiTokens.colorDanger,
+        UiIconColor.primary => context.ui.color.primary,
+        UiIconColor.muted => context.ui.color.muted,
+        UiIconColor.success => context.ui.color.success,
+        UiIconColor.warning => context.ui.color.warning,
+        UiIconColor.danger => context.ui.color.danger,
       };
 
   @override
@@ -36,7 +36,7 @@ class UiIcon extends StatelessWidget {
     // Square box at the token size so there is no layout shift; unknown names fall back to a neutral placeholder.
     final icon = SizedBox.square(
       dimension: _size,
-      child: Icon(uiIconData(name), size: _size, color: _color),
+      child: Icon(uiIconData(name), size: _size, color: _color(context)),
     );
     if (label == null) return ExcludeSemantics(child: icon);
     return Semantics(image: true, label: label, excludeSemantics: true, child: icon);

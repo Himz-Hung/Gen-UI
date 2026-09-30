@@ -1,4 +1,5 @@
 import { plain, type TypeNode } from './types.ts';
+import type { ProjectTokens } from './theme.ts';
 
 // ---------- Component contract ----------
 
@@ -101,14 +102,9 @@ export interface ProjectConfig {
   name: string;
   platforms: ('react' | 'flutter')[];
   agent: 'claude' | 'cursor' | 'codex' | 'copilot';
-  tokens: {
-    color: Record<string, string>;
-    spacing: number[];
-    radius: Record<string, number>;
-    font: Record<string, string>;
-    /** Named sizes (control heights…) that checks can reference: { token: 'size.controlMd' }. */
-    size?: Record<string, number>;
-  };
+  /** Design tokens: primitives → semantic roles → optional component tokens, and modes (colorScheme, density…).
+   *  The 1.x flat shape ({ color, spacing, radius, font }) is still read. See ThemeTokens in theme.ts. */
+  tokens: ProjectTokens;
   /** Named guards the flows may reference. Bodies are hand-written. */
   guards?: string[];
   /** The project's state, form, data and router libraries, e.g. 'bloc' or 'zustand, react-hook-form, @apollo/client, react-router'. Known ones allow their
@@ -128,7 +124,8 @@ export interface ProjectConfig {
   /** Convention only: how code looks up a translated string (a library such as 'i18next', or a file such as 'src/i18n.ts'). */
   i18nLibrary?: string;
 }
-export const defineProject = (p: ProjectConfig): ProjectConfig => p;
+/** Keeps the exact type of what is passed in, so ui/tokens.ts sees the project's own token shape (flat 1.x or ThemeTokens). */
+export const defineProject = <P extends ProjectConfig>(p: P): P => p;
 
 // ---------- Strings (one file per language: ui-spec/strings/<lang>.ts) ----------
 

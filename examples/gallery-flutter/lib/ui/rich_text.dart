@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiRichTextSize { sm, md, lg }
@@ -30,7 +31,7 @@ class _UiRichTextState extends State<UiRichText> {
   }
 
   double get _fontSize => switch (widget.size) { UiRichTextSize.sm => 13, UiRichTextSize.md => 15, UiRichTextSize.lg => 17 };
-  Color get _color => widget.color == UiRichTextColor.muted ? UiTokens.colorMuted : UiTokens.colorText;
+  Color get _color => widget.color == UiRichTextColor.muted ? context.ui.color.muted : context.ui.color.text;
 
   static final _inline = RegExp(r'\*\*(.+?)\*\*|\*(.+?)\*|\[([^\]]+)\]\(([^)\s]+)\)');
 
@@ -48,7 +49,7 @@ class _UiRichTextState extends State<UiRichText> {
         final url = m[4]!;
         final r = TapGestureRecognizer()..onTap = () => widget.onLink?.call(url);
         _recognizers.add(r);
-        out.add(TextSpan(text: m[3], recognizer: r, style: const TextStyle(color: UiTokens.colorPrimary, decoration: TextDecoration.underline), semanticsLabel: m[3]));
+        out.add(TextSpan(text: m[3], recognizer: r, style: TextStyle(color: context.ui.color.primary, decoration: TextDecoration.underline), semanticsLabel: m[3]));
       }
       at = m.end;
     }
@@ -70,7 +71,7 @@ class _UiRichTextState extends State<UiRichText> {
       final first = lines.first.trimLeft();
       if (first.startsWith('### ') || first.startsWith('## ')) {
         final level3 = first.startsWith('### ');
-        blocks.add(Semantics(header: true, child: _para(first.substring(level3 ? 4 : 3), style: TextStyle(fontSize: level3 ? 18 : 22, fontWeight: FontWeight.w700, color: UiTokens.colorText))));
+        blocks.add(Semantics(header: true, child: _para(first.substring(level3 ? 4 : 3), style: TextStyle(fontSize: level3 ? 18 : 22, fontWeight: FontWeight.w700, color: context.ui.color.text))));
         if (lines.length > 1) blocks.add(_para(lines.skip(1).join(' ')));
       } else if (lines.every((l) => RegExp(r'^\s*(-|\d+\.)\s+').hasMatch(l))) {
         final ordered = RegExp(r'^\s*\d+\.').hasMatch(lines.first);

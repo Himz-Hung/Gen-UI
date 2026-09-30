@@ -23,10 +23,10 @@ export function Button({ label, variant = 'primary', size = 'md', disabled = fal
     opacity: disabled ? 0.5 : 1, border: '1px solid transparent', position: 'relative',
   };
   const look: Record<NonNullable<ButtonProps['variant']>, CSSProperties> = {
-    primary: { background: tokens.color.primary, color: '#fff' },
+    primary: { background: tokens.color.primary, color: tokens.color.onPrimary },
     secondary: { background: 'transparent', color: tokens.color.text, borderColor: tokens.color.muted },
     ghost: { background: 'transparent', color: tokens.color.primary },
-    danger: { background: tokens.color.danger, color: '#fff' },
+    danger: { background: tokens.color.danger, color: tokens.color.onDanger },
   };
   return (
     <button type="button" disabled={inactive} aria-busy={loading || undefined} onClick={inactive ? undefined : onPress} style={{ ...base, ...look[variant] }}>

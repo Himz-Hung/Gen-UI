@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiPieChartSlice {
@@ -19,12 +20,12 @@ class UiPieChart extends StatelessWidget {
   final ValueChanged<int>? onSlicePress;
 
   // Slices colored from the tokens in a fixed order.
-  static const List<Color> _palette = [
-    UiTokens.colorPrimary,
-    UiTokens.colorSecondary,
-    UiTokens.colorSuccess,
-    UiTokens.colorWarning,
-    UiTokens.colorDanger,
+  static List<Color> _palette(BuildContext context) => [
+    context.ui.color.primary,
+    context.ui.color.secondary,
+    context.ui.color.success,
+    context.ui.color.warning,
+    context.ui.color.danger,
   ];
 
   double get _total => slices.fold<double>(0, (m, s) => m + s.value);
@@ -39,7 +40,7 @@ class UiPieChart extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         if (_isEmpty)
           // empty (all values 0) shows the summary text.
-          SizedBox(height: height, child: Center(child: Text(summary, style: const TextStyle(color: UiTokens.colorMuted), textAlign: TextAlign.center)))
+          SizedBox(height: height, child: Center(child: Text(summary, style: TextStyle(color: context.ui.color.muted), textAlign: TextAlign.center)))
         else ...[
           Center(
             child: SizedBox(
@@ -49,10 +50,10 @@ class UiPieChart extends StatelessWidget {
                 onTapUp: (details) => _handleTap(details.localPosition, Size(height, height)),
                 child: CustomPaint(
                   size: Size(height, height),
-                  painter: _PieChartPainter(slices: slices, total: _total, donut: donut, palette: _palette),
+                  painter: _PieChartPainter(slices: slices, total: _total, donut: donut, palette: _palette(context), surfaceColor: context.ui.color.surface),
                   child: donut && centerLabel != null
                       ? Center(
-                          child: Text(centerLabel!, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+                          child: Text(centerLabel!, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
                         )
                       : null,
                 ),
@@ -64,9 +65,9 @@ class UiPieChart extends StatelessWidget {
           Wrap(spacing: UiTokens.space(3), runSpacing: UiTokens.space(1), children: [
             for (var i = 0; i < slices.length; i++)
               Row(mainAxisSize: MainAxisSize.min, children: [
-                Container(width: 10, height: 10, decoration: BoxDecoration(color: _palette[i % _palette.length], shape: BoxShape.circle)),
+                Container(width: 10, height: 10, decoration: BoxDecoration(color: _palette(context)[i % _palette(context).length], shape: BoxShape.circle)),
                 SizedBox(width: UiTokens.space(1)),
-                Text('${slices[i].label} (${_pct(slices[i].value)}%)', style: const TextStyle(color: UiTokens.colorText, fontSize: 12)),
+                Text('${slices[i].label} (${_pct(slices[i].value)}%)', style: TextStyle(color: context.ui.color.text, fontSize: 12)),
               ]),
           ]),
         ],
@@ -100,12 +101,13 @@ class UiPieChart extends StatelessWidget {
 }
 
 class _PieChartPainter extends CustomPainter {
-  _PieChartPainter({required this.slices, required this.total, required this.donut, required this.palette});
+  _PieChartPainter({required this.slices, required this.total, required this.donut, required this.palette, required this.surfaceColor});
 
   final List<UiPieChartSlice> slices;
   final double total;
   final bool donut;
   final List<Color> palette;
+  final Color surfaceColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -123,7 +125,7 @@ class _PieChartPainter extends CustomPainter {
       startAngle += sweep;
     }
     if (donut) {
-      final holePaint = Paint()..color = UiTokens.colorSurface;
+      final holePaint = Paint()..color = surfaceColor;
       canvas.drawCircle(center, radius * 0.55, holePaint);
     }
   }

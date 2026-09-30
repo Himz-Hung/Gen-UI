@@ -1,6 +1,7 @@
 import 'dart:ui' show SemanticsRole;
 
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiFormFieldDirection { vertical, horizontal }
@@ -30,8 +31,8 @@ class UiFormField extends StatelessWidget {
       isRequired: required,
       container: true,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text.rich(TextSpan(text: label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600), children: [
-          if (required) TextSpan(text: ' *', style: TextStyle(color: UiTokens.colorDanger)),
+        Text.rich(TextSpan(text: label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600), children: [
+          if (required) TextSpan(text: ' *', style: TextStyle(color: context.ui.color.danger)),
         ])),
         SizedBox(height: UiTokens.space(2)),
         direction == UiFormFieldDirection.horizontal
@@ -39,10 +40,10 @@ class UiFormField extends StatelessWidget {
             : Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: gapped),
         if (error != null) ...[
           SizedBox(height: UiTokens.space(2)),
-          Text(error!, style: TextStyle(color: UiTokens.colorDanger, fontSize: 12)),
+          Text(error!, style: TextStyle(color: context.ui.color.danger, fontSize: 12)),
         ] else if (hint != null) ...[
           SizedBox(height: UiTokens.space(2)),
-          Text(hint!, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+          Text(hint!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
         ],
       ]),
     );

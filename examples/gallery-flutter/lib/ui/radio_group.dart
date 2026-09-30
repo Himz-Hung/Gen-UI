@@ -1,6 +1,7 @@
 import 'dart:ui' show SemanticsRole;
 
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiRadioGroupOption {
@@ -38,7 +39,7 @@ class UiRadioGroup extends StatelessWidget {
       role: SemanticsRole.radioGroup,
       label: label,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+        Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
         SizedBox(height: UiTokens.space(1)),
         RadioGroup<String>(
           groupValue: value,
@@ -49,7 +50,7 @@ class UiRadioGroup extends StatelessWidget {
         ),
         if (error != null) ...[
           SizedBox(height: UiTokens.space(1)),
-          Text(error!, style: TextStyle(color: UiTokens.colorDanger, fontSize: 12)),
+          Text(error!, style: TextStyle(color: context.ui.color.danger, fontSize: 12)),
         ],
       ]),
     );
@@ -79,9 +80,9 @@ class _RadioOptionTile extends StatelessWidget {
           SizedBox(width: UiTokens.space(2)),
           Flexible(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Text(option.label, style: TextStyle(color: enabled ? UiTokens.colorText : UiTokens.colorMuted)),
+              Text(option.label, style: TextStyle(color: enabled ? context.ui.color.text : context.ui.color.muted)),
               if (option.description != null)
-                Text(option.description!, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+                Text(option.description!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
             ]),
           ),
         ]),

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface MenuItem { value: string; label: string; icon?: string; danger?: boolean; disabled?: boolean }
 
@@ -81,7 +81,7 @@ export function Menu({ label, items, align = 'start', onSelect, children }: Menu
           style={{
             position: 'absolute', top: '100%', marginTop: sp(1), zIndex: 1000, minWidth: 160,
             [align === 'start' ? 'left' : 'right']: 0,
-            background: tokens.color.surface, borderRadius: tokens.radius.md, boxShadow: '0 4px 16px rgba(15, 23, 42, 0.15)',
+            background: tokens.color.surface, borderRadius: tokens.radius.md, boxShadow: `0 4px 16px ${alpha(tokens.color.shadow, 0.15)}`,
             padding: sp(1), fontFamily: font('body'), boxSizing: 'border-box',
           }}
         >

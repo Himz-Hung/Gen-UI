@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiImageViewerImage {
@@ -85,7 +86,7 @@ class _UiImageViewerState extends State<UiImageViewer> {
           label: widget.label,
           child: Material(
             // Dark backdrop covering the whole screen.
-            color: UiTokens.colorText.withValues(alpha: 0.94),
+            color: context.ui.color.scrim.withValues(alpha: 0.94),
             child: SafeArea(
               child: Stack(children: [
                 // Swipe down to close; swipe sideways (when not zoomed) to switch images.
@@ -107,17 +108,17 @@ class _UiImageViewerState extends State<UiImageViewer> {
                 PositionedDirectional(
                   top: UiTokens.space(3),
                   end: UiTokens.space(3),
-                  child: IconButton(icon: const Icon(Icons.close, color: UiTokens.colorSurface), tooltip: 'Close', onPressed: widget.onClose),
+                  child: IconButton(icon: Icon(Icons.close, color: context.ui.color.onScrim), tooltip: 'Close', onPressed: widget.onClose),
                 ),
                 if (many) ...[
                   Positioned(
                     top: UiTokens.space(4),
                     left: 0,
                     right: 0,
-                    child: Center(child: Text('${_clamped + 1} / ${widget.images.length}', style: const TextStyle(color: UiTokens.colorSurface, fontWeight: FontWeight.w600))),
+                    child: Center(child: Text('${_clamped + 1} / ${widget.images.length}', style: TextStyle(color: context.ui.color.onScrim, fontWeight: FontWeight.w600))),
                   ),
-                  PositionedDirectional(start: UiTokens.space(2), top: 0, bottom: 0, child: Center(child: IconButton(icon: const Icon(Icons.chevron_left, color: UiTokens.colorSurface, size: 32), tooltip: 'Previous image', onPressed: _clamped > 0 ? () => _go(-1) : null))),
-                  PositionedDirectional(end: UiTokens.space(2), top: 0, bottom: 0, child: Center(child: IconButton(icon: const Icon(Icons.chevron_right, color: UiTokens.colorSurface, size: 32), tooltip: 'Next image', onPressed: _clamped < widget.images.length - 1 ? () => _go(1) : null))),
+                  PositionedDirectional(start: UiTokens.space(2), top: 0, bottom: 0, child: Center(child: IconButton(icon: Icon(Icons.chevron_left, color: context.ui.color.onScrim, size: 32), tooltip: 'Previous image', onPressed: _clamped > 0 ? () => _go(-1) : null))),
+                  PositionedDirectional(end: UiTokens.space(2), top: 0, bottom: 0, child: Center(child: IconButton(icon: Icon(Icons.chevron_right, color: context.ui.color.onScrim, size: 32), tooltip: 'Next image', onPressed: _clamped < widget.images.length - 1 ? () => _go(1) : null))),
                 ],
               ]),
             ),
@@ -169,7 +170,7 @@ class _ZoomableImageState extends State<_ZoomableImage> {
             child: Image.network(
               widget.image.src,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stack) => const Icon(Icons.broken_image_outlined, color: UiTokens.colorSurface, size: 48),
+              errorBuilder: (context, error, stack) => Icon(Icons.broken_image_outlined, color: context.ui.color.onScrim, size: 48),
             ),
           ),
         ),

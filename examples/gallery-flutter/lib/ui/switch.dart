@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiSwitch extends StatelessWidget {
@@ -26,9 +27,9 @@ class UiSwitch extends StatelessWidget {
             // Label leads, switch trails; pressing the label toggles it too.
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text(label, style: TextStyle(color: enabled ? UiTokens.colorText : UiTokens.colorMuted, fontWeight: FontWeight.w600)),
+                Text(label, style: TextStyle(color: enabled ? context.ui.color.text : context.ui.color.muted, fontWeight: FontWeight.w600)),
                 if (description != null)
-                  Text(description!, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+                  Text(description!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
               ]),
             ),
             SizedBox(width: UiTokens.space(3)),
@@ -39,7 +40,7 @@ class UiSwitch extends StatelessWidget {
                 child: Switch(
                   value: checked,
                   onChanged: enabled ? (v) => onChange?.call(v) : null,
-                  activeTrackColor: UiTokens.colorPrimary,
+                  activeTrackColor: context.ui.color.primary,
                 ),
               ),
             ),

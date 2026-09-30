@@ -10,7 +10,7 @@ export function Card({ padding = '4', pressable = false, selected = false, onPre
   return (
     <div role={pressable ? 'button' : undefined} tabIndex={pressable ? 0 : undefined}
       onClick={fire} onKeyDown={(e) => { if (pressable && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); fire(e); } }}
-      style={{ background: tokens.color.surface, border: `1px solid ${selected ? tokens.color.primary : '#E5E7EB'}`, borderRadius: tokens.radius.lg, padding: sp(padding), cursor: pressable ? 'pointer' : undefined, height: '100%', boxSizing: 'border-box' }}>
+      style={{ background: tokens.color.surface, border: `1px solid ${selected ? tokens.color.primary : tokens.color.border}`, borderRadius: tokens.radius.lg, padding: sp(padding), cursor: pressable ? 'pointer' : undefined, height: '100%', boxSizing: 'border-box' }}>
       {children}
     </div>
   );

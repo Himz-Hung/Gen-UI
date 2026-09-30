@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiBarChartBar {
@@ -30,7 +31,7 @@ class UiBarChart extends StatelessWidget {
       label: summary,
       child: _isEmpty
           // empty shows the summary text in place of the plot.
-          ? SizedBox(height: height, child: Center(child: Text(summary, style: const TextStyle(color: UiTokens.colorMuted), textAlign: TextAlign.center)))
+          ? SizedBox(height: height, child: Center(child: Text(summary, style: TextStyle(color: context.ui.color.muted), textAlign: TextAlign.center)))
           : SizedBox(
               height: height,
               child: orientation == UiBarChartOrientation.vertical ? _VerticalBars(bars: bars, showValues: showValues, onBarPress: onBarPress) : _HorizontalBars(bars: bars, showValues: showValues, onBarPress: onBarPress),
@@ -57,7 +58,7 @@ class _VerticalBars extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: UiTokens.space(1)),
               child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                if (showValues && bars[i].valueLabel != null) Text(bars[i].valueLabel!, style: const TextStyle(fontSize: 11, color: UiTokens.colorText)),
+                if (showValues && bars[i].valueLabel != null) Text(bars[i].valueLabel!, style: TextStyle(fontSize: 11, color: context.ui.color.text)),
                 Expanded(
                   child: GestureDetector(
                     onTap: () => onBarPress?.call(i),
@@ -68,7 +69,7 @@ class _VerticalBars extends StatelessWidget {
                       heightFactor: (bars[i].value / safeMax).clamp(0.0, 1.0),
                       child: Container(
                         constraints: const BoxConstraints(minHeight: 2),
-                        decoration: BoxDecoration(color: UiTokens.colorPrimary, borderRadius: BorderRadius.vertical(top: Radius.circular(UiTokens.radiusSm))),
+                        decoration: BoxDecoration(color: context.ui.color.primary, borderRadius: BorderRadius.vertical(top: Radius.circular(UiTokens.radiusSm))),
                       ),
                     ),
                   ),
@@ -77,7 +78,7 @@ class _VerticalBars extends StatelessWidget {
                 // Labels never overlap: they truncate with the full text on hover (tooltip).
                 Tooltip(
                   message: bars[i].label,
-                  child: Text(bars[i].label, style: const TextStyle(fontSize: 11, color: UiTokens.colorMuted), overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center),
+                  child: Text(bars[i].label, style: TextStyle(fontSize: 11, color: context.ui.color.muted), overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center),
                 ),
               ]),
             ),
@@ -107,7 +108,7 @@ class _HorizontalBars extends StatelessWidget {
               width: 72,
               child: Tooltip(
                 message: bars[i].label,
-                child: Text(bars[i].label, style: const TextStyle(fontSize: 11, color: UiTokens.colorMuted), overflow: TextOverflow.ellipsis, maxLines: 1),
+                child: Text(bars[i].label, style: TextStyle(fontSize: 11, color: context.ui.color.muted), overflow: TextOverflow.ellipsis, maxLines: 1),
               ),
             ),
             Expanded(
@@ -120,7 +121,7 @@ class _HorizontalBars extends StatelessWidget {
                     child: Container(
                       height: 18,
                       constraints: const BoxConstraints(minWidth: 2),
-                      decoration: BoxDecoration(color: UiTokens.colorPrimary, borderRadius: BorderRadius.horizontal(right: Radius.circular(UiTokens.radiusSm))),
+                      decoration: BoxDecoration(color: context.ui.color.primary, borderRadius: BorderRadius.horizontal(right: Radius.circular(UiTokens.radiusSm))),
                     ),
                   ),
                 ),
@@ -128,7 +129,7 @@ class _HorizontalBars extends StatelessWidget {
             ),
             if (showValues && bars[i].valueLabel != null) ...[
               SizedBox(width: UiTokens.space(1)),
-              Text(bars[i].valueLabel!, style: const TextStyle(fontSize: 11, color: UiTokens.colorText)),
+              Text(bars[i].valueLabel!, style: TextStyle(fontSize: 11, color: context.ui.color.text)),
             ],
           ]),
         );

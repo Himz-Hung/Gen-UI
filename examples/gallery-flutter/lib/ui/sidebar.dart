@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiSidebarItem {
@@ -44,7 +45,7 @@ class UiSidebar extends StatelessWidget {
       container: true,
       child: Container(
         width: collapsed ? 64 : 240,
-        color: UiTokens.colorSurface,
+        color: context.ui.color.surface,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -52,7 +53,7 @@ class UiSidebar extends StatelessWidget {
             if (title != null && !collapsed)
               Padding(
                 padding: EdgeInsets.fromLTRB(UiTokens.space(4), UiTokens.space(4), UiTokens.space(4), UiTokens.space(2)),
-                child: Text(title!, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w700, fontSize: 16)),
+                child: Text(title!, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             if (onToggle != null)
               Align(
@@ -69,36 +70,36 @@ class UiSidebar extends StatelessWidget {
                   ),
                 ),
               ),
-            for (final g in _groups) ..._section(g.key, g.value),
+            for (final g in _groups) ..._section(context, g.key, g.value),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _section(String? section, List<UiSidebarItem> items) {
+  List<Widget> _section(BuildContext context, String? section, List<UiSidebarItem> items) {
     return [
       if (section != null && !collapsed)
         Padding(
           padding: EdgeInsets.fromLTRB(UiTokens.space(4), UiTokens.space(4), UiTokens.space(4), UiTokens.space(1)),
-          child: Text(section, style: TextStyle(color: UiTokens.colorMuted, fontWeight: FontWeight.w600, fontSize: 12)),
+          child: Text(section, style: TextStyle(color: context.ui.color.muted, fontWeight: FontWeight.w600, fontSize: 12)),
         ),
-      for (final item in items) _item(item),
+      for (final item in items) _item(context, item),
     ];
   }
 
-  Widget _item(UiSidebarItem item) {
+  Widget _item(BuildContext context, UiSidebarItem item) {
     final selected = item.value == value;
-    final icon = item.icon == null ? null : Icon(uiIconData(item.icon!), size: 20, color: selected ? UiTokens.colorPrimary : UiTokens.colorMuted);
+    final icon = item.icon == null ? null : Icon(uiIconData(item.icon!), size: 20, color: selected ? context.ui.color.primary : context.ui.color.muted);
     // Collapsed: badges become a dot instead of the text.
     final badgeDot = item.badge == null || !collapsed
         ? null
-        : Container(width: 8, height: 8, decoration: const BoxDecoration(color: UiTokens.colorDanger, shape: BoxShape.circle));
+        : Container(width: 8, height: 8, decoration: BoxDecoration(color: context.ui.color.danger, shape: BoxShape.circle));
 
     final row = SizedBox(
       height: 40,
       child: Material(
-        color: selected ? UiTokens.colorPrimary.withValues(alpha: 0.08) : Colors.transparent,
+        color: selected ? context.ui.color.primary.withValues(alpha: 0.08) : Colors.transparent,
         child: InkWell(
           onTap: () => onChange?.call(item.value),
           child: Padding(
@@ -117,7 +118,7 @@ class UiSidebar extends StatelessWidget {
                       item.label,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: selected ? UiTokens.colorPrimary : UiTokens.colorText,
+                        color: selected ? context.ui.color.primary : context.ui.color.text,
                         fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                       ),
                     ),
@@ -126,8 +127,8 @@ class UiSidebar extends StatelessWidget {
                   if (item.badge != null)
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: UiTokens.space(2)),
-                      decoration: BoxDecoration(color: UiTokens.colorMuted.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(UiTokens.radiusFull)),
-                      child: Text(item.badge!, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+                      decoration: BoxDecoration(color: context.ui.color.muted.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(UiTokens.radiusFull)),
+                      child: Text(item.badge!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
                     ),
                 ],
               ],

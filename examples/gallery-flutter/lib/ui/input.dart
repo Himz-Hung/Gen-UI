@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiInputType { text, email, password, number, tel }
@@ -76,8 +77,8 @@ class _UiInputState extends State<UiInput> {
     // MergeSemantics: the visible label becomes the field's accessible name (one node: label + field)
     return MergeSemantics(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       // Label always visible above the field; required shows a marker.
-      Text.rich(TextSpan(text: widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600), children: [
-        if (widget.required) TextSpan(text: ' *', style: TextStyle(color: UiTokens.colorDanger)),
+      Text.rich(TextSpan(text: widget.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600), children: [
+        if (widget.required) TextSpan(text: ' *', style: TextStyle(color: context.ui.color.danger)),
       ])),
       SizedBox(height: UiTokens.space(1)),
       SizedBox(
@@ -100,7 +101,7 @@ class _UiInputState extends State<UiInput> {
               helperText: widget.error == null ? widget.hint : null,
               contentPadding: EdgeInsets.symmetric(horizontal: UiTokens.space(3)),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
-              errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd), borderSide: BorderSide(color: UiTokens.colorDanger)),
+              errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd), borderSide: BorderSide(color: context.ui.color.danger)),
             ),
           ),
         ),

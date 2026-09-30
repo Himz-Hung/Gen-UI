@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 enum UiRatingSize { sm, md, lg }
 
@@ -20,7 +20,7 @@ class UiRating extends StatelessWidget {
   Widget build(BuildContext context) {
     final maxStars = max;
     // Filled stars use tokens.color.warning; empty stars are outlined.
-    final filledColor = UiTokens.colorWarning;
+    final filledColor = context.ui.color.warning;
     if (readOnly) {
       final rounded = (value.clamp(0, max) * 2).round() / 2;
       return Semantics(
@@ -36,7 +36,7 @@ class UiRating extends StatelessWidget {
       label: label,
       container: true,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+        Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
         Row(mainAxisSize: MainAxisSize.min, children: [
           for (var i = 1; i <= maxStars; i++)
             Semantics(

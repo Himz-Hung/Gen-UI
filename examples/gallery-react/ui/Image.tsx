@@ -5,7 +5,7 @@ export function Image({ src, alt, ratio = '5:7', fit = 'contain', radius = 'md' 
   const [state, setState] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [w, h] = ratio.split(':').map(Number);
   return (
-    <div style={{ aspectRatio: `${w} / ${h}`, background: '#F3F4F6', borderRadius: radius === 'none' ? 0 : tokens.radius[radius], overflow: 'hidden', display: 'grid', placeItems: 'center' }}>
+    <div style={{ aspectRatio: `${w} / ${h}`, background: tokens.color.surfaceAlt, borderRadius: radius === 'none' ? 0 : tokens.radius[radius], overflow: 'hidden', display: 'grid', placeItems: 'center' }}>
       {state !== 'error' && <img src={src} alt={alt} loading="lazy" onLoad={() => setState('loaded')} onError={() => setState('error')} style={{ width: '100%', height: '100%', objectFit: fit, opacity: state === 'loaded' ? 1 : 0 }} />}
       {/* the alt stays the accessible name while loading (transparent, not display:none) and after an error */}
       {state === 'error' && <span role="img" aria-label={alt} data-icon="image-off" />}

@@ -1,6 +1,7 @@
 import 'dart:ui' show SemanticsInputType;
 
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiSearchBox extends StatefulWidget {
@@ -65,9 +66,9 @@ class _UiSearchBoxState extends State<UiSearchBox> {
             prefixIcon: widget.loading
                 ? Padding(
                     padding: EdgeInsets.all(UiTokens.space(3)),
-                    child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: UiTokens.colorPrimary)),
+                    child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: context.ui.color.primary)),
                   )
-                : Icon(Icons.search, color: UiTokens.colorMuted),
+                : Icon(Icons.search, color: context.ui.color.muted),
             // Clear control is visible only when value is non-empty.
             suffixIcon: _controller.text.isEmpty
                 ? null

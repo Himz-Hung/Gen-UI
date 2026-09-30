@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiVideoRatio { v16x9, v4x3, v1x1, v9x16 }
@@ -48,10 +49,10 @@ class _UiVideoState extends State<UiVideo> {
     Widget body;
     if (_state == _PlayState.error) {
       body = ColoredBox(
-        color: UiTokens.colorMuted.withValues(alpha: 0.12),
+        color: context.ui.color.muted.withValues(alpha: 0.12),
         child: Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.error_outline, color: UiTokens.colorMuted),
+            Icon(Icons.error_outline, color: context.ui.color.muted),
             SizedBox(height: UiTokens.space(2)),
             TextButton(onPressed: _retry, child: const Text('Retry')),
           ]),
@@ -62,7 +63,7 @@ class _UiVideoState extends State<UiVideo> {
       body = Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: UiTokens.colorMuted.withValues(alpha: 0.12)),
+          ColoredBox(color: context.ui.color.muted.withValues(alpha: 0.12)),
           if (poster != null && poster.isNotEmpty)
             Image.network(
               poster,
@@ -75,7 +76,7 @@ class _UiVideoState extends State<UiVideo> {
             Center(
               child: IconButton(
                 iconSize: 40,
-                icon: Icon(effectivelyPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: UiTokens.colorSurface),
+                icon: Icon(effectivelyPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: context.ui.color.surface),
                 tooltip: effectivelyPlaying ? 'Pause' : 'Play',
                 onPressed: _togglePlay,
               ),

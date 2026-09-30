@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 class UiList extends StatelessWidget {
   const UiList({super.key, this.dense = false, this.children = const []});
@@ -10,7 +10,7 @@ class UiList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Rows separated by a 1px divider; no divider after the last row.
-    final divider = Divider(height: 1, thickness: 1, color: UiTokens.colorMuted.withValues(alpha: 0.2));
+    final divider = Divider(height: 1, thickness: 1, color: context.ui.color.muted.withValues(alpha: 0.2));
     final rows = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       rows.add(children[i]);

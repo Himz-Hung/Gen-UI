@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
-import { tokens, sp } from './tokens';
+import { tokens, sp, alpha } from './tokens';
 import { Icon } from './Icon';
 
 export interface ImageViewerProps {
@@ -73,7 +73,7 @@ export function ImageViewer({ open, label, images, index = 0, onClose, onChange 
       onPointerUp={onPointerUp}
       style={{
         position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `${tokens.color.text}F0`,
+        background: alpha(tokens.color.scrim, 0.94),
       }}
     >
       <button
@@ -81,12 +81,12 @@ export function ImageViewer({ open, label, images, index = 0, onClose, onChange 
         type="button"
         aria-label="Close"
         onClick={onClose}
-        style={{ position: 'absolute', top: sp(3), right: sp(3), background: 'none', border: 0, color: tokens.color.surface, cursor: 'pointer' }}
+        style={{ position: 'absolute', top: sp(3), right: sp(3), background: 'none', border: 0, color: tokens.color.onScrim, cursor: 'pointer' }}
       >
         <Icon name="close" color="inherit" size="lg" />
       </button>
       {count > 1 && (
-        <div aria-hidden style={{ position: 'absolute', top: sp(4), left: 0, right: 0, textAlign: 'center', color: tokens.color.surface, fontWeight: 600 }}>
+        <div aria-hidden style={{ position: 'absolute', top: sp(4), left: 0, right: 0, textAlign: 'center', color: tokens.color.onScrim, fontWeight: 600 }}>
           {clamped + 1} / {count}
         </div>
       )}
@@ -103,7 +103,7 @@ export function ImageViewer({ open, label, images, index = 0, onClose, onChange 
             aria-label="Previous image"
             disabled={clamped === 0}
             onClick={() => go(-1)}
-            style={{ position: 'absolute', left: sp(2), top: '50%', transform: 'translateY(-50%)', background: 'none', border: 0, color: tokens.color.surface, cursor: 'pointer' }}
+            style={{ position: 'absolute', left: sp(2), top: '50%', transform: 'translateY(-50%)', background: 'none', border: 0, color: tokens.color.onScrim, cursor: 'pointer' }}
           >
             <Icon name="chevron-left" color="inherit" size="lg" />
           </button>
@@ -112,7 +112,7 @@ export function ImageViewer({ open, label, images, index = 0, onClose, onChange 
             aria-label="Next image"
             disabled={clamped === count - 1}
             onClick={() => go(1)}
-            style={{ position: 'absolute', right: sp(2), top: '50%', transform: 'translateY(-50%)', background: 'none', border: 0, color: tokens.color.surface, cursor: 'pointer' }}
+            style={{ position: 'absolute', right: sp(2), top: '50%', transform: 'translateY(-50%)', background: 'none', border: 0, color: tokens.color.onScrim, cursor: 'pointer' }}
           >
             <Icon name="chevron-right" color="inherit" size="lg" />
           </button>

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiChipGroupOption {
@@ -40,7 +41,7 @@ class UiChipGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     final chips = [
       for (final o in options)
-        _chip(o, value.contains(o.value)),
+        _chip(context, o, value.contains(o.value)),
     ];
     return Semantics(
       container: true,
@@ -54,7 +55,7 @@ class UiChipGroup extends StatelessWidget {
     );
   }
 
-  Widget _chip(UiChipGroupOption o, bool selected) {
+  Widget _chip(BuildContext context, UiChipGroupOption o, bool selected) {
     final enabled = o.disabled != true;
     return SizedBox(
       height: _height,
@@ -66,9 +67,9 @@ class UiChipGroup extends StatelessWidget {
         label: Text(o.label),
         visualDensity: VisualDensity.compact,
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        shape: StadiumBorder(side: BorderSide(color: selected ? UiTokens.colorPrimary : UiTokens.colorMuted.withValues(alpha: 0.3))),
-        selectedColor: UiTokens.colorPrimary.withValues(alpha: 0.15),
-        checkmarkColor: UiTokens.colorPrimary,
+        shape: StadiumBorder(side: BorderSide(color: selected ? context.ui.color.primary : context.ui.color.muted.withValues(alpha: 0.3))),
+        selectedColor: context.ui.color.primary.withValues(alpha: 0.15),
+        checkmarkColor: context.ui.color.primary,
         onSelected: enabled ? (_) => _toggle(o) : null,
       ),
     );

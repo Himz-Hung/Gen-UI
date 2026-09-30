@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiComboboxOption {
@@ -69,7 +70,7 @@ class _UiComboboxState extends State<UiCombobox> {
   Widget build(BuildContext context) {
     final showList = _open && !widget.disabled && (widget.options.isNotEmpty || widget.loading || (widget.query.isNotEmpty && widget.emptyText != null));
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text(widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(widget.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       Semantics(
         // comboBox role assertions are not implemented by this Flutter
@@ -98,14 +99,14 @@ class _UiComboboxState extends State<UiCombobox> {
           margin: EdgeInsets.only(top: UiTokens.space(1)),
           constraints: const BoxConstraints(maxHeight: 240),
           decoration: BoxDecoration(
-            border: Border.all(color: UiTokens.colorMuted.withValues(alpha: 0.3)),
+            border: Border.all(color: context.ui.color.muted.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(UiTokens.radiusMd),
           ),
           child: widget.loading
               ? Padding(
                   padding: EdgeInsets.all(UiTokens.space(3)),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: UiTokens.colorPrimary)),
+                    SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: context.ui.color.primary)),
                     SizedBox(width: UiTokens.space(2)),
                     const Text('Loading…'),
                   ]),
@@ -113,7 +114,7 @@ class _UiComboboxState extends State<UiCombobox> {
               : widget.options.isEmpty
                   ? Padding(
                       padding: EdgeInsets.all(UiTokens.space(3)),
-                      child: Text(widget.emptyText ?? '', style: TextStyle(color: UiTokens.colorMuted)),
+                      child: Text(widget.emptyText ?? '', style: TextStyle(color: context.ui.color.muted)),
                     )
                   : Column(
                       mainAxisSize: MainAxisSize.min,
@@ -126,7 +127,7 @@ class _UiComboboxState extends State<UiCombobox> {
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                                 Text(o.label),
                                 if (o.description != null)
-                                  Text(o.description!, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+                                  Text(o.description!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
                               ]),
                             ),
                           ),

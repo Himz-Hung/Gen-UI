@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiBadgeTone { neutral, primary, success, warning, danger }
@@ -9,18 +10,18 @@ class UiBadge extends StatelessWidget {
   final String label;
   final UiBadgeTone tone;
 
-  Color get _color => switch (tone) {
-        UiBadgeTone.neutral => UiTokens.colorSecondary,
-        UiBadgeTone.primary => UiTokens.colorPrimary,
-        UiBadgeTone.success => UiTokens.colorSuccess,
-        UiBadgeTone.warning => UiTokens.colorWarning,
-        UiBadgeTone.danger => UiTokens.colorDanger,
+  Color _color(BuildContext context) => switch (tone) {
+        UiBadgeTone.neutral => context.ui.color.secondary,
+        UiBadgeTone.primary => context.ui.color.primary,
+        UiBadgeTone.success => context.ui.color.success,
+        UiBadgeTone.warning => context.ui.color.warning,
+        UiBadgeTone.danger => context.ui.color.danger,
       };
 
   @override
   Widget build(BuildContext context) {
     // Tone is conveyed by both color and the label text itself, never color alone.
-    final color = _color;
+    final color = _color(context);
     return Semantics(
       label: label,
       excludeSemantics: true,

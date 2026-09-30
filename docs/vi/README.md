@@ -372,6 +372,16 @@ kết đó vẫn là chữ trong `rules` / `a11y`. React không có trình duy�
 `fw add` đọc được component React (kể cả bọc MUI, shadcn `forwardRef`) và widget Flutter; prop kế thừa từ thư viện chỉ được liệt kê, bạn chọn cái nào đưa vào contract. `screenDirs` / `freeformDirs` trong `project.ts` quyết định thư mục nào áp luật màn (landing page để ở `freeformDirs`). Chưa có `defineShell`, `defineSources`, MCP. `--create flutter` đã thử; `--create vite/next` chưa. Bản 1.3.0 (check hành vi, core build sẵn ra JS) sau 1.2.0 (React và Flutter, 76 contract).
 Hứa nhất quán **trong một project**, không hứa hai project ra code giống nhau.
 
+## 10a. Theme (sáng / tối và các mode khác)
+
+Token có 3 tầng: `primitives` (bảng màu gốc) → `semantic` (vai trò: `primary`, `onPrimary`, `surface`, `text`, `border`…,
+cùng `space`, `radius`, `size`, `font`) → `modes` (trục bất kỳ: `colorScheme: { light, dark }`, `density`, `brand`…; mỗi mode
+chỉ ghi phần khác). `fw` sinh `ui/tokens.css` + `ui/tokens.g.ts` (web: biến CSS, `setMode({ colorScheme: 'dark' })`) và
+`lib/ui/theme.g.dart` (Flutter: `context.ui.color.x`, `uiTheme(colorScheme: …)`). `fw check` kiểm tham chiếu và **độ tương
+phản WCAG ở mọi tổ hợp mode**; `fw verify` cấm màu viết cứng trong `ui/` và kiểm `tokenColor` theo từng mode trên Flutter.
+Xuất / nhập JSON chuẩn W3C (`toDesignTokens` / `fromDesignTokens`) cho Figma / Style Dictionary. Chi tiết: mục **Theming**
+của README gốc; nâng cấp từ 1.x: CHANGELOG 2.0.0.
+
 ## 10b. Tương thích package
 
 Một luật cho cả hai nền tảng: **màn hình không được tạo UI lấy từ ngoài `ui/` (`lib/ui/`)**. Hook, lời gọi hàm,

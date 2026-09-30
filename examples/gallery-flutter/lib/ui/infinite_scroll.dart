@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiInfiniteScroll extends StatefulWidget {
@@ -76,7 +77,7 @@ class _UiInfiniteScrollState extends State<UiInfiniteScroll> {
               child: Center(
                 child: Semantics(
                   liveRegion: true,
-                  child: Text(widget.endText!, style: TextStyle(color: UiTokens.colorMuted)),
+                  child: Text(widget.endText!, style: TextStyle(color: context.ui.color.muted)),
                 ),
               ),
             ),

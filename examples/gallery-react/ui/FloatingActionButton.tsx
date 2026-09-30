@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface FloatingActionButtonProps {
   label: string;
@@ -46,7 +46,7 @@ export function FloatingActionButton({ label, icon, extended = false, position =
         borderRadius: tokens.radius.lg,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.6 : 1,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.18)',
+        boxShadow: `0 4px 12px ${alpha(tokens.color.shadow, 0.18)}`,
         zIndex: 40,
         fontFamily: font('body'),
         fontWeight: 600,

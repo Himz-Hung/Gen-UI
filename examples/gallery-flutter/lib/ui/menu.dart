@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiMenuItem {
@@ -35,18 +36,18 @@ class UiMenu extends StatelessWidget {
       // align: which edge of the trigger the menu lines up with.
       style: MenuStyle(
         alignment: align == UiMenuAlign.start ? AlignmentDirectional.bottomStart : AlignmentDirectional.bottomEnd,
-        backgroundColor: const WidgetStatePropertyAll(UiTokens.colorSurface),
+        backgroundColor: WidgetStatePropertyAll(context.ui.color.surface),
         shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd))),
       ),
       menuChildren: [
         for (final item in ordered)
           MenuItemButton(
             // Roles menu / menuitem.
-            leadingIcon: item.icon == null ? null : Icon(uiIconData(item.icon!), size: 18, color: item.danger == true ? UiTokens.colorDanger : null),
+            leadingIcon: item.icon == null ? null : Icon(uiIconData(item.icon!), size: 18, color: item.danger == true ? context.ui.color.danger : null),
             onPressed: item.disabled == true ? null : () => onSelect?.call(item.value),
             child: Text(
               item.label,
-              style: TextStyle(color: item.danger == true ? UiTokens.colorDanger : UiTokens.colorText),
+              style: TextStyle(color: item.danger == true ? context.ui.color.danger : context.ui.color.text),
             ),
           ),
       ],

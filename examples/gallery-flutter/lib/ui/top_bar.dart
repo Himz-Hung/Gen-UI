@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiTopBarAction {
@@ -28,7 +29,7 @@ class UiTopBar extends StatelessWidget {
       child: SizedBox(
         height: 56,
         child: Material(
-          color: UiTokens.colorSurface,
+          color: context.ui.color.surface,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: UiTokens.space(2)),
             child: Row(
@@ -46,7 +47,7 @@ class UiTopBar extends StatelessWidget {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w700, fontSize: 18),
+                    style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w700, fontSize: 18),
                   ),
                 ),
                 for (final a in actions)

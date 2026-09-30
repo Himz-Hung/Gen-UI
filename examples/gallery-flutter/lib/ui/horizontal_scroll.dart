@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiHorizontalScrollGap { v0, v1, v2, v3, v4, v5, v6, v7 }
@@ -81,7 +82,7 @@ class _UiHorizontalScrollState extends State<UiHorizontalScroll> {
   }
 
   Widget _arrow(IconData icon, String name, VoidCallback? onPressed) => Material(
-        color: UiTokens.colorSurface,
+        color: context.ui.color.surface,
         shape: const CircleBorder(),
         elevation: 2,
         child: IconButton(icon: Icon(icon), tooltip: name, onPressed: onPressed),

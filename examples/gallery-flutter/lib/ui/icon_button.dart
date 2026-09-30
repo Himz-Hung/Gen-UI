@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiIconButtonVariant { ghost, secondary }
@@ -32,7 +33,7 @@ class UiIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = disabled ? UiTokens.colorMuted.withValues(alpha: 0.5) : UiTokens.colorText;
+    final fg = disabled ? context.ui.color.muted.withValues(alpha: 0.5) : context.ui.color.text;
     final button = IconButton(
       // Never emits press while disabled.
       onPressed: disabled ? null : onPress,
@@ -44,7 +45,7 @@ class UiIconButton extends StatelessWidget {
       padding: EdgeInsets.zero,
       style: variant == UiIconButtonVariant.secondary
           ? IconButton.styleFrom(
-              backgroundColor: UiTokens.colorMuted.withValues(alpha: 0.1),
+              backgroundColor: context.ui.color.muted.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             )
@@ -65,9 +66,9 @@ class UiIconButton extends StatelessWidget {
                 child: Container(
                   constraints: BoxConstraints(minWidth: badge!.isEmpty ? 8 : 16, minHeight: badge!.isEmpty ? 8 : 16),
                   padding: EdgeInsets.symmetric(horizontal: badge!.isEmpty ? 0 : 4),
-                  decoration: BoxDecoration(color: UiTokens.colorDanger, borderRadius: BorderRadius.circular(UiTokens.radiusFull)),
+                  decoration: BoxDecoration(color: context.ui.color.danger, borderRadius: BorderRadius.circular(UiTokens.radiusFull)),
                   alignment: Alignment.center,
-                  child: badge!.isEmpty ? null : Text(count!, style: const TextStyle(color: UiTokens.colorSurface, fontSize: 10, fontWeight: FontWeight.w700, height: 1.2)),
+                  child: badge!.isEmpty ? null : Text(count!, style: TextStyle(color: context.ui.color.surface, fontSize: 10, fontWeight: FontWeight.w700, height: 1.2)),
                 ),
               ),
             ),

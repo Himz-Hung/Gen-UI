@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'button.dart';
 import 'drawer.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiSiteHeaderLink {
@@ -58,7 +59,7 @@ class _UiSiteHeaderState extends State<UiSiteHeader> {
               Image.network(widget.logo!, height: 28, errorBuilder: (_, _, _) => const SizedBox.shrink()),
               SizedBox(width: UiTokens.space(2)),
             ],
-            Text(widget.brand, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: UiTokens.colorText)),
+            Text(widget.brand, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: context.ui.color.text)),
           ]),
         ),
       );
@@ -77,8 +78,8 @@ class _UiSiteHeaderState extends State<UiSiteHeader> {
           height: 64,
           padding: EdgeInsets.symmetric(horizontal: UiTokens.space(3)),
           alignment: Alignment.center,
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: active ? UiTokens.colorPrimary : const Color(0x00000000), width: 3))),
-          child: Text(l.label, style: TextStyle(fontWeight: active ? FontWeight.w700 : FontWeight.w500, color: UiTokens.colorText)),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: active ? context.ui.color.primary : Colors.transparent, width: 3))),
+          child: Text(l.label, style: TextStyle(fontWeight: active ? FontWeight.w700 : FontWeight.w500, color: context.ui.color.text)),
         ),
       ),
     );
@@ -93,7 +94,7 @@ class _UiSiteHeaderState extends State<UiSiteHeader> {
       final bar = Container(
         height: wide ? 64 : 56,
         padding: EdgeInsets.symmetric(horizontal: UiTokens.space(4)),
-        decoration: BoxDecoration(color: UiTokens.colorSurface, border: Border(bottom: BorderSide(color: UiTokens.colorMuted.withValues(alpha: 0.25)))),
+        decoration: BoxDecoration(color: context.ui.color.surface, border: Border(bottom: BorderSide(color: context.ui.color.muted.withValues(alpha: 0.25)))),
         child: Row(children: [
           _brand(),
           if (wide) ...[

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface SiteFooterProps {
   brand?: string;
@@ -106,7 +106,7 @@ export function SiteFooter({ brand, description, columns = [], social = [], lega
   ) : null;
 
   return (
-    <footer style={{ background: `${tokens.color.muted}14`, padding: sp(wide ? 6 : 4), fontFamily: font('body') }}>
+    <footer style={{ background: alpha(tokens.color.muted, 0.08), padding: sp(wide ? 6 : 4), fontFamily: font('body') }}>
       {wide ? (
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: sp(4) }}>
           {brandBlock && <div style={{ flex: 2 }}>{brandBlock}</div>}
@@ -128,7 +128,7 @@ export function SiteFooter({ brand, description, columns = [], social = [], lega
       )}
       {legal && (
         <>
-          <hr aria-hidden style={{ margin: `${sp(5)} 0 ${sp(2)}`, border: 'none', borderTop: `1px solid ${tokens.color.muted}40` }} />
+          <hr aria-hidden style={{ margin: `${sp(5)} 0 ${sp(2)}`, border: 'none', borderTop: `1px solid ${alpha(tokens.color.muted, 0.25)}` }} />
           <div style={{ color: tokens.color.muted, fontSize: 12 }}>{legal}</div>
         </>
       )}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiCarousel extends StatefulWidget {
@@ -110,7 +111,7 @@ class _UiCarouselState extends State<UiCarousel> {
                     height: 8,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: i == _clampedIndex ? UiTokens.colorPrimary : UiTokens.colorMuted.withValues(alpha: 0.3),
+                      color: i == _clampedIndex ? context.ui.color.primary : context.ui.color.muted.withValues(alpha: 0.3),
                     ),
                   ),
                 ),

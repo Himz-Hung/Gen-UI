@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiTableColumn {
@@ -41,7 +42,7 @@ class UiTable extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(UiTokens.space(5)),
           child: Center(
-            child: Text(emptyText ?? '', style: const TextStyle(color: UiTokens.colorMuted)),
+            child: Text(emptyText ?? '', style: TextStyle(color: context.ui.color.muted)),
           ),
         ),
       );
@@ -75,7 +76,7 @@ class UiTable extends StatelessWidget {
                 for (var n = 0; n < 3; n++)
                   DataRow(cells: [
                     for (var i = 0; i < columns.length; i++)
-                      DataCell(ExcludeSemantics(child: Container(width: 64, height: 12, decoration: BoxDecoration(color: UiTokens.colorMuted.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(UiTokens.radiusSm))))),
+                      DataCell(ExcludeSemantics(child: Container(width: 64, height: 12, decoration: BoxDecoration(color: context.ui.color.muted.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(UiTokens.radiusSm))))),
                   ]),
               ]
             : [

@@ -19,6 +19,11 @@ flutter run -d chrome     # the gallery Home screen
 Twelve components were written by hand (the templates Button, Image, Select, Card, and FloatingActionButton, HorizontalScroll, ImageViewer, RichText, DateRangePicker, AvailabilityCalendar, SiteHeader, SiteFooter); the rest were written
 by coding agents from `fw docs`, then checked by `fw verify`, `flutter analyze` and the tests.
 
+## Theming
+
+`ui-spec/project.ts` defines a light and a dark color scheme (identical in both galleries). The gallery has a light / system / dark switch in the app bar (`lib/main.dart`: `theme` / `darkTheme` / `themeMode` from `lib/ui/theme.g.dart`); every component reads `context.ui`, and `test/theme/theme_test.dart` checks both modes.
+`fw check` verifies the contrast of every text / background pair in both schemes.
+
 ## Behavioural checks
 
 `fw verify` runs the `checks` of the 53 contracts that have them (124 checks), including the layout ones React

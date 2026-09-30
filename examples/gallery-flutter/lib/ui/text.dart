@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiTextSize { xs, sm, md, lg }
@@ -32,11 +33,11 @@ class UiText extends StatelessWidget {
         UiTextWeight.bold => FontWeight.w700,
       };
 
-  Color get _color => switch (color) {
-        UiTextColor.text => UiTokens.colorText,
-        UiTextColor.muted => UiTokens.colorMuted,
-        UiTextColor.primary => UiTokens.colorPrimary,
-        UiTextColor.danger => UiTokens.colorDanger,
+  Color _color(BuildContext context) => switch (color) {
+        UiTextColor.text => context.ui.color.text,
+        UiTextColor.muted => context.ui.color.muted,
+        UiTextColor.primary => context.ui.color.primary,
+        UiTextColor.danger => context.ui.color.danger,
       };
 
   TextAlign get _textAlign => switch (align) {
@@ -56,7 +57,7 @@ class UiText extends StatelessWidget {
       overflow: truncate ? TextOverflow.ellipsis : TextOverflow.clip,
       softWrap: !truncate,
       semanticsLabel: value,
-      style: TextStyle(fontFamily: UiTokens.fontBody, fontSize: _fontSize, fontWeight: _fontWeight, color: _color),
+      style: TextStyle(fontFamily: UiTokens.fontBody, fontSize: _fontSize, fontWeight: _fontWeight, color: _color(context)),
     );
   }
 }

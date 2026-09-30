@@ -1,4 +1,6 @@
 import type { ProjectConfig } from './define.ts';
+import { normalizeTokens, resolveTheme, type ModeSelection } from './theme.ts';
+import { cssVar, tokensCss } from './webtokens.ts';
 
 /**
  * ui-spec/project.ts tokens, shaped for the styling library a project already uses, so there is one source:
@@ -6,37 +8,31 @@ import type { ProjectConfig } from './define.ts';
  * Browser-safe and dependency-free (plain objects, no Tailwind or MUI types).
  */
 type Tokens = ProjectConfig['tokens'];
+/** Default-mode values in the 1.x shape these helpers were written for (rewritten in the theming work, phase 2). */
 const px = (n: number) => `${n}px`;
 const stack = (f: string) => `${f}, system-ui, sans-serif`;
 const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
-/** `:root { --ui-color-primary: …; --ui-space-4: 16px; --ui-radius-md: 8px; --ui-font-body: …; }` */
-export function cssVariables(project: { tokens: Tokens }, prefix = '--ui'): string {
-  const t = project.tokens;
-  const lines = [
-    ...Object.entries(t.color).map(([k, v]) => `${prefix}-color-${kebab(k)}: ${v};`),
-    ...t.spacing.map((v, i) => `${prefix}-space-${i}: ${px(v)};`),
-    ...Object.entries(t.radius).map(([k, v]) => `${prefix}-radius-${kebab(k)}: ${px(v)};`),
-    ...Object.entries(t.font).map(([k, v]) => `${prefix}-font-${kebab(k)}: ${stack(v)};`),
-    ...Object.entries(t.size ?? {}).map(([k, v]) => `${prefix}-size-${kebab(k)}: ${px(v)};`),
-  ];
-  return `:root {\n${lines.map((l) => `  ${l}`).join('\n')}\n}\n`;
+/** The full ui/tokens.css (default mode in :root, one block per mode value, OS dark preference): same as fw writes. */
+export function cssVariables(project: { tokens: Tokens }): string {
+  return tokensCss(project.tokens);
 }
 
 /**
- * A Tailwind preset: `presets: [tailwindPreset(project)]`. Colors and radius extend the theme under their token
- * names (bg-primary, rounded-md); spacing is prefixed (p-ui-4 = tokens.spacing[4]) so Tailwind's own scale stays.
+ * A Tailwind preset: `presets: [tailwindPreset(project)]`. Every value points at the CSS custom properties of
+ * ui/tokens.css, so modes switch Tailwind classes too: bg-primary, text-on-primary, rounded-md, p-ui-4, h-ui-control-md.
  */
 export function tailwindPreset(project: { tokens: Tokens }) {
-  const t = project.tokens;
+  const t = normalizeTokens(project.tokens);
+  const vars = (group: string, o: Record<string, unknown>, key = (k: string) => kebab(k)) => Object.fromEntries(Object.keys(o).map((k) => [key(k), `var(${cssVar(`${group}.${k}`)})`]));
   return {
     theme: {
       extend: {
-        colors: { ...t.color },
-        spacing: Object.fromEntries(t.spacing.map((v, i) => [`ui-${i}`, px(v)])),
-        borderRadius: Object.fromEntries(Object.entries(t.radius).map(([k, v]) => [k, px(v)])),
-        fontFamily: Object.fromEntries(Object.entries(t.font).map(([k, v]) => [k, [v, 'system-ui', 'sans-serif']])),
-        ...(t.size ? { height: Object.fromEntries(Object.entries(t.size).map(([k, v]) => [`ui-${kebab(k)}`, px(v)])) } : {}),
+        colors: vars('color', t.semantic.color),
+        spacing: Object.fromEntries(t.semantic.space.map((_, i) => [`ui-${i}`, `var(${cssVar(`space.${i}`)})`])),
+        borderRadius: vars('radius', t.semantic.radius),
+        fontFamily: Object.fromEntries(Object.keys(t.semantic.font).map((k) => [k, `var(${cssVar(`font.${k}`)})`])),
+        ...(t.semantic.size ? { height: vars('size', t.semantic.size, (k) => `ui-${kebab(k)}`), minHeight: vars('size', t.semantic.size, (k) => `ui-${kebab(k)}`) } : {}),
       },
     },
   };
@@ -47,8 +43,11 @@ export function tailwindPreset(project: { tokens: Tokens }) {
  * error, success when present, surface → background, text / muted → text.primary / secondary; spacing(n) =
  * tokens.spacing[n]; shape.borderRadius = radius.md; typography from font.body / font.heading.
  */
-export function muiTheme(project: { tokens: Tokens }) {
-  const { color: c, spacing, radius, font } = project.tokens;
+export function muiTheme(project: { tokens: Tokens }, mode?: ModeSelection) {
+  // MUI computes with real colors (hover shades, contrast text), so it gets the resolved values of one mode: rebuild the
+  // theme with the new mode when the app switches (createTheme(muiTheme(project, { colorScheme: 'dark' }))).
+  const r = resolveTheme(project.tokens, mode).theme;
+  const { color: c, space: spacing, radius, font } = r;
   const main = (v?: string) => (v ? { main: v } : undefined);
   const palette = Object.fromEntries(Object.entries({
     primary: main(c.primary), secondary: main(c.secondary), error: main(c.danger), success: main(c.success), warning: main(c.warning), info: main(c.info),
@@ -57,7 +56,7 @@ export function muiTheme(project: { tokens: Tokens }) {
   }).filter(([, v]) => v !== undefined));
   const heading = font.heading ? stack(font.heading) : undefined;
   return {
-    palette,
+    palette: { ...palette, ...(mode?.colorScheme === 'dark' ? { mode: 'dark' } : {}) },
     spacing: (n: number) => px(spacing[n] ?? n * 4),
     shape: { borderRadius: radius.md ?? 4 },
     typography: {

@@ -5,6 +5,8 @@ import { dirname, join, relative } from 'node:path';
 import type { Check, CheckActivation, CheckKey, CheckProps, CheckRole, CheckSize, ComponentContract, ProjectConfig } from './define.ts';
 import type { TypeNode } from './types.ts';
 import { checkLiteral } from './types.ts';
+import { modeAxes, resolveTheme } from './theme.ts';
+import { cssVar } from './webtokens.ts';
 import { Report } from './diagnostics.ts';
 import { callbackName, dartClass, enumType, enumValue, itemClass, snake } from './flutter.ts';
 import { dartClasses, dartEnums, maskDart } from './dart.ts';
@@ -57,7 +59,7 @@ export function validateChecks(c: ComponentContract, config: ProjectConfig, r: R
       case 'emits': case 'neverEmits': event(ch.event, 'event'); break;
       case 'key': case 'types': case 'selects': event(ch.emits, 'emits'); break;
       case 'tokenColor':
-        if (!config.tokens.color[ch.token]) r.error(`${at}.token`, `no color token "${ch.token}" in ui-spec/project.ts (${Object.keys(config.tokens.color).join(', ')})`);
+        { const colors = resolveTheme(config.tokens).theme.color; if (!colors[ch.token]) r.error(`${at}.token`, `no semantic color "${ch.token}" in ui-spec/project.ts (${Object.keys(colors).join(', ')})`); }
         if (ch.part && !['background', 'text'].includes(ch.part)) r.error(`${at}.part`, 'part is background or text');
         break;
       case 'role': if (ch.name && typeof ch.name === 'object' && !c.props[ch.name.fromProp]) r.error(`${at}.name.fromProp`, `no prop "${ch.name.fromProp}" in the contract`); break;
@@ -67,7 +69,7 @@ export function validateChecks(c: ComponentContract, config: ProjectConfig, r: R
 
 function resolveSize(s: CheckSize, config: ProjectConfig): number | null {
   if (typeof s === 'number') return s;
-  let v: unknown = config.tokens;
+  let v: unknown = resolveTheme(config.tokens).theme;
   for (const part of s.token.split('.')) v = v && typeof v === 'object' ? (v as Record<string, unknown>)[part] : undefined;
   return typeof v === 'number' ? v : null;
 }
@@ -184,10 +186,13 @@ export function generateReactTest(c: ComponentContract, implFile: string, testPa
       case 'selects':
         return `${itR}(${JSON.stringify(name)}, async () => {\n  const fn = vi.fn();\n  const u = userEvent.setup({ pointerEventsCheck: 0 });\n  const { container } = render(${el(ch.props, callbackName(ch.emits))});\n  const native = container.querySelector('select');\n  if (native) await u.selectOptions(native, screen.getByRole('option', { name: ${JSON.stringify(ch.option)} }));\n  else {\n    await u.click(${ch.open ? `screen.getByText(${JSON.stringify(ch.open)})` : `(first(container).querySelector('[role=combobox], input:not([type=hidden]), select, button') as HTMLElement | null) ?? first(container)`});\n    const options = await screen.findAllByText(${JSON.stringify(ch.option)});\n    await u.click(options[options.length - 1]);\n  }\n  expect(fn).toHaveBeenCalled();\n});`;
       case 'tokenColor': {
-        const hex = config.tokens.color[ch.token] ?? '#000000';
+        const hex = resolveTheme(config.tokens).theme.color[ch.token] || '#000000';
         // native controls (checkbox, radio, range) are painted through accent-color, which jsdom keeps as written
         const props = ch.part === 'text' ? ['color'] : ['backgroundColor', 'accentColor'];
-        return `${itR}(${JSON.stringify(name)}, () => {\n  const { container } = render(${el(ch.props)});\n  const root = first(container);\n  const want = ${JSON.stringify([rgb(hex), hex.toLowerCase()])};\n  const painted = [root, ...Array.from(root.querySelectorAll('*'))].flatMap((e) => { const cs = getComputedStyle(e); return ${JSON.stringify(props)}.map((p) => String(cs[p as keyof CSSStyleDeclaration] ?? '').trim().toLowerCase()); });\n  expect(painted.some((v) => want.includes(v)), ${JSON.stringify(`${props.join(' / ')} ${hex} (color.${ch.token})`)}).toBe(true);\n});`;
+        // with CSS-variable tokens the style names var(--ui-color-x) (jsdom cannot resolve it); 1.x tokens paint the value
+        const cssProps = ch.part === 'text' ? ['color'] : ['background', 'background-color', 'accent-color'];
+        const variable = `var(${cssVar(`color.${ch.token}`)})`;
+        return `${itR}(${JSON.stringify(name)}, () => {\n  const { container } = render(${el(ch.props)});\n  const root = first(container);\n  const nodes = [root, ...Array.from(root.querySelectorAll('*'))];\n  const want = ${JSON.stringify([rgb(hex), hex.toLowerCase()])};\n  const painted = nodes.flatMap((e) => { const cs = getComputedStyle(e); return ${JSON.stringify(props)}.map((p) => String(cs[p as keyof CSSStyleDeclaration] ?? '').trim().toLowerCase()); });\n  const byVariable = nodes.some((e) => (e.getAttribute('style') ?? '').split(';').some((d) => { const i = d.indexOf(':'); return ${JSON.stringify(cssProps)}.includes(d.slice(0, i).trim()) && d.slice(i + 1).includes(${JSON.stringify(variable)}); }));\n  expect(byVariable || painted.some((v) => want.includes(v)), ${JSON.stringify(`${props.join(' / ')} ${variable} or ${hex} (color.${ch.token})`)}).toBe(true);\n});`;
       }
     }
     return '';
@@ -282,11 +287,14 @@ export function generateFlutterTest(c: ComponentContract, pkg: string, config: P
         case 'selects':
           return `    var calls = 0;\n    await tester.pumpWidget(_host(${widget(ch.props, ch.emits)}));\n    await tester.pump();\n${ch.open ? `    await _tapText(tester, ${dstr(ch.open)});` : `    await tester.tap(${shown}, warnIfMissed: false);`}\n    await tester.pumpAndSettle();\n    await tester.tap(find.text(${dstr(ch.option)}, findRichText: true).last, warnIfMissed: false);\n    await tester.pumpAndSettle();\n    expect(calls, greaterThan(0));`;
         case 'tokenColor': {
-          const c = dartColor(config.tokens.color[ch.token] ?? '#000000');
-          const pred = ch.part === 'text'
-            ? `(w) => w is RichText && _spanColored(w.text, c)`
-            : `(w) => _paints(w, c)`;
-          return `    const c = ${c};\n    await tester.pumpWidget(_host(${widget(ch.props)}));\n    await tester.pump();\n    expect(find.descendant(of: ${find}, matching: find.byWidgetPredicate(${pred}), matchRoot: true), findsWidgets, reason: ${dstr(`${ch.part ?? 'background'} ${config.tokens.color[ch.token]} (color.${ch.token})`)});`;
+          // every colorScheme value (the other axes at their default), under the generated uiTheme(...)
+          const schemes = modeAxes(config.tokens).find((a) => a.name === 'colorScheme')?.values ?? [null];
+          return schemes.map((scheme) => {
+            const hex = resolveTheme(config.tokens, scheme ? { colorScheme: scheme } : undefined).theme.color[ch.token] || '#000000';
+            const pred = ch.part === 'text' ? `(w) => w is RichText && _spanColored(w.text, c)` : `(w) => _paints(w, c)`;
+            const theme = scheme ? `uiTheme(colorScheme: UiColorScheme.${enumValue(scheme)})` : 'uiTheme()';
+            return `    {\n      const c = ${dartColor(hex)};\n      await tester.pumpWidget(_host(${widget(ch.props)}, theme: ${theme}));\n      await tester.pumpAndSettle();\n      expect(find.descendant(of: ${find}, matching: find.byWidgetPredicate(${pred}), matchRoot: true), findsWidgets, reason: ${dstr(`${scheme ? `${scheme}: ` : ''}${ch.part ?? 'background'} ${hex} (color.${ch.token})`)});\n    }`;
+          }).join('\n');
         }
         case 'rendersNothing':
           return `    await tester.pumpWidget(_host(${widget(ch.props)}));\n    await tester.pump();\n    await tester.pump();\n    expect(find.descendant(of: ${find}, matching: find.byWidgetPredicate((w) => w is RichText || w is EditableText || w is Image || w is Icon)), findsNothing);\n    final size = tester.getSize(${find});\n    expect(size.width * size.height, 0);`;
@@ -303,11 +311,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:${pkg}/ui/ui.dart';
+import 'package:${pkg}/ui/theme.g.dart';
 
 // warn-level checks run only under fw verify, so a plain \`flutter test\` stays green on them
 const _fwVerify = bool.fromEnvironment('FW_VERIFY');
 
-Widget _host(Widget child) => MaterialApp(home: Scaffold(body: Align(alignment: Alignment.topLeft, child: child)));
+Widget _host(Widget child, {ThemeData? theme}) => MaterialApp(theme: theme, home: Scaffold(body: Align(alignment: Alignment.topLeft, child: child)));
 
 // tap the text itself (reaches a link span inside a longer paragraph); text whose paragraph is not the hit target
 // (a label inside a button) is tapped as a widget instead

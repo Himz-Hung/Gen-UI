@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiNumberInput extends StatefulWidget {
@@ -76,7 +77,7 @@ class _UiNumberInputState extends State<UiNumberInput> {
     final atMin = widget.min != null && widget.value <= widget.min!;
     final atMax = widget.max != null && widget.value >= widget.max!;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text(widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(widget.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       Semantics(
         // spinButton role assertions are not implemented by this Flutter
@@ -147,7 +148,7 @@ class _StepButton extends StatelessWidget {
         onPressed: onPressed,
         style: IconButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
-          side: BorderSide(color: UiTokens.colorMuted.withValues(alpha: 0.3)),
+          side: BorderSide(color: context.ui.color.muted.withValues(alpha: 0.3)),
         ),
       ),
     );

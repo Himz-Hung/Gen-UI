@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiListItem extends StatelessWidget {
@@ -24,15 +25,15 @@ class UiListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(title, overflow: TextOverflow.ellipsis, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w500)),
+                Text(title, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w500)),
                 if (subtitle != null)
-                  Text(subtitle!, overflow: TextOverflow.ellipsis, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 13)),
+                  Text(subtitle!, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.ui.color.muted, fontSize: 13)),
               ],
             ),
           ),
           if (trailing != null) ...[
             SizedBox(width: UiTokens.space(3)),
-            Text(trailing!, style: const TextStyle(color: UiTokens.colorMuted)),
+            Text(trailing!, style: TextStyle(color: context.ui.color.muted)),
           ],
         ]),
       ),

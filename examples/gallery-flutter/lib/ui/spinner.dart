@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiSpinnerSize { sm, md, lg }
@@ -17,7 +18,7 @@ class UiSpinner extends StatelessWidget {
   Widget build(BuildContext context) {
     final indicator = SizedBox.square(
       dimension: _diameter,
-      child: CircularProgressIndicator(strokeWidth: _diameter <= 16 ? 2 : 3, color: UiTokens.colorPrimary),
+      child: CircularProgressIndicator(strokeWidth: _diameter <= 16 ? 2 : 3, color: context.ui.color.primary),
     );
     return Semantics(
       label: label,
@@ -26,7 +27,7 @@ class UiSpinner extends StatelessWidget {
           ? Row(mainAxisSize: MainAxisSize.min, children: [
               indicator,
               SizedBox(width: UiTokens.space(3)),
-              Text(label, style: const TextStyle(color: UiTokens.colorText)),
+              Text(label, style: TextStyle(color: context.ui.color.text)),
             ])
           : ExcludeSemantics(child: indicator),
     );

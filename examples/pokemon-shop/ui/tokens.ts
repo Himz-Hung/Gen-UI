@@ -1,4 +1,2 @@
-import project from '../ui-spec/project';
-export const tokens = project.tokens;
-export const sp = (i: string | number) => `${tokens.spacing[Number(i)] ?? 0}px`;
-export const font = (which: 'body' | 'heading') => `${tokens.font[which]}, system-ui, sans-serif`;
+// Tokens come from the theme model in ui-spec/project.ts, generated into ./tokens.g.ts and ./tokens.css by fw.
+export * from './tokens.g';

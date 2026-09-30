@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiSectionHeaderLevel { v2, v3 }
@@ -17,7 +18,7 @@ class UiSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleStyle = TextStyle(
-      color: UiTokens.colorText,
+      color: context.ui.color.text,
       fontFamily: UiTokens.fontHeading,
       fontWeight: FontWeight.bold,
       fontSize: level == UiSectionHeaderLevel.v2 ? 20 : 17,
@@ -41,7 +42,7 @@ class UiSectionHeader extends StatelessWidget {
                 ),
                 if (description != null) ...[
                   SizedBox(height: UiTokens.space(1)),
-                  Text(description!, style: TextStyle(color: UiTokens.colorMuted, fontFamily: UiTokens.fontBody)),
+                  Text(description!, style: TextStyle(color: context.ui.color.muted, fontFamily: UiTokens.fontBody)),
                 ],
               ],
             ),
@@ -53,7 +54,7 @@ class UiSectionHeader extends StatelessWidget {
               height: 44,
               child: TextButton(
                 onPressed: onAction,
-                style: TextButton.styleFrom(foregroundColor: UiTokens.colorPrimary),
+                style: TextButton.styleFrom(foregroundColor: context.ui.color.primary),
                 child: Text(actionLabel!, style: const TextStyle(decoration: TextDecoration.underline)),
               ),
             ),

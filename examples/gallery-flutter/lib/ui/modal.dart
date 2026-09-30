@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiModalSize { sm, md, lg }
@@ -64,7 +65,7 @@ class _UiModalState extends State<UiModal> {
     final panel = ConstrainedBox(
       constraints: BoxConstraints(maxWidth: _width, maxHeight: MediaQuery.sizeOf(context).height * 0.9),
       child: Material(
-        color: UiTokens.colorSurface,
+        color: context.ui.color.surface,
         borderRadius: BorderRadius.circular(UiTokens.radiusLg),
         clipBehavior: Clip.antiAlias,
         child: Padding(
@@ -72,7 +73,7 @@ class _UiModalState extends State<UiModal> {
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(children: [
               Expanded(
-                child: Text(widget.title, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w700, fontSize: 18)),
+                child: Text(widget.title, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w700, fontSize: 18)),
               ),
               SizedBox(width: UiTokens.space(3)),
               // Always has a visible close control.
@@ -82,7 +83,7 @@ class _UiModalState extends State<UiModal> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(UiTokens.radiusFull),
                   onTap: widget.onClose,
-                  child: Padding(padding: EdgeInsets.all(UiTokens.space(1)), child: const Icon(Icons.close, color: UiTokens.colorMuted)),
+                  child: Padding(padding: EdgeInsets.all(UiTokens.space(1)), child: Icon(Icons.close, color: context.ui.color.muted)),
                 ),
               ),
             ]),
@@ -105,7 +106,7 @@ class _UiModalState extends State<UiModal> {
             behavior: HitTestBehavior.opaque,
             // Backdrop press closes; background content is inert while open.
             onTap: widget.onClose,
-            child: ColoredBox(color: UiTokens.colorText.withValues(alpha: 0.5)),
+            child: ColoredBox(color: context.ui.color.scrim.withValues(alpha: 0.5)),
           ),
         ),
         Positioned.fill(

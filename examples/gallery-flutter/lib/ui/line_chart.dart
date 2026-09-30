@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiLineChartSeries {
@@ -31,12 +32,12 @@ class UiLineChart extends StatelessWidget {
   final ValueChanged<UiLineChartPointPressEvent>? onPointPress;
 
   // Series colors come from the project tokens in a fixed order.
-  static const List<Color> _palette = [
-    UiTokens.colorPrimary,
-    UiTokens.colorSecondary,
-    UiTokens.colorSuccess,
-    UiTokens.colorWarning,
-    UiTokens.colorDanger,
+  static List<Color> _palette(BuildContext context) => [
+    context.ui.color.primary,
+    context.ui.color.secondary,
+    context.ui.color.success,
+    context.ui.color.warning,
+    context.ui.color.danger,
   ];
 
   bool get _isEmpty => series.isEmpty || series.every((s) => s.points.isEmpty);
@@ -52,22 +53,22 @@ class UiLineChart extends StatelessWidget {
           // empty (no points) shows the summary text in place of the plot.
           SizedBox(
             height: height,
-            child: Center(child: Text(summary, style: const TextStyle(color: UiTokens.colorMuted), textAlign: TextAlign.center)),
+            child: Center(child: Text(summary, style: TextStyle(color: context.ui.color.muted), textAlign: TextAlign.center)),
           )
         else ...[
           if (yLabel != null)
             Padding(
               padding: EdgeInsets.only(bottom: UiTokens.space(1)),
-              child: Text(yLabel!, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+              child: Text(yLabel!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
             ),
           SizedBox(
             height: height,
             child: LayoutBuilder(builder: (context, constraints) {
               return GestureDetector(
-                onTapUp: (details) => _handleTap(details.localPosition, Size(constraints.maxWidth, height)),
+                onTapUp: (details) => _handleTap(context, details.localPosition, Size(constraints.maxWidth, height)),
                 child: CustomPaint(
                   size: Size(constraints.maxWidth, height),
-                  painter: _LineChartPainter(series: series, palette: _palette),
+                  painter: _LineChartPainter(series: series, palette: _palette(context), gridColor: context.ui.color.muted.withValues(alpha: 0.15)),
                 ),
               );
             }),
@@ -75,7 +76,7 @@ class UiLineChart extends StatelessWidget {
           if (xLabel != null)
             Padding(
               padding: EdgeInsets.only(top: UiTokens.space(1)),
-              child: Text(xLabel!, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+              child: Text(xLabel!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
             ),
           // Legend only shown with more than one series.
           if (showLegend && series.length > 1)
@@ -84,9 +85,9 @@ class UiLineChart extends StatelessWidget {
               child: Wrap(spacing: UiTokens.space(3), runSpacing: UiTokens.space(1), children: [
                 for (var i = 0; i < series.length; i++)
                   Row(mainAxisSize: MainAxisSize.min, children: [
-                    Container(width: 10, height: 10, decoration: BoxDecoration(color: _palette[i % _palette.length], shape: BoxShape.circle)),
+                    Container(width: 10, height: 10, decoration: BoxDecoration(color: _palette(context)[i % _palette(context).length], shape: BoxShape.circle)),
                     SizedBox(width: UiTokens.space(1)),
-                    Text(series[i].name, style: const TextStyle(color: UiTokens.colorText, fontSize: 12)),
+                    Text(series[i].name, style: TextStyle(color: context.ui.color.text, fontSize: 12)),
                   ]),
               ]),
             ),
@@ -95,9 +96,9 @@ class UiLineChart extends StatelessWidget {
     );
   }
 
-  void _handleTap(Offset local, Size size) {
+  void _handleTap(BuildContext context, Offset local, Size size) {
     if (onPointPress == null || _isEmpty) return;
-    final geometry = _LineChartPainter(series: series, palette: _palette).layout(size);
+    final geometry = _LineChartPainter(series: series, palette: _palette(context), gridColor: context.ui.color.muted.withValues(alpha: 0.15)).layout(size);
     double bestDist = double.infinity;
     int bestSeries = -1;
     int bestIndex = -1;
@@ -126,10 +127,11 @@ class _ChartGeometry {
 }
 
 class _LineChartPainter extends CustomPainter {
-  _LineChartPainter({required this.series, required this.palette});
+  _LineChartPainter({required this.series, required this.palette, required this.gridColor});
 
   final List<UiLineChartSeries> series;
   final List<Color> palette;
+  final Color gridColor;
 
   static final double _padding = UiTokens.space(2);
 
@@ -175,7 +177,7 @@ class _LineChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Gridlines are light.
     final gridPaint = Paint()
-      ..color = UiTokens.colorMuted.withValues(alpha: 0.15)
+      ..color = gridColor
       ..strokeWidth = 1;
     for (var i = 0; i <= 3; i++) {
       final y = _padding + (size.height - _padding * 2) * i / 3;

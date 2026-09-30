@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 class UiBottomNavItem {
   const UiBottomNavItem({required this.value, required this.label, required this.icon, this.badge});
@@ -35,8 +35,8 @@ class UiBottomNav extends StatelessWidget {
         destinations: [
           for (final item in shown)
             NavigationDestination(
-              icon: _icon(item, selected: false),
-              selectedIcon: _icon(item, selected: true),
+              icon: _icon(context, item, selected: false),
+              selectedIcon: _icon(context, item, selected: true),
               label: item.label,
               tooltip: item.badge == null ? item.label : '${item.label}, ${item.badge}',
             ),
@@ -45,8 +45,8 @@ class UiBottomNav extends StatelessWidget {
     );
   }
 
-  Widget _icon(UiBottomNavItem item, {required bool selected}) {
-    final icon = Icon(uiIconData(item.icon), color: selected ? UiTokens.colorPrimary : null);
+  Widget _icon(BuildContext context, UiBottomNavItem item, {required bool selected}) {
+    final icon = Icon(uiIconData(item.icon), color: selected ? context.ui.color.primary : null);
     if (item.badge == null) return icon;
     return Badge(label: Text(item.badge!), child: icon);
   }

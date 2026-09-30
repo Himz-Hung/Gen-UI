@@ -1,5 +1,5 @@
 import { Children, useEffect, useRef, useState } from 'react';
-import { tokens, sp } from './tokens';
+import { tokens, sp, alpha } from './tokens';
 
 export interface HorizontalScrollProps {
   label: string;
@@ -83,7 +83,7 @@ export function HorizontalScroll({ label, gap = '3', itemWidth, snap = true, sho
             style={{
               position: 'absolute', left: sp(1), top: '50%', transform: 'translateY(-50%)',
               width: 32, height: 32, borderRadius: tokens.radius.full, border: 'none',
-              background: tokens.color.surface, boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+              background: tokens.color.surface, boxShadow: `0 1px 4px ${alpha(tokens.color.shadow, 0.2)}`,
               cursor: atStart ? 'not-allowed' : 'pointer', opacity: atStart ? 0.4 : 1,
               display: 'grid', placeItems: 'center',
             }}
@@ -98,7 +98,7 @@ export function HorizontalScroll({ label, gap = '3', itemWidth, snap = true, sho
             style={{
               position: 'absolute', right: sp(1), top: '50%', transform: 'translateY(-50%)',
               width: 32, height: 32, borderRadius: tokens.radius.full, border: 'none',
-              background: tokens.color.surface, boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+              background: tokens.color.surface, boxShadow: `0 1px 4px ${alpha(tokens.color.shadow, 0.2)}`,
               cursor: atEnd ? 'not-allowed' : 'pointer', opacity: atEnd ? 0.4 : 1,
               display: 'grid', placeItems: 'center',
             }}

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { tokens, sp } from './tokens';
+import { tokens, sp, alpha } from './tokens';
 import { Icon } from './Icon';
 
 export interface VideoProps {
@@ -85,7 +85,7 @@ export function Video({ src, label, poster, ratio = '16:9', controls = true, aut
               onClick={toggle}
               style={{
                 position: 'absolute', inset: 0, margin: 'auto', width: 48, height: 48, borderRadius: '50%',
-                border: 0, background: 'rgba(0,0,0,0.5)', color: tokens.color.surface, cursor: 'pointer', display: 'grid', placeItems: 'center',
+                border: 0, background: alpha(tokens.color.scrim, 0.5), color: tokens.color.surface, cursor: 'pointer', display: 'grid', placeItems: 'center',
               }}
             >
               <Icon name={playing ? 'pause' : 'play'} color="inherit" />

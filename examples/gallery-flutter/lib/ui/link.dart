@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiLinkVariant { inline, standalone }
@@ -15,7 +16,7 @@ class UiLink extends StatelessWidget {
     // Color tokens.color.primary; inline variant is underlined (distinct from surrounding text
     // by more than color alone).
     final style = TextStyle(
-      color: UiTokens.colorPrimary,
+      color: context.ui.color.primary,
       fontFamily: UiTokens.fontBody,
       decoration: variant == UiLinkVariant.inline ? TextDecoration.underline : TextDecoration.none,
       fontWeight: variant == UiLinkVariant.standalone ? FontWeight.w600 : FontWeight.w400,
@@ -31,8 +32,8 @@ class UiLink extends StatelessWidget {
       excludeSemantics: true,
       child: InkWell(
         onTap: onPress,
-        focusColor: UiTokens.colorPrimary.withValues(alpha: 0.12),
-        hoverColor: UiTokens.colorPrimary.withValues(alpha: 0.08),
+        focusColor: context.ui.color.primary.withValues(alpha: 0.12),
+        hoverColor: context.ui.color.primary.withValues(alpha: 0.08),
         mouseCursor: SystemMouseCursors.click,
         child: child,
       ),

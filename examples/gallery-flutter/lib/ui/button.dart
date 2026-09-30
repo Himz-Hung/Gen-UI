@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiButtonVariant { primary, secondary, ghost, danger }
@@ -24,7 +25,7 @@ class UiButton extends StatelessWidget {
   Widget build(BuildContext context) {
     // loading implies disabled and keeps the same size; never emits press while disabled or loading.
     final enabled = !disabled && !loading;
-    final fg = switch (variant) { UiButtonVariant.primary || UiButtonVariant.danger => UiTokens.colorSurface, _ => UiTokens.colorPrimary };
+    final fg = switch (variant) { UiButtonVariant.primary || UiButtonVariant.danger => context.ui.color.onPrimary, _ => context.ui.color.primary };
     // the label stays laid out (invisible) under the spinner, so width and height do not change while loading
     final child = Stack(alignment: Alignment.center, children: [
       Visibility(
@@ -46,8 +47,8 @@ class UiButton extends StatelessWidget {
     );
     final onPressed = enabled ? onPress : null;
     final button = switch (variant) {
-      UiButtonVariant.primary => FilledButton(onPressed: onPressed, style: style.copyWith(backgroundColor: const WidgetStatePropertyAll(UiTokens.colorPrimary)), child: child),
-      UiButtonVariant.danger => FilledButton(onPressed: onPressed, style: style.copyWith(backgroundColor: const WidgetStatePropertyAll(UiTokens.colorDanger)), child: child),
+      UiButtonVariant.primary => FilledButton(onPressed: onPressed, style: style.copyWith(backgroundColor: WidgetStatePropertyAll(context.ui.color.primary)), child: child),
+      UiButtonVariant.danger => FilledButton(onPressed: onPressed, style: style.copyWith(backgroundColor: WidgetStatePropertyAll(context.ui.color.danger)), child: child),
       UiButtonVariant.secondary => OutlinedButton(onPressed: onPressed, style: style, child: child),
       UiButtonVariant.ghost => TextButton(onPressed: onPressed, style: style, child: child),
     };

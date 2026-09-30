@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiTextarea extends StatefulWidget {
@@ -47,8 +48,8 @@ class _UiTextareaState extends State<UiTextarea> {
     final maxLength = widget.maxLength;
     // MergeSemantics: the visible label becomes the field's accessible name (one node: label + field)
     return MergeSemantics(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text.rich(TextSpan(text: widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600), children: [
-        if (widget.required) TextSpan(text: ' *', style: TextStyle(color: UiTokens.colorDanger)),
+      Text.rich(TextSpan(text: widget.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600), children: [
+        if (widget.required) TextSpan(text: ' *', style: TextStyle(color: context.ui.color.danger)),
       ])),
       SizedBox(height: UiTokens.space(1)),
       Semantics(
@@ -65,7 +66,7 @@ class _UiTextareaState extends State<UiTextarea> {
               ? null
               : (context, {required currentLength, required isFocused, required maxLength}) => Text(
                     '$currentLength / $maxLength',
-                    style: TextStyle(color: UiTokens.colorMuted, fontSize: 12),
+                    style: TextStyle(color: context.ui.color.muted, fontSize: 12),
                   ),
           onChanged: (v) => widget.onChange?.call(v),
           decoration: InputDecoration(
@@ -75,7 +76,7 @@ class _UiTextareaState extends State<UiTextarea> {
             helperText: widget.error == null ? widget.hint : null,
             contentPadding: EdgeInsets.symmetric(horizontal: UiTokens.space(3), vertical: UiTokens.space(2)),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
-            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd), borderSide: BorderSide(color: UiTokens.colorDanger)),
+            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd), borderSide: BorderSide(color: context.ui.color.danger)),
           ),
         ),
       ),

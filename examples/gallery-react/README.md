@@ -20,6 +20,11 @@ npm run dev        # the gallery Home screen
 written by coding agents from `fw docs` (which prints a React and a Dart signature from the same contract),
 reading the Flutter implementation for behaviour.
 
+## Theming
+
+`ui-spec/project.ts` defines a light and a dark color scheme (identical in both galleries). The gallery has a light / dark / system switch (bottom right, `src/ModeSwitch.tsx`, `setMode` from `ui/tokens.g.ts`); every component reads `tokens.*` CSS variables, so the switch restyles without a render.
+`fw check` verifies the contrast of every text / background pair in both schemes.
+
 ## Behavioural checks
 
 `fw verify` runs the `checks` of the 53 contracts that have them (124 checks) on both galleries: all pass.

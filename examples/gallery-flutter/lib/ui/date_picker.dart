@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiDatePicker extends StatefulWidget {
@@ -43,7 +44,7 @@ class _UiDatePickerState extends State<UiDatePicker> {
     // The field shows the date formatted for the current locale; value/change stay ISO.
     final displayText = date == null ? '' : MaterialLocalizations.of(context).formatMediumDate(date);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text(widget.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(widget.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       Semantics(
         button: true,
@@ -60,13 +61,13 @@ class _UiDatePickerState extends State<UiDatePicker> {
               hintText: widget.placeholder,
               errorText: widget.error,
               helperText: widget.error == null ? widget.hint : null,
-              suffixIcon: Icon(Icons.calendar_today_outlined, size: 18, color: UiTokens.colorMuted),
+              suffixIcon: Icon(Icons.calendar_today_outlined, size: 18, color: context.ui.color.muted),
               contentPadding: EdgeInsets.symmetric(horizontal: UiTokens.space(3), vertical: UiTokens.space(3)),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
             ),
             child: Text(
               displayText,
-              style: TextStyle(color: widget.disabled ? UiTokens.colorMuted : UiTokens.colorText),
+              style: TextStyle(color: widget.disabled ? context.ui.color.muted : context.ui.color.text),
             ),
           ),
         ),

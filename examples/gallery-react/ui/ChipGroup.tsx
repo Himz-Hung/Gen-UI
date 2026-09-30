@@ -1,4 +1,4 @@
-import { tokens, sp } from './tokens';
+import { tokens, sp, alpha } from './tokens';
 
 export interface ChipGroupOption { value: string; label: string; icon?: string; disabled?: boolean }
 
@@ -37,7 +37,7 @@ export function ChipGroup({ label, options, value, multiple = true, size = 'md',
             aria-pressed={selected}
             disabled={disabled}
             onClick={() => toggle(o)}
-            style={{ height, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: sp(1), padding: `0 ${sp(2)}`, borderRadius: tokens.radius.full, border: `1px solid ${selected ? tokens.color.primary : tokens.color.muted}`, background: selected ? `${tokens.color.primary}26` : 'transparent', color: disabled ? tokens.color.muted : tokens.color.text, cursor: disabled ? 'not-allowed' : 'pointer', fontSize: size === 'sm' ? 12 : 13 }}
+            style={{ height, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: sp(1), padding: `0 ${sp(2)}`, borderRadius: tokens.radius.full, border: `1px solid ${selected ? tokens.color.primary : tokens.color.muted}`, background: selected ? alpha(tokens.color.primary, 0.15) : 'transparent', color: disabled ? tokens.color.muted : tokens.color.text, cursor: disabled ? 'not-allowed' : 'pointer', fontSize: size === 'sm' ? 12 : 13 }}
           >
             {selected && <span aria-hidden>✓</span>}
             {o.label}

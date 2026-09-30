@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiCardPadding { v0, v2, v3, v4, v5 }
@@ -18,14 +19,14 @@ class UiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(UiTokens.radiusLg),
-      side: BorderSide(color: selected ? UiTokens.colorPrimary : UiTokens.colorMuted.withValues(alpha: 0.3), width: selected ? 2 : 1),
+      side: BorderSide(color: selected ? context.ui.color.primary : context.ui.color.muted.withValues(alpha: 0.3), width: selected ? 2 : 1),
     );
     final content = Padding(
       padding: EdgeInsets.all(UiTokens.space(_step)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: children),
     );
     return Material(
-      color: UiTokens.colorSurface,
+      color: context.ui.color.surface,
       shape: shape,
       clipBehavior: Clip.antiAlias,
       // pressable=false: no hover feedback, never emits press.

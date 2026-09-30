@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiImageRatio { v1x1, v4x3, v3x4, v16x9, v5x7 }
@@ -22,12 +23,12 @@ class UiImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // The box keeps its ratio before, during and after load: no layout shift.
-    final placeholder = ColoredBox(color: UiTokens.colorMuted.withValues(alpha: 0.12));
+    final placeholder = ColoredBox(color: context.ui.color.muted.withValues(alpha: 0.12));
     final image = Image.network(
       src,
       fit: fit == UiImageFit.cover ? BoxFit.cover : BoxFit.contain,
       loadingBuilder: (context, child, progress) => progress == null ? child : placeholder,
-      errorBuilder: (context, error, stack) => Stack(fit: StackFit.expand, children: [placeholder, Icon(Icons.broken_image_outlined, color: UiTokens.colorMuted)]),
+      errorBuilder: (context, error, stack) => Stack(fit: StackFit.expand, children: [placeholder, Icon(Icons.broken_image_outlined, color: context.ui.color.muted)]),
     );
     return Semantics(
       image: alt.isNotEmpty,

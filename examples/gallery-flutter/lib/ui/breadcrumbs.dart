@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiBreadcrumbsItem {
@@ -46,7 +47,7 @@ class _UiBreadcrumbsState extends State<UiBreadcrumbs> {
               for (var i = 0; i < visible.length; i++) ...[
                 if (i > 0) Padding(
                   padding: EdgeInsets.symmetric(horizontal: UiTokens.space(1)),
-                  child: Icon(uiIconData('chevron-right'), size: 14, color: UiTokens.colorMuted),
+                  child: Icon(uiIconData('chevron-right'), size: 14, color: context.ui.color.muted),
                 ),
                 _crumb(visible[i], isLast: i == visible.length - 1),
               ],
@@ -63,7 +64,7 @@ class _UiBreadcrumbsState extends State<UiBreadcrumbs> {
       return TextButton(
         onPressed: () => setState(() => _expanded = true),
         style: TextButton.styleFrom(minimumSize: Size.zero, padding: EdgeInsets.symmetric(horizontal: UiTokens.space(1))),
-        child: const Text('…', style: TextStyle(color: UiTokens.colorMuted)),
+        child: Text('…', style: TextStyle(color: context.ui.color.muted)),
       );
     }
     if (isLast) {
@@ -71,14 +72,14 @@ class _UiBreadcrumbsState extends State<UiBreadcrumbs> {
       return Semantics(
         label: '${item.label}, current page',
         child: ExcludeSemantics(
-          child: Text(item.label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+          child: Text(item.label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
         ),
       );
     }
     return TextButton(
       onPressed: () => widget.onPress?.call(item.value),
       style: TextButton.styleFrom(minimumSize: Size.zero, padding: EdgeInsets.symmetric(horizontal: UiTokens.space(1))),
-      child: Text(item.label, style: TextStyle(color: UiTokens.colorMuted)),
+      child: Text(item.label, style: TextStyle(color: context.ui.color.muted)),
     );
   }
 }

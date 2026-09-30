@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiDrawerSide { start, end, bottom }
@@ -74,14 +75,14 @@ class _UiDrawerState extends State<UiDrawer> {
     final titleBar = Padding(
       padding: EdgeInsets.fromLTRB(UiTokens.space(5), UiTokens.space(4), UiTokens.space(4), UiTokens.space(3)),
       child: Row(children: [
-        Expanded(child: Text(widget.title, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w700, fontSize: 18))),
+        Expanded(child: Text(widget.title, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w700, fontSize: 18))),
         Semantics(
           button: true,
           label: 'Close',
           child: InkWell(
             borderRadius: BorderRadius.circular(UiTokens.radiusFull),
             onTap: widget.onClose,
-            child: Padding(padding: EdgeInsets.all(UiTokens.space(1)), child: const Icon(Icons.close, color: UiTokens.colorMuted)),
+            child: Padding(padding: EdgeInsets.all(UiTokens.space(1)), child: Icon(Icons.close, color: context.ui.color.muted)),
           ),
         ),
       ]),
@@ -99,7 +100,7 @@ class _UiDrawerState extends State<UiDrawer> {
     ]);
 
     Widget panel = Material(
-      color: UiTokens.colorSurface,
+      color: context.ui.color.surface,
       child: panelContent,
     );
 
@@ -142,7 +143,7 @@ class _UiDrawerState extends State<UiDrawer> {
             behavior: HitTestBehavior.opaque,
             // Backdrop press closes.
             onTap: widget.onClose,
-            child: ColoredBox(color: UiTokens.colorText.withValues(alpha: 0.5)),
+            child: ColoredBox(color: context.ui.color.scrim.withValues(alpha: 0.5)),
           ),
         ),
         Align(

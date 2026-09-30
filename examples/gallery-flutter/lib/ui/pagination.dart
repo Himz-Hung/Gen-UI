@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiPagination extends StatelessWidget {
@@ -47,13 +48,13 @@ class UiPagination extends StatelessWidget {
             height: 32,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isCurrent ? UiTokens.colorPrimary : null,
+              color: isCurrent ? context.ui.color.primary : null,
               borderRadius: BorderRadius.circular(UiTokens.radiusSm),
             ),
             child: Text(
               '$n',
               style: TextStyle(
-                color: isCurrent ? UiTokens.colorSurface : UiTokens.colorText,
+                color: isCurrent ? context.ui.color.surface : context.ui.color.text,
                 fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w400,
               ),
             ),
@@ -73,7 +74,7 @@ class UiPagination extends StatelessWidget {
           for (final s in slots)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: UiTokens.space(1)),
-              child: s == null ? const Text('…', style: TextStyle(color: UiTokens.colorMuted)) : pageButton(s),
+              child: s == null ? Text('…', style: TextStyle(color: context.ui.color.muted)) : pageButton(s),
             ),
           navButton(Icons.chevron_right, 'Next page', current < count, current + 1),
         ],

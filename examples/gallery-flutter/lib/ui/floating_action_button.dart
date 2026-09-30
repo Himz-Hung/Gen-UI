@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiFloatingActionButtonPosition { end, center, start }
@@ -41,13 +42,13 @@ class _UiFloatingActionButtonState extends State<UiFloatingActionButton> {
 
   Widget _button() {
     final enabled = !widget.disabled;
-    final bg = enabled ? UiTokens.colorPrimary : UiTokens.colorMuted.withValues(alpha: 0.4);
-    final icon = Icon(uiIconData(widget.icon), color: UiTokens.colorSurface);
+    final bg = enabled ? context.ui.color.primary : context.ui.color.muted.withValues(alpha: 0.4);
+    final icon = Icon(uiIconData(widget.icon), color: context.ui.color.onPrimary);
     final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(UiTokens.radiusLg));
     // Never emits press while disabled.
     final onPressed = enabled ? widget.onPress : null;
     final Widget fab = widget.extended
-        ? FloatingActionButton.extended(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, icon: icon, label: Text(widget.label, style: const TextStyle(color: UiTokens.colorSurface, fontWeight: FontWeight.w600)))
+        ? FloatingActionButton.extended(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, icon: icon, label: Text(widget.label, style: TextStyle(color: context.ui.color.onPrimary, fontWeight: FontWeight.w600)))
         : widget.size == UiFloatingActionButtonSize.sm
             ? FloatingActionButton.small(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, tooltip: widget.label, child: icon)
             : FloatingActionButton(heroTag: null, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, onPressed: onPressed, backgroundColor: bg, shape: shape, tooltip: widget.label, child: icon);

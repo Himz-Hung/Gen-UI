@@ -147,7 +147,7 @@ export function DateRangePicker({ label, start, end, min, max, disabledDates = [
                         aria-label={iso}
                         aria-pressed={isStart || isEnd}
                         onClick={() => pick(ms)}
-                        style={{ width: 32, height: 32, border: 'none', borderRadius: tokens.radius.sm, background: isStart || isEnd ? tokens.color.primary : 'transparent', color: isStart || isEnd ? '#fff' : dis ? tokens.color.muted : tokens.color.text, cursor: dis ? 'not-allowed' : 'pointer' }}
+                        style={{ width: 32, height: 32, border: 'none', borderRadius: tokens.radius.sm, background: isStart || isEnd ? tokens.color.primary : 'transparent', color: isStart || isEnd ? tokens.color.onPrimary : dis ? tokens.color.muted : tokens.color.text, cursor: dis ? 'not-allowed' : 'pointer' }}
                       >
                         {new Date(ms).getUTCDate()}
                       </button>

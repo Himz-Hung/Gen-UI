@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiDateRangePickerChangeEvent {
@@ -74,7 +75,7 @@ class UiDateRangePicker extends StatelessWidget {
     final s = _parse(start), e = _parse(end);
     final text = s == null ? '' : '${loc.formatMediumDate(s)} – ${e == null ? '' : loc.formatMediumDate(e)}';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       Semantics(
         button: true,
@@ -96,7 +97,7 @@ class UiDateRangePicker extends StatelessWidget {
               contentPadding: EdgeInsets.symmetric(horizontal: UiTokens.space(3), vertical: UiTokens.space(3)),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(UiTokens.radiusMd)),
             ),
-            child: Text(text, style: const TextStyle(color: UiTokens.colorText)),
+            child: Text(text, style: TextStyle(color: context.ui.color.text)),
           ),
         ),
       ),

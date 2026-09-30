@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiTooltipPlacement { top, bottom, start, end }
@@ -22,9 +23,9 @@ class UiTooltip extends StatelessWidget {
       message: text,
       preferBelow: preferBelow,
       triggerMode: _triggerMode,
-      textStyle: const TextStyle(color: UiTokens.colorSurface),
+      textStyle: TextStyle(color: context.ui.color.surface),
       decoration: BoxDecoration(
-        color: UiTokens.colorText,
+        color: context.ui.color.text,
         borderRadius: BorderRadius.circular(UiTokens.radiusSm),
       ),
       child: child,

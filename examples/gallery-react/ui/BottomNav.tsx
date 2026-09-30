@@ -1,4 +1,4 @@
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface BottomNavProps {
   items: { value: string; label: string; icon: string; badge?: string }[];
@@ -14,7 +14,7 @@ export function BottomNav({ items, value, onChange }: BottomNavProps) {
       aria-label="Primary"
       style={{
         position: 'fixed', left: 0, right: 0, bottom: 0, display: 'flex',
-        background: tokens.color.surface, borderTop: `1px solid ${tokens.color.muted}4d`,
+        background: tokens.color.surface, borderTop: `1px solid ${alpha(tokens.color.muted, 0.3)}`,
         paddingBottom: 'env(safe-area-inset-bottom)', zIndex: 100,
       }}
     >

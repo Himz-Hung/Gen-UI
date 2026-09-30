@@ -35,6 +35,7 @@ Two packages:
 - [Languages](#languages)
 - [Flutter](#flutter)
 - [Compatibility](#compatibility)
+- [Theming](#theming)
 - [Integrations](#integrations-state-data-forms-router-i18n-ui-kits)
 - [Contracts](#contracts)
 - [Screen specs](#screen-specs)
@@ -274,12 +275,14 @@ export default defineProject({
   name: 'PokéCards Shop',
   platforms: ['react'],
   agent: 'claude',                       // which rules file to generate
-  tokens: {
-    color:   { primary: '#E3350D', secondary: '#3B4CCA', danger: '#B91C1C', success: '#15803D',
-               surface: '#FFFFFF', text: '#1F2937', muted: '#6B7280' },
-    spacing: [0, 4, 8, 12, 16, 24, 32, 48],   // specs say "gap": "4" → 16px
-    radius:  { sm: 4, md: 8, lg: 16, full: 9999 },
-    font:    { body: 'Inter', heading: 'Inter' },
+  tokens: {                              // three layers and modes: see Theming
+    primitives: { color: { red: { 700: '#D12F0C' }, gray: { 800: '#1F2937' }, white: '#FFFFFF' } },
+    semantic: {
+      color:  { primary: '{color.red.700}', onPrimary: '{color.white}', surface: '{color.white}', text: '{color.gray.800}' },
+      space:  [0, 4, 8, 12, 16, 24, 32, 48],   // specs say "gap": "4" → 16px
+      radius: { sm: 4, md: 8, lg: 16, full: 9999 },
+      font:   { body: 'Inter', heading: 'Inter' },
+    },
   },
   guards: ['requireCartNotEmpty'],       // names screens may use as guard; bodies are hand-written
   stateLibrary: 'zustand',               // convention: one store library for the project
@@ -288,7 +291,7 @@ export default defineProject({
 });
 ```
 
-Implementations read tokens through `ui/tokens.ts`; change a color here, not in twenty files.
+Implementations read tokens through the generated `ui/tokens.g.ts` (web) or `context.ui` (Flutter); change a color here, not in twenty files.
 
 `screenDirs` / `freeformDirs` decide where the screen rules (compose from `ui/`, no raw markup, no hard-coded
 text) apply. The defaults are `src/screens` and `screens` (React) and `lib/screens` (Flutter). When a common UI
@@ -437,7 +440,7 @@ props, so implementations stay verified).
 | component | `ui/ListItem.tsx`, `export function ListItem` | `lib/ui/list_item.dart`, `class UiListItem` |
 | screen | `src/screens/CartScreen.tsx` | `lib/screens/cart_screen.dart`, `class CartScreen` |
 | props / events / children | props type, `onPress`, `children` | named constructor params, `VoidCallback? onPress` / `ValueChanged<T>? onChange`, `List<Widget> children` |
-| tokens | `ui-spec/project.ts` imported directly (`tailwindPreset` / `muiTheme` / `cssVariables` for styling libraries) | `lib/ui/tokens.g.dart` (`UiTokens.colorPrimary`, `UiTokens.space(4)`) and `lib/ui/theme.g.dart` (`MaterialApp(theme: uiTheme())`), generated |
+| tokens | `ui/tokens.g.ts` + `ui/tokens.css` (CSS variables, modes via `setMode`), generated | `lib/ui/theme.g.dart` (`context.ui.color.primary`, `context.ui.space(4)`, `uiTheme(colorScheme: …)`), generated |
 | strings | the project's i18n function | `lib/l10n/strings.g.dart` (`UiStrings.cartEmptyTitle`), generated; or, with `i18nLibrary: 'flutter_localizations'`, ARB files `lib/l10n/app_<lang>.arb` read through `AppLocalizations` |
 | type check | `tsc` | `flutter analyze` |
 
@@ -552,6 +555,77 @@ in `screenWrappers`; a component that draws goes inside `ui/` or through `fw add
 
 ---
 
+## Theming
+
+Design tokens have three layers and any number of **mode axes**; every platform switches modes at run time, and
+fw checks that nothing escapes the theme.
+
+| layer | example | used by |
+|---|---|---|
+| `primitives` | `color.blue.600 = '#2563EB'`, `color.slate.900` | the semantic layer only |
+| `semantic` | `color.primary = '{color.blue.600}'`, `color.onPrimary`, `color.surface`, `space`, `radius.md`, `size.controlMd`, `font.body` | components, contracts, checks |
+| `semantic.component` (optional) | `component.button.primaryBg = '{color.primary}'` | one component's fine-tuning |
+
+```ts
+// ui-spec/project.ts
+tokens: {
+  primitives: { color: { blue: { 400: '#60A5FA', 600: '#2563EB' }, slate: { 100: '#F1F5F9', 900: '#0F172A' }, white: '#FFFFFF' } },
+  semantic: {
+    color: { primary: '{color.blue.600}', onPrimary: '{color.white}', surface: '{color.white}', text: '{color.slate.900}' },
+    space: [0, 4, 8, 12, 16, 24, 32, 48], radius: { sm: 4, md: 8, lg: 16, full: 9999 },
+    size: { controlSm: 32, controlMd: 40, controlLg: 48 }, font: { body: 'Inter', heading: 'Inter' },
+  },
+  modes: {
+    colorScheme: {                                     // light / dark also answer the OS preference ("system")
+      light: {},
+      dark: { color: { primary: '{color.blue.400}', onPrimary: '{color.slate.900}', surface: '{color.slate.900}', text: '{color.slate.100}' } },
+    },
+    density: { comfortable: {}, compact: { size: { controlMd: 36 } } },   // any axis: brand, contrast, density…
+  },
+  contrast: [['text', 'surface'], ['primary', 'surface']],              // onX / X pairs are implied
+}
+```
+
+A mode value lists only what differs; the first value of each axis is the default. References are
+`'{group.path}'` and may point at primitives or at other semantic tokens.
+
+**Generated on every fw command**
+
+| platform | file | what it gives |
+|---|---|---|
+| web | `ui/tokens.css` | CSS custom properties: `:root` (defaults), `[data-ui-color-scheme="dark"]`, `[data-ui-density="compact"]`, `@media (prefers-color-scheme: dark)` for "system". A reference to another semantic token stays `var(--…)`, so it follows every mode |
+| web | `ui/tokens.g.ts` | `tokens.color.primary` = `'var(--ui-color-primary)'`, `sp(4)`, `alpha(tokens.color.primary, 0.12)` (`color-mix`), `setMode({ colorScheme: 'dark' })`, `getMode()`, `onModeChange()`, `modeScript` (put in `<head>` for SSR: no flash), `values` (resolved defaults for canvas / charts) |
+| Flutter | `lib/ui/theme.g.dart` | an enum per axis (`UiColorScheme`), `UiTheme` (a `ThemeExtension`: `color`, `space(n)`, `radius`, `size`, `font`, `component`) as a const per mode combination with `lerp` (animated switches), `uiTheme(colorScheme: …)` → `ThemeData` with a ColorScheme built from the tokens, and `context.ui` |
+
+```tsx
+// web: import './ui/tokens.css' once; components use tokens.* and restyle without a render
+<button onClick={() => setMode({ colorScheme: 'dark' })} />
+```
+```dart
+// Flutter shell
+MaterialApp(theme: uiTheme(), darkTheme: uiTheme(colorScheme: UiColorScheme.dark), themeMode: ThemeMode.system, …);
+// components
+final c = context.ui.color;  Container(color: c.surface, child: Text('…', style: TextStyle(color: c.text)));
+```
+
+**Checks**
+
+| check | where | what |
+|---|---|---|
+| token integrity | `fw check` | broken references, cycles, a mode overriding a token the semantic layer lacks |
+| WCAG contrast | `fw check` | every `onX` / `X` pair (4.5:1) and the declared pairs, **in every mode combination** |
+| no raw values in `ui/` | `fw verify` | React: hex / `rgb()` / `hsl()` / named colors in strings, a hex alpha appended to a token (use `alpha()`); Flutter: `Color(0x…)`, `Colors.x` (except transparent), `UiTokens.color*` and any `UiTokens` group a mode changes |
+| `tokenColor` per mode | `fw verify` | Flutter renders every `colorScheme` value under `uiTheme(...)`; React checks the style names the token's variable |
+
+**Interchange:** `toDesignTokens(project.tokens)` / `fromDesignTokens(json)` from `@himz-genui/core` convert to and
+from W3C Design Tokens JSON (one token set per layer and mode value: `primitives`, `semantic`,
+`mode/colorScheme/dark`…), which Tokens Studio (Figma) and Style Dictionary read.
+
+The 1.x flat shape (`{ color, spacing, radius, font }`) is still read, as one mode without checks as errors;
+`fw check` warns until it is moved.
+
+---
+
 ## Integrations: state, data, forms, router, i18n, UI kits
 
 `fw` owns the UI layer only. Components are controlled (values in through props, changes out through `onX`),
@@ -612,24 +686,21 @@ the library's hooks (`useField`).
 `onX` handler of its events): `className`, `style`, `sx` included. Styling lives inside `ui/<Name>`; spacing
 between components comes from layout components (`Stack`, `Inline`, `Grid`, `Container`, `Spacer`).
 
-**One source for design tokens.** `@himz-genui/core` turns the `tokens` of `ui-spec/project.ts` into what your
-styling library reads:
+**One source for design tokens.** Styling libraries read the same tokens (and follow the modes, see
+[Theming](#theming)):
 
 ```ts
-// tailwind.config.ts
+// tailwind.config.ts: every value points at the CSS variables of ui/tokens.css, so modes switch Tailwind classes too
 import project from './ui-spec/project';
 import { tailwindPreset } from '@himz-genui/core';
 export default { content: ['./src/**/*.tsx', './ui/**/*.tsx'], presets: [tailwindPreset(project)] };
-// bg-primary, text-muted, rounded-md from the tokens; spacing as p-ui-4 = tokens.spacing[4]
+// bg-primary, text-on-primary, rounded-md, p-ui-4, h-ui-control-md
 
-// ui/theme.ts (MUI)
+// ui/theme.ts (MUI computes with real colors: build the theme of the active mode)
 import { createTheme } from '@mui/material/styles';
 import { muiTheme } from '@himz-genui/core';
-export const theme = createTheme(muiTheme(project));   // palette, spacing(n), shape, typography
-
-// anywhere: CSS custom properties
-import { cssVariables } from '@himz-genui/core';
-cssVariables(project);   // ":root { --ui-color-primary: #2563EB; --ui-space-4: 16px; --ui-radius-md: 8px; … }"
+export const light = createTheme(muiTheme(project));
+export const dark = createTheme(muiTheme(project, { colorScheme: 'dark' }));
 ```
 
 `tests/compat/react` holds a screen per library pattern with the answer `fw check` must give; `npm test` runs them.

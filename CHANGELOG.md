@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.0 — 2026-09-30
+
+**Theming.** Tokens become a theme model with modes, switched at run time on the web and in Flutter, and checked.
+Breaking: the token shape, the generated web tokens and the Flutter color API change (1.x tokens still load, with a warning).
+
+- **Three layers and mode axes** in `ui-spec/project.ts`: `primitives` (raw palette) → `semantic` (roles: `primary`, `onPrimary`, `surface`, `text`, `border`… plus `space`, `radius`, `size`, `font`, optional `component`) → `modes` (any axes: `colorScheme: { light, dark }`, `density`, `brand`…; a value lists only what differs). References are `'{group.path}'`. `fw init` writes this shape with a light and a dark scheme.
+- **Web:** fw generates `ui/tokens.css` (CSS custom properties per mode, OS dark preference for "system"; references to semantic tokens stay `var()` so they follow every mode) and `ui/tokens.g.ts` (`tokens.*` as variables, `sp`, `font`, `alpha()`, `setMode` / `getMode` / `onModeChange`, `modeScript` for SSR, `values`). `tailwindPreset` points at the variables; `muiTheme(project, mode)` resolves one mode; `cssVariables` returns `tokens.css`.
+- **Flutter:** `lib/ui/theme.g.dart` has an enum per axis, `UiTheme` (a `ThemeExtension` with `color`, `space(n)`, `radius`, `size`, `font`, `component`) as a const per mode combination with `lerp`, `uiTheme(colorScheme: …)` → `ThemeData` built from the tokens, and `context.ui`.
+- **Checks:** `fw check` reports broken references, cycles, overrides of unknown tokens and **WCAG contrast of every `onX` / `X` pair (and declared pairs) in every mode combination**. `fw verify` rejects raw values in `ui/` (hex / `rgb()` / named colors, hex alpha appended to a token; `Color(0x…)`, `Colors.x`, `UiTokens.color*`) and runs `tokenColor` per `colorScheme` on Flutter.
+- **Interchange:** `toDesignTokens` / `fromDesignTokens` convert to and from W3C Design Tokens JSON (Tokens Studio, Style Dictionary).
+- **Examples:** both galleries have light / dark / system switches (React `setMode`, Flutter `themeMode`) and new roles (`surfaceAlt`, `border`, `scrim`, `onScrim`, `shadow`, `on*`); 65 hard-coded colors (React) and ~310 `UiTokens.color*` reads (Flutter) moved to tokens. The contrast check caught the Pokemon brand red: white on `#E3350D` is 4.39:1 (under AA), so its `primary` is now `#D12F0C`.
+- **Upgrading from 1.x:**
+  1. Move `tokens` to `{ primitives?, semantic: { color, space, radius, size?, font }, modes? }` (`spacing` is now `semantic.space`). Add `onX` roles for text on colored fills.
+  2. React: import `ui/tokens.css` once in the app entry; make `ui/tokens.ts` `export * from './tokens.g'` (or import from `./tokens.g`); replace hard-coded colors (`fw verify` lists them) and `${tokens.color.x}22` with `alpha(tokens.color.x, 0.13)`. Token values are CSS variables now: no arithmetic on them (use `values.*` where a number is unavoidable).
+  3. Flutter: `UiTokens.colorX` → `context.ui.color.x` (the compiler and `fw verify` list them); drop `const` where a widget now reads the theme; shell `theme: uiTheme(), darkTheme: uiTheme(colorScheme: UiColorScheme.dark)`.
+  4. Re-copy `ui-rules/` from `@himz-genui/rules` 2.0.0.
+
 ## 1.3.2 — 2026-09-29
 
 Both packages move to 1.3.2; `@himz-genui/rules` 1.3.2 requires `@himz-genui/core` ^1.3.2 (its contracts use the new check kinds, which older cores reject as unknown). Upgrading projects re-copy `ui-rules/` from the package to get the new checks.

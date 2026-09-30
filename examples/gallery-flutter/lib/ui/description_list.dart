@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiDescriptionListItem {
@@ -18,14 +19,14 @@ class UiDescriptionList extends StatelessWidget {
   final UiDescriptionListLayout layout;
   final UiDescriptionListColumns columns;
 
-  Widget _stacked(UiDescriptionListItem item) {
+  Widget _stacked(BuildContext context, UiDescriptionListItem item) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: UiTokens.space(1)),
       child: MergeSemantics(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(item.label, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 13)),
+          Text(item.label, style: TextStyle(color: context.ui.color.muted, fontSize: 13)),
           SizedBox(height: UiTokens.space(1) / 2),
-          Text(item.value, style: const TextStyle(color: UiTokens.colorText)),
+          Text(item.value, style: TextStyle(color: context.ui.color.text)),
         ]),
       ),
     );
@@ -33,7 +34,7 @@ class UiDescriptionList extends StatelessWidget {
 
   // One Table per column group so every row's label column shares the same width and every
   // value lands in one aligned column, per "inline layout aligns all values to one column".
-  Widget _inlineGroup(List<UiDescriptionListItem> group) {
+  Widget _inlineGroup(BuildContext context, List<UiDescriptionListItem> group) {
     return Table(
       columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
       defaultVerticalAlignment: TableCellVerticalAlignment.top,
@@ -45,13 +46,13 @@ class UiDescriptionList extends StatelessWidget {
               child: Semantics(
                 label: '${item.label}, ${item.value}',
                 excludeSemantics: true,
-                child: Text(item.label, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 13)),
+                child: Text(item.label, style: TextStyle(color: context.ui.color.muted, fontSize: 13)),
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: UiTokens.space(1)),
               child: ExcludeSemantics(
-                child: Text(item.value, style: const TextStyle(color: UiTokens.colorText)),
+                child: Text(item.value, style: TextStyle(color: context.ui.color.text)),
               ),
             ),
           ]),
@@ -68,8 +69,8 @@ class UiDescriptionList extends StatelessWidget {
       final stacked = narrow || layout == UiDescriptionListLayout.stacked;
 
       Widget group(List<UiDescriptionListItem> g) => stacked
-          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [for (final item in g) _stacked(item)])
-          : _inlineGroup(g);
+          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [for (final item in g) _stacked(context, item)])
+          : _inlineGroup(context, g);
 
       Widget list;
       if (effectiveColumns == 2) {

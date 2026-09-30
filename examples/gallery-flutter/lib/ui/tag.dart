@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiTag extends StatelessWidget {
@@ -14,11 +15,11 @@ class UiTag extends StatelessWidget {
       height: 28,
       padding: EdgeInsets.only(left: UiTokens.space(3), right: removable ? UiTokens.space(1) : UiTokens.space(3)),
       decoration: BoxDecoration(
-        color: UiTokens.colorSecondary.withValues(alpha: 0.12),
+        color: context.ui.color.secondary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(UiTokens.radiusFull),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Text(label, overflow: TextOverflow.ellipsis, style: const TextStyle(color: UiTokens.colorText, fontSize: 13)),
+        Text(label, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.ui.color.text, fontSize: 13)),
         if (removable) ...[
           SizedBox(width: UiTokens.space(1)),
           IconButton(

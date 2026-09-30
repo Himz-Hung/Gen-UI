@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiAvailabilityCalendarDay {
@@ -74,13 +75,13 @@ class UiAvailabilityCalendar extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
         Row(children: [
           IconButton(icon: const Icon(Icons.chevron_left), tooltip: loc.previousMonthTooltip, onPressed: canPrev ? () => onMonthChange?.call(_ym(prev)) : null),
-          Expanded(child: Center(child: Text(loc.formatMonthYear(first), style: const TextStyle(fontWeight: FontWeight.w700, color: UiTokens.colorText)))),
+          Expanded(child: Center(child: Text(loc.formatMonthYear(first), style: TextStyle(fontWeight: FontWeight.w700, color: context.ui.color.text)))),
           IconButton(icon: const Icon(Icons.chevron_right), tooltip: loc.nextMonthTooltip, onPressed: canNext ? () => onMonthChange?.call(_ym(next)) : null),
         ]),
-        Row(children: [for (final w in order) Expanded(child: Center(child: Text(names[w], style: const TextStyle(color: UiTokens.colorMuted, fontSize: 12))))]),
+        Row(children: [for (final w in order) Expanded(child: Center(child: Text(names[w], style: TextStyle(color: context.ui.color.muted, fontSize: 12))))]),
         SizedBox(height: UiTokens.space(1)),
         ...rows,
-        if (legend != null) ...[SizedBox(height: UiTokens.space(3)), _legend(legend!)],
+        if (legend != null) ...[SizedBox(height: UiTokens.space(3)), _legend(context, legend!)],
       ]),
     );
   }
@@ -101,7 +102,7 @@ class UiAvailabilityCalendar extends StatelessWidget {
     final muted = status == UiAvailabilityCalendarStatus.closed;
     final dayStyle = TextStyle(
       fontWeight: isEnd ? FontWeight.w700 : FontWeight.w500,
-      color: isEnd ? UiTokens.colorSurface : muted ? UiTokens.colorMuted.withValues(alpha: 0.5) : UiTokens.colorText,
+      color: isEnd ? context.ui.color.onPrimary : muted ? context.ui.color.muted.withValues(alpha: 0.5) : context.ui.color.text,
       // booked is struck through, closed dimmed, limited has a dot — never color alone.
       decoration: status == UiAvailabilityCalendarStatus.booked ? TextDecoration.lineThrough : null,
     );
@@ -111,20 +112,20 @@ class UiAvailabilityCalendar extends StatelessWidget {
       margin: const EdgeInsets.all(1),
       padding: EdgeInsets.symmetric(vertical: UiTokens.space(1)),
       decoration: BoxDecoration(
-        color: isEnd ? UiTokens.colorPrimary : inRange ? UiTokens.colorPrimary.withValues(alpha: 0.12) : null,
+        color: isEnd ? context.ui.color.primary : inRange ? context.ui.color.primary.withValues(alpha: 0.12) : null,
         borderRadius: BorderRadius.circular(UiTokens.radiusSm),
-        border: iso == today ? Border.all(color: UiTokens.colorPrimary) : null,
+        border: iso == today ? Border.all(color: context.ui.color.primary) : null,
       ),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text('${date.day}', style: dayStyle),
         if (info?.priceLabel != null)
-          Text(info!.priceLabel!, style: TextStyle(fontSize: 10, color: isEnd ? UiTokens.colorSurface : UiTokens.colorMuted))
+          Text(info!.priceLabel!, style: TextStyle(fontSize: 10, color: isEnd ? context.ui.color.onPrimary : context.ui.color.muted))
         else
           const SizedBox(height: 12),
         SizedBox(
           height: 6,
           child: status == UiAvailabilityCalendarStatus.limited
-              ? Container(width: 4, height: 4, decoration: BoxDecoration(color: isEnd ? UiTokens.colorSurface : UiTokens.colorPrimary, shape: BoxShape.circle))
+              ? Container(width: 4, height: 4, decoration: BoxDecoration(color: isEnd ? context.ui.color.onPrimary : context.ui.color.primary, shape: BoxShape.circle))
               : null,
         ),
       ]),
@@ -140,20 +141,20 @@ class UiAvailabilityCalendar extends StatelessWidget {
     );
   }
 
-  Widget _legend(UiAvailabilityCalendarLegend l) {
-    Widget item(Widget mark, String text) => Row(mainAxisSize: MainAxisSize.min, children: [mark, SizedBox(width: UiTokens.space(1)), Text(text, style: const TextStyle(fontSize: 12, color: UiTokens.colorMuted))]);
+  Widget _legend(BuildContext context, UiAvailabilityCalendarLegend l) {
+    Widget item(Widget mark, String text) => Row(mainAxisSize: MainAxisSize.min, children: [mark, SizedBox(width: UiTokens.space(1)), Text(text, style: TextStyle(fontSize: 12, color: context.ui.color.muted))]);
     Widget box({Color? fill, bool strike = false, bool dot = false}) => Container(
           width: 16,
           height: 16,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: fill, border: Border.all(color: UiTokens.colorMuted.withValues(alpha: 0.4)), borderRadius: BorderRadius.circular(UiTokens.radiusSm)),
-          child: strike ? const Text('–', style: TextStyle(fontSize: 12, color: UiTokens.colorMuted)) : dot ? Container(width: 4, height: 4, decoration: const BoxDecoration(color: UiTokens.colorPrimary, shape: BoxShape.circle)) : null,
+          decoration: BoxDecoration(color: fill, border: Border.all(color: context.ui.color.muted.withValues(alpha: 0.4)), borderRadius: BorderRadius.circular(UiTokens.radiusSm)),
+          child: strike ? Text('–', style: TextStyle(fontSize: 12, color: context.ui.color.muted)) : dot ? Container(width: 4, height: 4, decoration: BoxDecoration(color: context.ui.color.primary, shape: BoxShape.circle)) : null,
         );
     return Wrap(spacing: UiTokens.space(4), runSpacing: UiTokens.space(2), children: [
       item(box(), l.available),
       item(box(dot: true), l.limited),
       item(box(strike: true), l.booked),
-      item(box(fill: UiTokens.colorMuted.withValues(alpha: 0.15)), l.closed),
+      item(box(fill: context.ui.color.muted.withValues(alpha: 0.15)), l.closed),
     ]);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiSelectOption {
@@ -23,7 +24,7 @@ class UiSelect extends StatelessWidget {
     final selected = options.any((o) => o.value == value) ? value : null;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       // Label always visible above the control.
-      Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       SizedBox(
         height: error == null ? 40 : null,

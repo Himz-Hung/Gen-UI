@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 import { Button } from './Button';
 
 export interface SiteHeaderProps {
@@ -51,7 +51,7 @@ export function SiteHeader({ brand, logo, links = [], actions = [], menuLabel, s
     <header
       style={{
         position: sticky ? 'sticky' : 'static', top: 0, zIndex: 50, height: wide ? 64 : 56, display: 'flex',
-        alignItems: 'center', padding: `0 ${sp(4)}`, background: tokens.color.surface, borderBottom: `1px solid ${tokens.color.muted}40`,
+        alignItems: 'center', padding: `0 ${sp(4)}`, background: tokens.color.surface, borderBottom: `1px solid ${alpha(tokens.color.muted, 0.25)}`,
         fontFamily: font('body'),
       }}
     >
@@ -110,7 +110,7 @@ export function SiteHeader({ brand, logo, links = [], actions = [], menuLabel, s
         <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}>
           <div
             onClick={close}
-            style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.5)' }}
+            style={{ position: 'absolute', inset: 0, background: alpha(tokens.color.scrim, 0.5) }}
           />
           <div
             role="dialog"
@@ -119,7 +119,7 @@ export function SiteHeader({ brand, logo, links = [], actions = [], menuLabel, s
             style={{
               position: 'absolute', top: 0, right: 0, bottom: 0, width: 'min(320px, 100%)',
               background: tokens.color.surface, display: 'flex', flexDirection: 'column',
-              boxShadow: '-4px 0 12px rgba(0,0,0,0.2)',
+              boxShadow: `-4px 0 12px ${alpha(tokens.color.shadow, 0.2)}`,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', padding: sp(4) }}>

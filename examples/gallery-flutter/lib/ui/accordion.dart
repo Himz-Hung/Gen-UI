@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiAccordionItem {
@@ -26,7 +27,7 @@ class UiAccordion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final divider = Divider(height: 1, thickness: 1, color: UiTokens.colorMuted.withValues(alpha: 0.2));
+    final divider = Divider(height: 1, thickness: 1, color: context.ui.color.muted.withValues(alpha: 0.2));
     final rows = <Widget>[];
     for (var i = 0; i < items.length; i++) {
       final item = items[i];
@@ -43,11 +44,11 @@ class UiAccordion extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: UiTokens.space(4), vertical: UiTokens.space(3)),
                 child: Row(children: [
-                  Expanded(child: Text(item.title, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600))),
+                  Expanded(child: Text(item.title, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600))),
                   AnimatedRotation(
                     turns: isOpen ? 0.5 : 0,
                     duration: const Duration(milliseconds: 150),
-                    child: const Icon(Icons.expand_more, color: UiTokens.colorMuted),
+                    child: Icon(Icons.expand_more, color: context.ui.color.muted),
                   ),
                 ]),
               ),

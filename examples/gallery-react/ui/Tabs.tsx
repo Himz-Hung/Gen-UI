@@ -1,5 +1,5 @@
 import { useRef, type KeyboardEvent, type ReactNode } from 'react';
-import { tokens, sp, font } from './tokens';
+import { tokens, sp, font, alpha } from './tokens';
 
 export interface TabsProps {
   tabs: { value: string; label: string }[];
@@ -26,7 +26,7 @@ export function Tabs({ tabs, value, onChange, children }: TabsProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div role="tablist" style={{ display: 'flex', height: 44, borderBottom: `1px solid ${tokens.color.muted}4d` }}>
+      <div role="tablist" style={{ display: 'flex', height: 44, borderBottom: `1px solid ${alpha(tokens.color.muted, 0.3)}` }}>
         {tabs.map((t, i) => {
           const selected = t.value === value;
           return (

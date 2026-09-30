@@ -28,7 +28,7 @@ export function Switch({ label, checked, description, disabled = false, onChange
         {description && <span id={descId} style={{ color: tokens.color.muted, fontSize: 12 }}>{description}</span>}
       </span>
       <span aria-hidden style={{ position: 'relative', width: 44, height: 24, borderRadius: tokens.radius.full, background: checked ? tokens.color.primary : tokens.color.muted, flexShrink: 0 }}>
-        <span style={{ position: 'absolute', top: 2, left: checked ? 22 : 2, width: 20, height: 20, borderRadius: tokens.radius.full, background: '#fff' }} />
+        <span style={{ position: 'absolute', top: 2, left: checked ? 22 : 2, width: 20, height: 20, borderRadius: tokens.radius.full, background: tokens.color.onPrimary }} />
       </span>
     </button>
   );

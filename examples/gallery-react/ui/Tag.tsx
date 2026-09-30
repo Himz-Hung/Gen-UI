@@ -1,4 +1,4 @@
-import { tokens, sp } from './tokens';
+import { tokens, sp, alpha } from './tokens';
 
 export interface TagProps {
   label: string;
@@ -14,7 +14,7 @@ export function Tag({ label, removable = true, onRemove }: TagProps) {
         alignItems: 'center',
         height: 28,
         borderRadius: tokens.radius.full,
-        background: `${tokens.color.secondary}1F`,
+        background: alpha(tokens.color.secondary, 0.12),
         color: tokens.color.text,
         fontSize: 13,
         paddingLeft: sp(3),

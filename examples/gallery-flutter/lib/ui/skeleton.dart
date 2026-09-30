@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiSkeletonShape { text, rect, circle, card }
@@ -78,7 +79,7 @@ class _UiSkeletonState extends State<UiSkeleton> with SingleTickerProviderStateM
           width: width,
           height: height,
           decoration: BoxDecoration(
-            color: UiTokens.colorMuted.withValues(alpha: 0.12 + 0.10 * t),
+            color: context.ui.color.muted.withValues(alpha: 0.12 + 0.10 * t),
             borderRadius: BorderRadius.circular(radius),
           ),
         );

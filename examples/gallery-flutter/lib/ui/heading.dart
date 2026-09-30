@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiHeadingLevel { v1, v2, v3, v4 }
@@ -46,7 +47,7 @@ class UiHeading extends StatelessWidget {
           fontFamily: UiTokens.fontHeading,
           fontSize: _fontSize,
           fontWeight: FontWeight.bold,
-          color: UiTokens.colorText,
+          color: context.ui.color.text,
         ),
       ),
     );

@@ -1,5 +1,5 @@
 import { useRef, type KeyboardEvent, type ReactNode } from 'react';
-import { tokens, sp } from './tokens';
+import { tokens, sp, alpha } from './tokens';
 import { Icon } from './Icon';
 
 export interface AvailabilityCalendarProps {
@@ -102,7 +102,7 @@ export function AvailabilityCalendar({
     );
     const cellStyle = {
       width: '100%', boxSizing: 'border-box' as const, padding: sp(1), borderRadius: tokens.radius.sm,
-      background: isEnd ? tokens.color.primary : selected ? `${tokens.color.primary}1F` : 'transparent',
+      background: isEnd ? tokens.color.primary : selected ? alpha(tokens.color.primary, 0.12) : 'transparent',
       border: isToday ? `1px solid ${tokens.color.primary}` : '1px solid transparent',
     };
 
@@ -192,7 +192,7 @@ function LegendItem({ label, dot, strike, muted }: { label: string; dot?: boolea
         aria-hidden
         style={{
           width: 16, height: 16, borderRadius: tokens.radius.sm, border: `1px solid ${tokens.color.muted}`,
-          display: 'grid', placeItems: 'center', background: muted ? `${tokens.color.muted}26` : undefined,
+          display: 'grid', placeItems: 'center', background: muted ? alpha(tokens.color.muted, 0.15) : undefined,
         }}
       >
         {dot && <span style={{ width: 4, height: 4, borderRadius: '50%', background: tokens.color.primary }} />}

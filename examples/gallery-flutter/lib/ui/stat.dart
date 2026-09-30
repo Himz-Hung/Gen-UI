@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiStatTrend { up, down, flat }
@@ -11,25 +12,25 @@ class UiStat extends StatelessWidget {
   final UiStatTrend? trend;
   final String? hint;
 
-  (IconData, Color)? get _trend => switch (trend) {
+  (IconData, Color)? _trend(BuildContext context) => switch (trend) {
         null => null,
-        UiStatTrend.up => (Icons.arrow_upward, UiTokens.colorSuccess),
-        UiStatTrend.down => (Icons.arrow_downward, UiTokens.colorDanger),
-        UiStatTrend.flat => (Icons.trending_flat, UiTokens.colorMuted),
+        UiStatTrend.up => (Icons.arrow_upward, context.ui.color.success),
+        UiStatTrend.down => (Icons.arrow_downward, context.ui.color.danger),
+        UiStatTrend.flat => (Icons.trending_flat, context.ui.color.muted),
       };
 
   @override
   Widget build(BuildContext context) {
-    final trendInfo = _trend;
+    final trendInfo = _trend(context);
     return MergeSemantics(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text(label, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 13)),
+        Text(label, style: TextStyle(color: context.ui.color.muted, fontSize: 13)),
         SizedBox(height: UiTokens.space(1)),
         Row(mainAxisSize: MainAxisSize.min, children: [
           Text(
             value,
-            style: const TextStyle(
-              color: UiTokens.colorText,
+            style: TextStyle(
+              color: context.ui.color.text,
               fontFamily: UiTokens.fontHeading,
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -42,7 +43,7 @@ class UiStat extends StatelessWidget {
         ]),
         if (hint != null) ...[
           SizedBox(height: UiTokens.space(1)),
-          Text(hint!, style: const TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+          Text(hint!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
         ],
       ]),
     );

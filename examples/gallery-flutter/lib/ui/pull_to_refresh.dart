@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 class UiPullToRefresh extends StatefulWidget {
   const UiPullToRefresh({super.key, required this.label, required this.refreshing, this.onRefresh, this.children = const []});
@@ -56,7 +56,7 @@ class _UiPullToRefreshState extends State<UiPullToRefresh> {
       label: widget.label,
       onTap: widget.refreshing ? null : () => _handleRefresh(),
       child: RefreshIndicator(
-        color: UiTokens.colorPrimary,
+        color: context.ui.color.primary,
         onRefresh: _handleRefresh,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

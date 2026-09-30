@@ -1,6 +1,7 @@
 import 'dart:ui' show SemanticsRole;
 
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiFileUploadFile {
@@ -27,12 +28,12 @@ class UiFileUpload extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = !disabled;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600)),
+      Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600)),
       SizedBox(height: UiTokens.space(1)),
       Container(
         padding: EdgeInsets.all(UiTokens.space(3)),
         decoration: BoxDecoration(
-          border: Border.all(color: error != null ? UiTokens.colorDanger : UiTokens.colorMuted.withValues(alpha: 0.3)),
+          border: Border.all(color: error != null ? context.ui.color.danger : context.ui.color.muted.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(UiTokens.radiusMd),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
@@ -54,11 +55,11 @@ class UiFileUpload extends StatelessWidget {
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: UiTokens.space(1)),
                         child: Row(children: [
-                          Icon(Icons.insert_drive_file_outlined, size: 18, color: UiTokens.colorMuted),
+                          Icon(Icons.insert_drive_file_outlined, size: 18, color: context.ui.color.muted),
                           SizedBox(width: UiTokens.space(2)),
                           Expanded(child: Text(f.name, overflow: TextOverflow.ellipsis)),
                           SizedBox(width: UiTokens.space(2)),
-                          Text(f.sizeLabel, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+                          Text(f.sizeLabel, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
                           Semantics(
                             label: 'Remove ${f.name}',
                             button: true,
@@ -78,10 +79,10 @@ class UiFileUpload extends StatelessWidget {
       ),
       if (error != null) ...[
         SizedBox(height: UiTokens.space(1)),
-        Text(error!, style: TextStyle(color: UiTokens.colorDanger, fontSize: 12)),
+        Text(error!, style: TextStyle(color: context.ui.color.danger, fontSize: 12)),
       ] else if (hint != null) ...[
         SizedBox(height: UiTokens.space(1)),
-        Text(hint!, style: TextStyle(color: UiTokens.colorMuted, fontSize: 12)),
+        Text(hint!, style: TextStyle(color: context.ui.color.muted, fontSize: 12)),
       ],
     ]);
   }

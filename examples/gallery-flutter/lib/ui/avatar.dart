@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiAvatarSize { xs, sm, md, lg, xl }
@@ -24,11 +25,11 @@ class UiAvatar extends StatelessWidget {
         UiAvatarSize.xl => 80,
       };
 
-  Color? get _statusColor => switch (status) {
+  Color? _statusColor(BuildContext context) => switch (status) {
         UiAvatarStatus.none => null,
-        UiAvatarStatus.online => UiTokens.colorSuccess,
-        UiAvatarStatus.away => UiTokens.colorWarning,
-        UiAvatarStatus.offline => UiTokens.colorMuted,
+        UiAvatarStatus.online => context.ui.color.success,
+        UiAvatarStatus.away => context.ui.color.warning,
+        UiAvatarStatus.offline => context.ui.color.muted,
       };
 
   String get _initials {
@@ -50,11 +51,11 @@ class UiAvatar extends StatelessWidget {
       child: Container(
         width: dim,
         height: dim,
-        color: UiTokens.colorSecondary,
+        color: context.ui.color.secondary,
         alignment: Alignment.center,
         child: Text(
           _initials,
-          style: TextStyle(color: UiTokens.colorSurface, fontWeight: FontWeight.w600, fontSize: dim * 0.36),
+          style: TextStyle(color: context.ui.color.onSecondary, fontWeight: FontWeight.w600, fontSize: dim * 0.36),
         ),
       ),
     );
@@ -92,8 +93,8 @@ class UiAvatar extends StatelessWidget {
                   height: dim * 0.28,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _statusColor,
-                    border: Border.all(color: UiTokens.colorSurface, width: 2),
+                    color: _statusColor(context),
+                    border: Border.all(color: context.ui.color.surface, width: 2),
                   ),
                 ),
               ),

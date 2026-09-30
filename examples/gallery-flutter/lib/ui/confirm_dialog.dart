@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'button.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiConfirmDialogTone { defaultValue, danger }
@@ -99,15 +100,15 @@ class _UiConfirmDialogState extends State<UiConfirmDialog> {
     final panel = ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 420),
       child: Material(
-        color: UiTokens.colorSurface,
+        color: context.ui.color.surface,
         borderRadius: BorderRadius.circular(UiTokens.radiusLg),
         clipBehavior: Clip.antiAlias,
         child: Padding(
           padding: EdgeInsets.all(UiTokens.space(5)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text(widget.title, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w700, fontSize: 18)),
+            Text(widget.title, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w700, fontSize: 18)),
             SizedBox(height: UiTokens.space(3)),
-            Text(widget.message, style: const TextStyle(color: UiTokens.colorText)),
+            Text(widget.message, style: TextStyle(color: context.ui.color.text)),
             SizedBox(height: UiTokens.space(5)),
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               // Two buttons: cancel (secondary) and confirm (primary, or danger), confirm last.
@@ -149,7 +150,7 @@ class _UiConfirmDialogState extends State<UiConfirmDialog> {
             behavior: HitTestBehavior.opaque,
             // Backdrop press cancels.
             onTap: _cancel,
-            child: ColoredBox(color: UiTokens.colorText.withValues(alpha: 0.5)),
+            child: ColoredBox(color: context.ui.color.scrim.withValues(alpha: 0.5)),
           ),
         ),
         Positioned.fill(

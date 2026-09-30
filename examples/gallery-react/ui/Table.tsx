@@ -94,7 +94,7 @@ export function Table({
                   <td
                     key={i}
                     style={{
-                      textAlign: columns[i]?.align ?? 'start', borderBottom: '1px solid #E5E7EB',
+                      textAlign: columns[i]?.align ?? 'start', borderBottom: `1px solid ${tokens.color.border}`,
                       padding: `0 ${sp(3)}`, boxSizing: 'border-box',
                     }}
                   >

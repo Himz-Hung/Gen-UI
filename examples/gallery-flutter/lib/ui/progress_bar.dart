@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 enum UiProgressBarTone { primary, success, warning, danger }
@@ -12,11 +13,11 @@ class UiProgressBar extends StatelessWidget {
   final UiProgressBarTone tone;
   final bool showLabel;
 
-  Color get _color => switch (tone) {
-        UiProgressBarTone.primary => UiTokens.colorPrimary,
-        UiProgressBarTone.success => UiTokens.colorSuccess,
-        UiProgressBarTone.warning => UiTokens.colorWarning,
-        UiProgressBarTone.danger => UiTokens.colorDanger,
+  Color _color(BuildContext context) => switch (tone) {
+        UiProgressBarTone.primary => context.ui.color.primary,
+        UiProgressBarTone.success => context.ui.color.success,
+        UiProgressBarTone.warning => context.ui.color.warning,
+        UiProgressBarTone.danger => context.ui.color.danger,
       };
 
   @override
@@ -33,8 +34,8 @@ class UiProgressBar extends StatelessWidget {
           if (showLabel) ...[
             Row(
               children: [
-                Expanded(child: Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600))),
-                if (text != null) Text(text, style: TextStyle(color: UiTokens.colorMuted)),
+                Expanded(child: Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600))),
+                if (text != null) Text(text, style: TextStyle(color: context.ui.color.muted)),
               ],
             ),
             SizedBox(height: UiTokens.space(2)),
@@ -45,8 +46,8 @@ class UiProgressBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: clamped == null ? null : clamped / 100,
                 minHeight: 8,
-                backgroundColor: _color.withValues(alpha: 0.15),
-                valueColor: AlwaysStoppedAnimation<Color>(_color),
+                backgroundColor: _color(context).withValues(alpha: 0.15),
+                valueColor: AlwaysStoppedAnimation<Color>(_color(context)),
               ),
             ),
           ),

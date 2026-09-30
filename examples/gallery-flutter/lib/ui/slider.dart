@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 class UiSlider extends StatelessWidget {
   const UiSlider({super.key, required this.label, required this.value, required this.min, required this.max, this.step = 1.0, this.valueLabel, this.disabled = false, this.onChange, this.onCommit});
@@ -28,11 +28,11 @@ class UiSlider extends StatelessWidget {
     // MergeSemantics: the visible label becomes the field's accessible name (one node: label + field)
     return MergeSemantics(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       Row(children: [
-        Expanded(child: Text(label, style: const TextStyle(color: UiTokens.colorText, fontWeight: FontWeight.w600))),
-        if (valueLabel != null) Text(valueLabel!, style: TextStyle(color: UiTokens.colorMuted)),
+        Expanded(child: Text(label, style: TextStyle(color: context.ui.color.text, fontWeight: FontWeight.w600))),
+        if (valueLabel != null) Text(valueLabel!, style: TextStyle(color: context.ui.color.muted)),
       ]),
       SliderTheme(
-        data: SliderTheme.of(context).copyWith(activeTrackColor: UiTokens.colorPrimary, thumbColor: UiTokens.colorPrimary),
+        data: SliderTheme.of(context).copyWith(activeTrackColor: context.ui.color.primary, thumbColor: context.ui.color.primary),
         child: Slider(
           value: v,
           min: min,

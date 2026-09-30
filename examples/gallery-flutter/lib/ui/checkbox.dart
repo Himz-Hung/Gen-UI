@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiCheckbox extends StatelessWidget {
@@ -28,13 +29,13 @@ class UiCheckbox extends StatelessWidget {
               child: Checkbox(
                 value: checked,
                 onChanged: enabled ? (v) => onChange?.call(v ?? false) : null,
-                activeColor: UiTokens.colorPrimary,
+                activeColor: context.ui.color.primary,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
               ),
             ),
             SizedBox(width: UiTokens.space(2)),
-            Flexible(child: Text(label, style: TextStyle(color: enabled ? UiTokens.colorText : UiTokens.colorMuted))),
+            Flexible(child: Text(label, style: TextStyle(color: enabled ? context.ui.color.text : context.ui.color.muted))),
           ]),
         ),
       ),

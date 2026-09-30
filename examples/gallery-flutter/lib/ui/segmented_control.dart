@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
+import 'theme.g.dart';
 import 'tokens.g.dart';
 
 class UiSegmentedControlOption {
@@ -35,21 +36,21 @@ class UiSegmentedControl extends StatelessWidget {
         width: fullWidth ? double.infinity : null,
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: UiTokens.colorMuted.withValues(alpha: 0.12),
+          color: context.ui.color.muted.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(UiTokens.radiusMd),
         ),
         child: Row(
           mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
           children: [
             for (final o in options)
-              _segment(o, selectedExists && o.value == value),
+              _segment(context, o, selectedExists && o.value == value),
           ],
         ),
       ),
     );
   }
 
-  Widget _segment(UiSegmentedControlOption o, bool selected) {
+  Widget _segment(BuildContext context, UiSegmentedControlOption o, bool selected) {
     final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -59,7 +60,7 @@ class UiSegmentedControl extends StatelessWidget {
             o.label,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: selected ? UiTokens.colorText : UiTokens.colorMuted,
+              color: selected ? context.ui.color.text : context.ui.color.muted,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
             ),
           ),
@@ -72,7 +73,7 @@ class UiSegmentedControl extends StatelessWidget {
       checked: selected,
       label: o.label,
       child: Material(
-        color: selected ? UiTokens.colorSurface : Colors.transparent,
+        color: selected ? context.ui.color.surface : Colors.transparent,
         elevation: selected ? 1 : 0,
         borderRadius: BorderRadius.circular(UiTokens.radiusSm),
         child: InkWell(

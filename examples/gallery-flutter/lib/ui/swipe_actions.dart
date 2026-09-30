@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons.dart';
-import 'tokens.g.dart';
+import 'theme.g.dart';
 
 class UiSwipeActionsAction {
   const UiSwipeActionsAction({required this.value, required this.label, this.icon, this.tone});
@@ -29,9 +29,15 @@ class _UiSwipeActionsState extends State<UiSwipeActions> {
   static const double _actionWidth = 72;
 
   Color _toneColor(UiSwipeActionsTone? tone) => switch (tone) {
-        null || UiSwipeActionsTone.neutral => UiTokens.colorSecondary,
-        UiSwipeActionsTone.primary => UiTokens.colorPrimary,
-        UiSwipeActionsTone.danger => UiTokens.colorDanger,
+        null || UiSwipeActionsTone.neutral => context.ui.color.secondary,
+        UiSwipeActionsTone.primary => context.ui.color.primary,
+        UiSwipeActionsTone.danger => context.ui.color.danger,
+      };
+
+  Color _onToneColor(UiSwipeActionsTone? tone) => switch (tone) {
+        null || UiSwipeActionsTone.neutral => context.ui.color.onSecondary,
+        UiSwipeActionsTone.primary => context.ui.color.onPrimary,
+        UiSwipeActionsTone.danger => context.ui.color.onDanger,
       };
 
   double get _maxOffset => _actionWidth * widget.actions.length;
@@ -78,8 +84,8 @@ class _UiSwipeActionsState extends State<UiSwipeActions> {
                   color: _toneColor(action.tone),
                   alignment: Alignment.center,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    if (action.icon != null) Icon(uiIconData(action.icon!), color: UiTokens.colorSurface, size: 18),
-                    Text(action.label, style: const TextStyle(color: UiTokens.colorSurface, fontSize: 12)),
+                    if (action.icon != null) Icon(uiIconData(action.icon!), color: _onToneColor(action.tone), size: 18),
+                    Text(action.label, style: TextStyle(color: _onToneColor(action.tone), fontSize: 12)),
                   ]),
                 ),
               ),
@@ -109,7 +115,7 @@ class _UiSwipeActionsState extends State<UiSwipeActions> {
             child: Transform.translate(
               offset: Offset(_offset, 0),
               // An opaque backing so the actions underneath are hidden until swiped into view.
-              child: ColoredBox(color: UiTokens.colorSurface, child: widget.children.first),
+              child: ColoredBox(color: context.ui.color.surface, child: widget.children.first),
             ),
           ),
         ],

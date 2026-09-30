@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { basename, extname, join, relative, resolve, sep } from 'node:path';
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { basename, dirname, extname, join, relative, resolve, sep } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { loadProject, findRoot, readSpec, DIRS, type Project } from './loader.ts';
 import { buildCatalog, writeCatalog } from './catalog.ts';
 import { writeRules } from './rules.ts';
@@ -18,10 +18,13 @@ import { screenWrappers } from './wrappers.ts';
 import { FLUTTER, writeFlutterFiles, dartFile, usesArb } from './flutter.ts';
 import { renderDocs, renderScreen } from './docs.ts';
 import { didYouMean } from './suggest.ts';
+import { isLegacyTokens, themeProblems } from './theme.ts';
+import { tokensCss, tokensTs } from './webtokens.ts';
+import { rawValues } from './rawcheck.ts';
 import { addFlutterWidget, addReactComponent } from './add.ts';
 import { init } from './init.ts';
 import type { Catalog } from './define.ts';
-import type { Report } from './diagnostics.ts';
+import { Report } from './diagnostics.ts';
 
 const [cmd, ...rest] = process.argv.slice(2);
 const flags = new Map<string, string>();
@@ -126,6 +129,7 @@ async function main() {
       if (!args.length) {
         // everything: outline → components → specs → screen descriptions + navigation → screen code
         if (project.app) reports.push(checkApp(project));
+        reports.push(tokenReport(project));
         reports.push(...verifyMany(project, catalog));
         writeCatalog(project.root, catalog);
         const specs = collect([resolve(project.root, DIRS.screens)], project.root).specs;
@@ -168,6 +172,11 @@ async function sync(root: string): Promise<{ project: Project; catalog: Catalog 
   const catalog = buildCatalog(project);
   writeCatalog(root, catalog);
   writeRules(root, project.config, catalog, !!project.app);
+  if (platformsOf(project).includes('react')) {
+    // ui/tokens.css + ui/tokens.g.ts from the theme model (modes switch through CSS custom properties)
+    writeGenerated(join(root, DIRS.ui, 'tokens.css'), tokensCss(project.config.tokens));
+    writeGenerated(join(root, DIRS.ui, 'tokens.g.ts'), tokensTs(project.config.tokens));
+  }
   if (platformsOf(project).includes('flutter')) {
     // Dart cannot import TypeScript: tokens, strings and the lib/ui barrel are generated from ui-spec/.
     const uiDir = join(root, FLUTTER.ui);
@@ -175,6 +184,12 @@ async function sync(root: string): Promise<{ project: Project; catalog: Catalog 
     writeFlutterFiles(root, project.config, uiFiles, new Map([...project.strings].map(([k, v]) => [k, v.flat])));
   }
   return { project, catalog };
+}
+
+function writeGenerated(file: string, content: string) {
+  if (existsSync(file) && readFileSync(file, 'utf8') === content) return;
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
 }
 
 type Platform = 'react' | 'flutter';
@@ -192,6 +207,8 @@ function verifyOne(project: Project, catalog: Catalog, name: string): Report[] {
   const results = platformsOf(project).map((p) => {
     const { report, implPath } = p === 'react' ? verifyReact(project.root, c.contract) : verifyFlutter(project.root, c.contract);
     if (entry) { if (implPath) entry.impl[p] = implPath; else delete entry.impl[p]; }
+    // hard-coded colors do not follow theme modes (registered components keep their own theming)
+    if (implPath && !c.contract.impl?.[p]) rawValues(join(project.root, implPath), p, project.config.tokens, report);
     return { report, implPath };
   });
   // checks are part of the contract: validate once, on the first platform that has an implementation
@@ -251,6 +268,14 @@ function screenScope(project: Project): { dirs: string[]; free: string[]; unchec
   const common = [...(ps.includes('react') ? ['src/pages', 'pages', 'src/app', 'app', 'src/views', 'src/routes'] : []), ...(ps.includes('flutter') ? ['lib/pages', 'lib/views'] : [])];
   const hasCode = (d: string) => { try { return readdirSync(join(project.root, d), { recursive: true }).some((f) => /\.(tsx|jsx|dart)$/.test(String(f))); } catch { return false; } };
   return { dirs, free, unchecked: common.filter((d) => !covered(d) && hasCode(d)) };
+}
+
+/** Token integrity and WCAG contrast in every mode combination (theme.ts). */
+function tokenReport(project: Project): Report {
+  const r = new Report('ui-spec/project.ts tokens');
+  if (isLegacyTokens(project.config.tokens)) r.warn('tokens', 'the 1.x flat shape ({ color, spacing, radius, font }) has no modes: move to { primitives, semantic, modes } (see the README, Theming) to get light / dark and the other checks as errors');
+  for (const p of themeProblems(project.config.tokens)) p.level === 'error' ? r.error(p.where, p.message) : r.warn(p.where, p.message);
+  return r;
 }
 
 /** Hard-coded text is only an error in code when the project has several languages. */
