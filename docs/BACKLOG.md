@@ -3,8 +3,9 @@
 Ghi ngày 2026-09-30, cập nhật 2026-10-12. Chưa làm, chưa duyệt; chọn việc rồi mới làm.
 
 > **Đã đưa vào kế hoạch 2.1 (`docs/PLAN-2.1.md`):** nhóm A, C1 (một phần), D (một phần: focus ring), chuyển động / tương tác
-> (`docs/TODO-interaction-motion.md`), layout web + responsive. `defineShell` / `defineSources` để 2.2. Trạng thái phát hành: core + rules **2.0.0** trên npm,
-GitHub `main` ở `d006391`.
+> (`docs/TODO-interaction-motion.md`), layout web + responsive. `defineShell` / `defineSources` để 2.2.
+
+Trạng thái phát hành: core + rules **2.0.0** trên npm.
 
 ---
 
